@@ -50,6 +50,7 @@ const elements = {
   nextButton: document.querySelector("#next-button"),
   shuffleButton: document.querySelector("#shuffle-button"),
   skipButton: document.querySelector("#skip-button"),
+  inlineSkipButton: document.querySelector("#inline-skip-button"),
   emptyMissed: document.querySelector("#empty-missed"),
   missedList: document.querySelector("#missed-list"),
   missedAsideCount: document.querySelector("#missed-aside-count"),
@@ -317,6 +318,8 @@ function updateStats() {
     ? "Return to main progress"
     : "Practice missed";
   elements.finishPracticeButton.disabled = state.missed.size === 0;
+  elements.skipButton.disabled = state.practiceMode;
+  elements.inlineSkipButton.disabled = state.practiceMode;
 
   elements.missedList.replaceChildren(
     ...[...state.missed.entries()].map(([id, entry]) => {
@@ -716,6 +719,7 @@ elements.acceptAnswerButton.addEventListener("click", () =>
   markCurrentCorrect(true),
 );
 elements.skipButton.addEventListener("click", skipCurrentQuestion);
+elements.inlineSkipButton.addEventListener("click", skipCurrentQuestion);
 elements.shuffleButton.addEventListener("click", shuffleRemaining);
 elements.questionSelect.addEventListener("change", (event) =>
   goToQuestion(Number(event.target.value)),
