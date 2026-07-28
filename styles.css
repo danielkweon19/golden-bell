@@ -445,6 +445,25 @@ main {
   font-size: 13px;
 }
 
+.accepted-answers {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(23, 107, 103, 0.2);
+}
+
+.feedback.wrong .accepted-answers {
+  border-top-color: rgba(189, 83, 60, 0.22);
+}
+
+.accepted-answers ul {
+  margin: 5px 0 0;
+  padding-left: 20px;
+}
+
+.accepted-answers li + li {
+  margin-top: 3px;
+}
+
 .answer-actions {
   min-height: 44px;
   justify-content: flex-end;

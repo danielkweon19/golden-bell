@@ -129,6 +129,21 @@ function escapeHtml(value) {
   return node.innerHTML;
 }
 
+function acceptedAnswersMarkup(question) {
+  const answers = state.acceptedAnswers.get(question.id) || [];
+  if (!answers.length) return "";
+
+  const items = answers
+    .map((answer) => `<li>${escapeHtml(answer)}</li>`)
+    .join("");
+  return `
+    <div class="accepted-answers">
+      <strong>Your accepted answers</strong>
+      <ul>${items}</ul>
+    </div>
+  `;
+}
+
 function showToast(message) {
   window.clearTimeout(toastTimer);
   elements.toast.textContent = message;
@@ -345,6 +360,7 @@ function showCorrectFeedback(question, heading = "Correct.") {
   elements.feedback.innerHTML = `
     <strong>${escapeHtml(heading)}</strong>
     <p><b>Official answer:</b> ${escapeHtml(question.displayAnswer)}</p>
+    ${acceptedAnswersMarkup(question)}
     <p class="verse">“${escapeHtml(getVerse(question))}” — ${escapeHtml(
       question.source,
     )} NKJV</p>
@@ -449,7 +465,9 @@ function handleSubmit(event) {
   elements.feedback.className = "feedback wrong";
   elements.feedback.hidden = false;
   elements.feedback.innerHTML = `
-    <strong>Not quite. The answer is ${escapeHtml(question.displayAnswer)}.</strong>
+    <strong>Not quite.</strong>
+    <p><b>Official answer:</b> ${escapeHtml(question.displayAnswer)}</p>
+    ${acceptedAnswersMarkup(question)}
     <p><b>You entered:</b> ${escapeHtml(value)}</p>
     <p class="verse">“${escapeHtml(getVerse(question))}” — ${escapeHtml(
       question.source,
