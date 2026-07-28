@@ -1,4 +1,4 @@
-const questionBank = [
+const sampleQuestionBank = [
   {
     question: "What was the name of the woman Hosea took as his wife?",
     answers: ["Gomer", "Gomer the daughter of Diblaim"],
@@ -136,6 +136,8 @@ const questionBank = [
   },
 ];
 
+const questionBank = expandedQuestionBank;
+
 const state = {
   currentIndex: 0,
   missed: [],
@@ -166,6 +168,7 @@ const elements = {
   resultsHeading: document.querySelector("#results-heading"),
   resultsCopy: document.querySelector("#results-copy"),
   scoreValue: document.querySelector("#score-value"),
+  scoreTotal: document.querySelector("#score-total"),
   reviewCount: document.querySelector("#review-count"),
   reviewList: document.querySelector("#review-list"),
   restartButton: document.querySelector("#restart-button"),
@@ -302,6 +305,7 @@ function showResults() {
   elements.quizView.hidden = true;
   elements.resultsView.hidden = false;
   elements.scoreValue.textContent = correctOnFirstTry;
+  elements.scoreTotal.textContent = questionBank.length;
   elements.reviewCount.textContent = missedLabel;
 
   if (state.missed.length === 0) {
