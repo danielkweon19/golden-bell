@@ -427,11 +427,6 @@ function handleSubmit(event) {
 
   const question = currentQuestion();
   const value = elements.answerInput.value.trim();
-  if (!value) {
-    elements.answerInput.setAttribute("aria-invalid", "true");
-    elements.answerInput.focus();
-    return;
-  }
 
   if (answerIsCorrect(value, question)) {
     if (state.practiceMode) {
@@ -468,13 +463,13 @@ function handleSubmit(event) {
     <strong>Not quite.</strong>
     <p><b>Official answer:</b> ${escapeHtml(question.displayAnswer)}</p>
     ${acceptedAnswersMarkup(question)}
-    <p><b>You entered:</b> ${escapeHtml(value)}</p>
+    <p><b>You entered:</b> ${value ? escapeHtml(value) : "No answer"}</p>
     <p class="verse">“${escapeHtml(getVerse(question))}” — ${escapeHtml(
       question.source,
     )} NKJV</p>
   `;
   elements.markCorrectButton.hidden = false;
-  elements.acceptAnswerButton.hidden = false;
+  elements.acceptAnswerButton.hidden = !value;
   updateQuestionStatus(question);
   updateStats();
   saveSession();
@@ -483,7 +478,7 @@ function handleSubmit(event) {
 
 function markCurrentCorrect(acceptPermanently) {
   const question = currentQuestion();
-  if (!question || !state.pendingRejectedAnswer) return;
+  if (!question || (acceptPermanently && !state.pendingRejectedAnswer)) return;
 
   if (acceptPermanently) {
     const alternatives = state.acceptedAnswers.get(question.id) || [];
