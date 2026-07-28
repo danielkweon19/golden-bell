@@ -5,156 +5,202 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="A focused NKJV Bible knowledge study session."
+      content="A focused NKJV recall study for Haggai, Zechariah, and Malachi."
     />
-    <title>Golden Bell | NKJV Bible Study</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Caslon+Display&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
+    <meta name="color-scheme" content="light" />
+    <title>Minor Prophets Recall</title>
+    <link rel="stylesheet" href="styles.css?v=20260728-2" />
   </head>
   <body>
-    <div class="page-shell">
-      <header class="site-header">
-        <a class="brand" href="./" aria-label="Golden Bell home">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="./" aria-label="Minor Prophets Recall home">
           <span class="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 40 40" role="img">
-              <path d="M11 27h18M14 27V16a6 6 0 0 1 12 0v11M9 27h22M17 31h6" />
-              <path d="M20 7V4M16 8l-2-3M24 8l2-3" />
+            <svg viewBox="0 0 24 24">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
             </svg>
           </span>
-          <span>
-            <strong>Golden Bell</strong>
-            <small>NKJV Bible Study</small>
+          <span class="brand-copy">
+            <strong>Minor Prophets Recall</strong>
+            <small>Haggai · Zechariah · Malachi</small>
           </span>
         </a>
-        <div class="translation-badge">New King James Version</div>
-      </header>
 
-      <main>
-        <section id="loading-view" class="loading-view" aria-live="polite">
-          <span class="loader" aria-hidden="true"></span>
-          <p>Preparing your study session...</p>
-        </section>
+        <div class="header-actions">
+          <button class="button" id="shuffle-button" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m16 3 4 4-4 4" />
+              <path d="M4 7h4c5 0 5 10 10 10h2" />
+              <path d="m16 13 4 4-4 4" />
+              <path d="M4 17h4c1.7 0 2.8-1.1 3.8-2.5" />
+            </svg>
+            <span>Shuffle</span>
+          </button>
+          <button class="button danger" id="skip-button" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m5 4 10 8L5 20V4Z" />
+              <path d="M19 5v14" />
+            </svg>
+            <span>Skip</span>
+          </button>
+        </div>
+      </div>
+    </header>
 
-        <section id="quiz-view" class="quiz-layout" hidden>
-          <aside class="session-panel">
-            <p class="eyebrow">Study session</p>
-            <h1>Know the Word.<br />Recall it clearly.</h1>
-            <p class="intro">
-              Answer from memory. A missed question returns immediately after
-              you review the NKJV answer.
-            </p>
+    <main>
+      <section id="loading-view" class="loading-view" aria-live="polite">
+        <span class="loader" aria-hidden="true"></span>
+        <p>Preparing NKJV study set...</p>
+      </section>
 
-            <div class="session-stats" aria-label="Session progress">
-              <div>
-                <strong id="question-count">1 / 100</strong>
-                <span>Question</span>
-              </div>
-              <div>
-                <strong id="miss-count">0</strong>
-                <span>To review</span>
-              </div>
+      <section id="quiz-view" hidden>
+        <div class="progress-band">
+          <div class="progress-area">
+            <div class="progress-copy">
+              <span id="progress-label">Question 1 of 100</span>
+              <span id="book-label">Haggai</span>
             </div>
-
-            <div class="progress-track" aria-hidden="true">
-              <span id="progress-bar"></span>
+            <div
+              class="progress-track"
+              role="progressbar"
+              aria-label="Study progress"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+            >
+              <span id="progress-fill"></span>
             </div>
-            <p id="progress-copy" class="progress-copy">0% complete</p>
-          </aside>
+          </div>
 
-          <section class="question-area" aria-labelledby="question-text">
+          <div class="stats" aria-label="Quiz statistics">
+            <div class="stat">
+              <strong id="correct-count">0</strong>
+              <span>Correct</span>
+            </div>
+            <div class="stat">
+              <strong id="missed-count">0</strong>
+              <span>Missed</span>
+            </div>
+            <div class="stat">
+              <strong id="skipped-count">0</strong>
+              <span>Skipped</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="study-toolbar">
+          <label for="question-select">Go to question</label>
+          <select id="question-select"></select>
+          <span id="save-status">Progress saved in this browser</span>
+        </div>
+
+        <div class="workspace">
+          <article class="quiz-card">
             <div class="question-meta">
-              <span id="question-label">Question 01</span>
-              <span id="reference-hint">Old Testament</span>
+              <span class="source" id="source"></span>
+              <span class="question-status" id="question-status">Unanswered</span>
             </div>
 
-            <div id="question-state">
-              <h2 id="question-text"></h2>
-              <form id="answer-form" novalidate>
-                <label for="answer-input">Your answer</label>
-                <div class="answer-row">
-                  <input
-                    id="answer-input"
-                    name="answer"
-                    type="text"
-                    autocomplete="off"
-                    autocapitalize="sentences"
-                    spellcheck="false"
-                    placeholder="Type your answer"
-                    required
-                  />
-                  <button id="submit-button" type="submit">
-                    Check answer
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="m9 18 6-6-6-6" />
-                    </svg>
-                  </button>
-                </div>
-                <p class="answer-note">
-                  Spelling matters. Capitalization and punctuation do not.
-                </p>
-              </form>
-            </div>
+            <h1 id="question-text"></h1>
 
-            <div id="feedback" class="feedback" hidden aria-live="polite">
-              <div id="feedback-icon" class="feedback-icon" aria-hidden="true"></div>
-              <div class="feedback-copy">
-                <p id="feedback-kicker"></p>
-                <h3 id="feedback-title"></h3>
-                <blockquote id="verse-text"></blockquote>
-                <cite id="verse-reference"></cite>
+            <form id="answer-form" novalidate>
+              <label id="answer-label" for="answer-input">Your answer</label>
+              <div class="input-row">
+                <input
+                  id="answer-input"
+                  name="answer"
+                  type="text"
+                  autocomplete="off"
+                  autocapitalize="sentences"
+                  spellcheck="false"
+                  aria-describedby="answer-note feedback"
+                  required
+                />
+                <button class="button primary submit-button" type="submit">
+                  Check answer
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m9 18 6-6-6-6" />
+                  </svg>
+                </button>
               </div>
-              <button id="retry-button" class="retry-button" type="button" hidden>
-                Try this question again
+              <p id="answer-note">
+                Spelling matters. Capitalization, punctuation, and articles do not.
+              </p>
+            </form>
+
+            <div id="feedback" class="feedback" hidden aria-live="polite"></div>
+
+            <div class="answer-actions">
+              <button class="button" id="mark-correct-button" type="button" hidden>
+                Mark correct once
+              </button>
+              <button class="button" id="accept-answer-button" type="button" hidden>
+                Accept from now on
+              </button>
+              <button class="button primary" id="next-button" type="button" hidden>
+                Next question
                 <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M20 11a8 8 0 1 0-2.3 5.7L20 14M20 19v-5h-5" />
+                  <path d="m9 18 6-6-6-6" />
                 </svg>
               </button>
             </div>
-          </section>
-        </section>
+          </article>
 
-        <section id="results-view" class="results-view" hidden>
-          <div class="results-summary">
-            <p class="eyebrow">Session complete</p>
-            <h1 id="results-heading">Well remembered.</h1>
-            <p id="results-copy"></p>
-            <div class="score-ring" aria-label="Final score">
-              <strong id="score-value">100</strong>
-              <span>of <span id="score-total">100</span><br />first try</span>
+          <aside class="missed-panel" aria-labelledby="missed-heading">
+            <div class="side-heading">
+              <h2 id="missed-heading">Missed so far</h2>
+              <span id="missed-aside-count">0 questions</span>
             </div>
-            <button id="restart-button" type="button">
-              Start a new session
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M20 11a8 8 0 1 0-2.3 5.7L20 14M20 19v-5h-5" />
-              </svg>
-            </button>
-          </div>
-
-          <div class="review-panel">
-            <div class="review-heading">
-              <div>
-                <p class="eyebrow">Review list</p>
-                <h2>Questions to revisit</h2>
-              </div>
-              <span id="review-count">0 missed</span>
+            <p id="empty-missed" class="empty-note">
+              Questions answered incorrectly stay here for review.
+            </p>
+            <div id="missed-list" class="missed-list"></div>
+            <div class="side-actions">
+              <button class="button primary" id="practice-missed-button" type="button">
+                Practice missed
+              </button>
+              <button class="button danger" id="reset-button" type="button">
+                Reset progress
+              </button>
             </div>
-            <div id="review-list"></div>
-          </div>
-        </section>
-      </main>
+          </aside>
+        </div>
+      </section>
 
-      <footer>
-        <span>Scripture quotations from the NKJV source provided with this study.</span>
-        <span>Built for focused recall</span>
-      </footer>
-    </div>
+      <section id="finish-view" class="finish-view" hidden>
+        <div class="finish-header">
+          <p class="eyebrow">Study set complete</p>
+          <h1>Review your session</h1>
+          <p id="finish-summary"></p>
+        </div>
 
-    <script src="questions.js?v=20260728-1"></script>
-    <script src="app.js?v=20260728-1"></script>
+        <div class="finish-stats">
+          <div><strong id="finish-correct">0</strong><span>Correct</span></div>
+          <div><strong id="finish-missed">0</strong><span>Missed at least once</span></div>
+          <div><strong id="finish-skipped">0</strong><span>Skipped</span></div>
+        </div>
+
+        <div id="review-content"></div>
+
+        <div class="finish-actions">
+          <button class="button primary" id="finish-practice-button" type="button">
+            Practice missed questions
+          </button>
+          <button class="button danger" id="finish-reset-button" type="button">
+            Reset and start over
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      NKJV study set · Progress is stored only in this browser
+    </footer>
+
+    <div class="toast" id="toast" role="status" hidden></div>
+
+    <script src="questions.js?v=20260728-2"></script>
+    <script src="app.js?v=20260728-2"></script>
   </body>
 </html>
