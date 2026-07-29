@@ -41,7 +41,8 @@ body.reader-open {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
@@ -212,7 +213,8 @@ select {
 
 button:focus-visible,
 input:focus-visible,
-select:focus-visible {
+select:focus-visible,
+textarea:focus-visible {
   outline: 3px solid rgba(23, 107, 103, 0.22);
   outline-offset: 2px;
 }
@@ -390,6 +392,23 @@ main {
 
 .question-status.is-missed {
   color: var(--coral);
+}
+
+.question-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.compact-button {
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.compact-button svg {
+  width: 15px;
+  height: 15px;
 }
 
 #question-text {
@@ -754,6 +773,82 @@ main {
   transform: translateX(0);
 }
 
+.question-dialog {
+  width: min(650px, calc(100% - 28px));
+  max-height: calc(100dvh - 28px);
+  padding: 0;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 70px rgba(36, 43, 43, 0.25);
+}
+
+.question-dialog::backdrop {
+  background: rgba(36, 43, 43, 0.48);
+}
+
+.question-form {
+  display: grid;
+  gap: 17px;
+  padding: 24px;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.dialog-header h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 26px;
+}
+
+.question-form label > span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.question-form input,
+.question-form select,
+.question-form textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 11px;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid #acb1ad;
+  border-radius: var(--radius);
+}
+
+.question-form textarea {
+  min-height: 82px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.reference-fields {
+  display: grid;
+  grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: 10px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+}
+
 .reader-header {
   display: flex;
   align-items: center;
@@ -1026,6 +1121,19 @@ footer {
   .reader-verses {
     padding-right: 14px;
     padding-left: 14px;
+  }
+
+  .question-tools {
+    align-items: flex-end;
+    flex-direction: column;
+  }
+
+  .question-form {
+    padding: 18px;
+  }
+
+  .reference-fields {
+    grid-template-columns: 1fr 1fr;
   }
 }
 

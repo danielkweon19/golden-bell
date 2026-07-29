@@ -1,13 +1,66 @@
-const QUESTIONS = expandedQuestionBank.map((question, index) => ({
-  ...question,
-  id: index + 1,
-  source: `${question.book} ${question.chapter}:${question.verse}${
-    question.endVerse ? `-${question.endVerse}` : ""
-  }`,
-}));
-
 const SESSION_KEY = "minor-prophets-recall-session-v2";
 const ACCEPTED_KEY = "minor-prophets-recall-accepted-v2";
+const QUESTION_LIBRARY_KEY = "minor-prophets-recall-question-library-v1";
+
+function questionSource(question) {
+  return `${question.book} ${question.chapter}:${question.verse}${
+    question.endVerse ? `-${question.endVerse}` : ""
+  }`;
+}
+
+function loadQuestionLibrary() {
+  try {
+    const saved = JSON.parse(
+      localStorage.getItem(QUESTION_LIBRARY_KEY) || "null",
+    );
+    if (!saved || saved.version !== 1) return { edits: {}, custom: [] };
+    return {
+      edits:
+        saved.edits && typeof saved.edits === "object" ? saved.edits : {},
+      custom: Array.isArray(saved.custom) ? saved.custom : [],
+    };
+  } catch {
+    return { edits: {}, custom: [] };
+  }
+}
+
+function hydrateQuestion(question, id) {
+  const displayAnswer = String(question.displayAnswer || "").trim();
+  const aliases = Array.isArray(question.aliases)
+    ? question.aliases
+    : Array.isArray(question.answers)
+      ? question.answers.filter((answer) => answer !== question.displayAnswer)
+      : [];
+  const hydrated = {
+    ...question,
+    id,
+    chapter: Number(question.chapter),
+    verse: Number(question.verse),
+    endVerse: question.endVerse ? Number(question.endVerse) : undefined,
+    question: String(question.question || "").trim(),
+    displayAnswer,
+    aliases: aliases.map(String).map((answer) => answer.trim()).filter(Boolean),
+  };
+  hydrated.answers = [hydrated.displayAnswer, ...hydrated.aliases];
+  hydrated.source = questionSource(hydrated);
+  return hydrated;
+}
+
+const questionLibrary = loadQuestionLibrary();
+const BASE_QUESTION_COUNT = expandedQuestionBank.length;
+const QUESTIONS = expandedQuestionBank.map((question, index) => {
+  const id = index + 1;
+  return hydrateQuestion(
+    { ...question, ...(questionLibrary.edits[id] || {}) },
+    id,
+  );
+});
+
+questionLibrary.custom.forEach((question) => {
+  if (!question?.id || QUESTIONS.some((item) => item.id === question.id)) return;
+  QUESTIONS.push(hydrateQuestion(question, Number(question.id)));
+});
+
 const READER_BOOKS = [...new Set(QUESTIONS.map((question) => question.book))];
 
 const state = {
@@ -28,6 +81,7 @@ const state = {
   readerBook: READER_BOOKS[0],
   readerChapter: 1,
   readerVerse: 1,
+  editingQuestionId: null,
 };
 
 const elements = {
@@ -68,6 +122,8 @@ const elements = {
   reviewContent: document.querySelector("#review-content"),
   finishPracticeButton: document.querySelector("#finish-practice-button"),
   finishResetButton: document.querySelector("#finish-reset-button"),
+  addQuestionButton: document.querySelector("#add-question-button"),
+  editQuestionButton: document.querySelector("#edit-question-button"),
   openReaderButton: document.querySelector("#open-reader-button"),
   readerBackdrop: document.querySelector("#reader-backdrop"),
   readerPanel: document.querySelector("#reader-panel"),
@@ -78,6 +134,21 @@ const elements = {
   previousChapterButton: document.querySelector("#previous-chapter-button"),
   nextChapterButton: document.querySelector("#next-chapter-button"),
   readerVerses: document.querySelector("#reader-verses"),
+  questionDialog: document.querySelector("#question-dialog"),
+  questionForm: document.querySelector("#question-form"),
+  questionDialogTitle: document.querySelector("#question-dialog-title"),
+  closeQuestionDialogButton: document.querySelector(
+    "#close-question-dialog-button",
+  ),
+  cancelQuestionButton: document.querySelector("#cancel-question-button"),
+  saveQuestionButton: document.querySelector("#save-question-button"),
+  questionBook: document.querySelector("#question-book"),
+  questionChapter: document.querySelector("#question-chapter"),
+  questionVerse: document.querySelector("#question-verse"),
+  questionEndVerse: document.querySelector("#question-end-verse"),
+  questionPrompt: document.querySelector("#question-prompt"),
+  questionAnswer: document.querySelector("#question-answer"),
+  questionAliases: document.querySelector("#question-aliases"),
   toast: document.querySelector("#toast"),
 };
 
@@ -132,6 +203,186 @@ function getVerse(question) {
 
 function bibleBook(bookName) {
   return state.bible?.books.find((book) => book.name === bookName);
+}
+
+function setSelectOptions(select, values, selectedValue, label = String) {
+  select.replaceChildren(
+    ...values.map((value) => {
+      const option = document.createElement("option");
+      option.value = String(value);
+      option.textContent = label(value);
+      return option;
+    }),
+  );
+  select.value = String(selectedValue);
+}
+
+function populateEditorBooks(selectedBook = READER_BOOKS[0]) {
+  setSelectOptions(
+    elements.questionBook,
+    READER_BOOKS,
+    selectedBook,
+    (book) => book,
+  );
+}
+
+function populateEditorChapters(selectedChapter = 1) {
+  const count = bibleBook(elements.questionBook.value)?.chapters.length || 1;
+  const chapters = Array.from({ length: count }, (_, index) => index + 1);
+  setSelectOptions(
+    elements.questionChapter,
+    chapters,
+    Math.min(Number(selectedChapter) || 1, count),
+  );
+}
+
+function populateEditorVerses(selectedVerse = 1, selectedEndVerse = "") {
+  const chapter =
+    bibleBook(elements.questionBook.value)?.chapters[
+      Number(elements.questionChapter.value) - 1
+    ];
+  const verses = chapter?.verses.map((verse) => verse.num) || [1];
+  const verse = verses.includes(Number(selectedVerse))
+    ? Number(selectedVerse)
+    : verses[0];
+  setSelectOptions(elements.questionVerse, verses, verse);
+
+  const validEndVerses = verses.filter((number) => number >= verse);
+  elements.questionEndVerse.replaceChildren(
+    Object.assign(document.createElement("option"), {
+      value: "",
+      textContent: "Same verse",
+    }),
+    ...validEndVerses
+      .filter((number) => number > verse)
+      .map((number) =>
+        Object.assign(document.createElement("option"), {
+          value: String(number),
+          textContent: String(number),
+        }),
+      ),
+  );
+  elements.questionEndVerse.value = validEndVerses.includes(
+    Number(selectedEndVerse),
+  )
+    ? String(selectedEndVerse)
+    : "";
+}
+
+function openQuestionEditor(question = null) {
+  if (!state.bible) return;
+  state.editingQuestionId = question?.id || null;
+  elements.questionDialogTitle.textContent = question
+    ? "Edit question"
+    : "Add question";
+  elements.saveQuestionButton.textContent = question
+    ? "Save changes"
+    : "Add question";
+
+  const reference = question || currentQuestion() || QUESTIONS[0];
+  populateEditorBooks(reference.book);
+  populateEditorChapters(reference.chapter);
+  populateEditorVerses(reference.verse, reference.endVerse);
+  elements.questionPrompt.value = question?.question || "";
+  elements.questionAnswer.value = question?.displayAnswer || "";
+  elements.questionAliases.value = question?.aliases?.join("\n") || "";
+  elements.questionDialog.showModal();
+  requestAnimationFrame(() => elements.questionPrompt.focus());
+}
+
+function closeQuestionEditor() {
+  elements.questionDialog.close();
+  state.editingQuestionId = null;
+}
+
+function questionFieldsFromEditor() {
+  const endVerse = Number(elements.questionEndVerse.value);
+  return {
+    book: elements.questionBook.value,
+    chapter: Number(elements.questionChapter.value),
+    verse: Number(elements.questionVerse.value),
+    endVerse: endVerse || undefined,
+    question: elements.questionPrompt.value.trim(),
+    displayAnswer: elements.questionAnswer.value.trim(),
+    aliases: elements.questionAliases.value
+      .split(/\r?\n/)
+      .map((answer) => answer.trim())
+      .filter(Boolean),
+  };
+}
+
+function storedQuestion(question) {
+  return {
+    id: question.id,
+    book: question.book,
+    chapter: question.chapter,
+    verse: question.verse,
+    endVerse: question.endVerse,
+    question: question.question,
+    displayAnswer: question.displayAnswer,
+    aliases: question.aliases,
+  };
+}
+
+function saveQuestionLibrary() {
+  try {
+    localStorage.setItem(
+      QUESTION_LIBRARY_KEY,
+      JSON.stringify({ version: 1, ...questionLibrary }),
+    );
+    return true;
+  } catch {
+    showToast("Question changes could not be saved.");
+    return false;
+  }
+}
+
+function createQuestionId() {
+  let id = Date.now();
+  while (QUESTIONS.some((question) => question.id === id)) id += 1;
+  return id;
+}
+
+function handleQuestionSave(event) {
+  event.preventDefault();
+  if (!elements.questionForm.reportValidity()) return;
+
+  const fields = questionFieldsFromEditor();
+  let question;
+  let message;
+
+  if (state.editingQuestionId) {
+    question = questionById(state.editingQuestionId);
+    Object.assign(question, hydrateQuestion(fields, question.id));
+    if (question.id <= BASE_QUESTION_COUNT) {
+      questionLibrary.edits[question.id] = storedQuestion(question);
+    } else {
+      const index = questionLibrary.custom.findIndex(
+        (item) => Number(item.id) === question.id,
+      );
+      if (index >= 0) questionLibrary.custom[index] = storedQuestion(question);
+    }
+    message = "Question updated.";
+  } else {
+    question = hydrateQuestion(fields, createQuestionId());
+    QUESTIONS.push(question);
+    questionLibrary.custom.push(storedQuestion(question));
+    if (state.practiceMode) {
+      state.mainDeckIds ||= expandedQuestionBank.map((_, index) => index + 1);
+      state.mainDeckIds.push(question.id);
+    } else {
+      state.deckIds.push(question.id);
+    }
+    message = "Question added.";
+  }
+
+  if (!saveQuestionLibrary()) return;
+  populateQuestionSelect();
+  closeQuestionEditor();
+  saveSession();
+  goToQuestion(question.id);
+  if (state.readerOpen) renderReader();
+  showToast(message);
 }
 
 function populateReaderBooks() {
@@ -423,10 +674,14 @@ function restoreSession() {
 
     const validIds = new Set(QUESTIONS.map((question) => question.id));
     const restoredDeck = (saved.deckIds || []).filter((id) => validIds.has(id));
-    if (restoredDeck.length !== QUESTIONS.length && !saved.practiceMode) return;
+    const missingIds = QUESTIONS.map((question) => question.id).filter(
+      (id) => !restoredDeck.includes(id),
+    );
 
-    state.deckIds = restoredDeck.length
+    state.deckIds = saved.practiceMode
       ? restoredDeck
+      : restoredDeck.length
+        ? [...restoredDeck, ...missingIds]
       : QUESTIONS.map((question) => question.id);
     state.index = Math.min(
       Math.max(Number(saved.index) || 0, 0),
@@ -446,7 +701,10 @@ function restoreSession() {
       (saved.practiceCorrectIds || []).filter((id) => validIds.has(id)),
     );
     state.mainDeckIds = Array.isArray(saved.mainDeckIds)
-      ? saved.mainDeckIds.filter((id) => validIds.has(id))
+      ? [
+          ...saved.mainDeckIds.filter((id) => validIds.has(id)),
+          ...missingIds.filter((id) => !saved.mainDeckIds.includes(id)),
+        ]
       : null;
     state.mainIndex = Number(saved.mainIndex) || 0;
   } catch {
@@ -511,7 +769,7 @@ function updateProgress(question) {
 
   elements.progressLabel.textContent = state.practiceMode
     ? `Missed practice · ${state.index + 1} of ${state.deckIds.length}`
-    : `Question ${question.id} of ${QUESTIONS.length}`;
+    : `Question ${QUESTIONS.indexOf(question) + 1} of ${QUESTIONS.length}`;
   elements.bookLabel.textContent = question.book;
   elements.progressFill.style.width = `${percent}%`;
   elements.progressTrack.setAttribute("aria-valuenow", String(percent));
@@ -942,6 +1200,31 @@ elements.practiceMissedButton.addEventListener("click", toggleMissedPractice);
 elements.finishPracticeButton.addEventListener("click", startMissedPractice);
 elements.resetButton.addEventListener("click", resetProgress);
 elements.finishResetButton.addEventListener("click", resetProgress);
+elements.addQuestionButton.addEventListener("click", () =>
+  openQuestionEditor(),
+);
+elements.editQuestionButton.addEventListener("click", () =>
+  openQuestionEditor(currentQuestion()),
+);
+elements.questionForm.addEventListener("submit", handleQuestionSave);
+elements.closeQuestionDialogButton.addEventListener(
+  "click",
+  closeQuestionEditor,
+);
+elements.cancelQuestionButton.addEventListener("click", closeQuestionEditor);
+elements.questionDialog.addEventListener("click", (event) => {
+  if (event.target === elements.questionDialog) closeQuestionEditor();
+});
+elements.questionBook.addEventListener("change", () => {
+  populateEditorChapters();
+  populateEditorVerses();
+});
+elements.questionChapter.addEventListener("change", () =>
+  populateEditorVerses(),
+);
+elements.questionVerse.addEventListener("change", () =>
+  populateEditorVerses(elements.questionVerse.value),
+);
 elements.openReaderButton.addEventListener("click", openReader);
 elements.closeReaderButton.addEventListener("click", closeReader);
 elements.readerBackdrop.addEventListener("click", closeReader);
