@@ -27,6 +27,7 @@ const state = {
   readerOpen: false,
   readerBook: READER_BOOKS[0],
   readerChapter: 1,
+  readerVerse: 1,
 };
 
 const elements = {
@@ -160,12 +161,35 @@ function populateReaderChapters() {
 function updateReaderNavigation() {
   const bookIndex = READER_BOOKS.indexOf(state.readerBook);
   const book = bibleBook(state.readerBook);
-  const lastChapter = book?.chapters.length || 1;
+  const chapter = book?.chapters[state.readerChapter - 1];
+  const firstVerse = chapter?.verses[0]?.num || 1;
+  const lastVerse = chapter?.verses.at(-1)?.num || 1;
   elements.previousChapterButton.disabled =
-    bookIndex === 0 && state.readerChapter === 1;
+    bookIndex === 0 &&
+    state.readerChapter === 1 &&
+    state.readerVerse === firstVerse;
   elements.nextChapterButton.disabled =
     bookIndex === READER_BOOKS.length - 1 &&
-    state.readerChapter === lastChapter;
+    state.readerChapter === book.chapters.length &&
+    state.readerVerse === lastVerse;
+}
+
+function questionsForReaderVerse(verseNumber) {
+  return QUESTIONS.filter(
+    (question) =>
+      question.book === state.readerBook &&
+      question.chapter === state.readerChapter &&
+      verseNumber >= question.verse &&
+      verseNumber <= (question.endVerse || question.verse),
+  );
+}
+
+function goToQuestionFromReader(questions) {
+  const target =
+    questions.find((question) => !state.correctIds.has(question.id)) ||
+    questions[0];
+  closeReader();
+  goToQuestion(target.id);
 }
 
 function renderReader() {
@@ -173,24 +197,34 @@ function renderReader() {
   const chapter = book?.chapters[state.readerChapter - 1];
   if (!chapter) return;
 
-  elements.readerTitle.textContent = `${state.readerBook} ${state.readerChapter}`;
+  if (!chapter.verses.some((verse) => verse.num === state.readerVerse)) {
+    state.readerVerse = chapter.verses[0].num;
+  }
+
+  elements.readerTitle.textContent =
+    `${state.readerBook} ${state.readerChapter}:${state.readerVerse}`;
   elements.readerBookSelect.value = state.readerBook;
   populateReaderChapters();
   elements.readerChapterSelect.value = String(state.readerChapter);
 
-  const activeQuestion = currentQuestion();
   let highlightedRow = null;
   elements.readerVerses.replaceChildren(
     ...chapter.verses.map((verse) => {
-      const row = document.createElement("p");
+      const questions = questionsForReaderVerse(verse.num);
+      const row = document.createElement(questions.length ? "button" : "p");
       row.className = "verse-row";
+      if (questions.length) {
+        row.type = "button";
+        row.setAttribute(
+          "aria-label",
+          `Go to ${questions.length === 1 ? "question" : "questions"} for ${
+            state.readerBook
+          } ${state.readerChapter}:${verse.num}`,
+        );
+        row.addEventListener("click", () => goToQuestionFromReader(questions));
+      }
 
-      const isCurrent =
-        activeQuestion &&
-        activeQuestion.book === state.readerBook &&
-        activeQuestion.chapter === state.readerChapter &&
-        verse.num >= activeQuestion.verse &&
-        verse.num <= (activeQuestion.endVerse || activeQuestion.verse);
+      const isCurrent = verse.num === state.readerVerse;
       if (isCurrent) {
         row.classList.add("is-current");
         highlightedRow = row;
@@ -202,6 +236,12 @@ function renderReader() {
       const text = document.createElement("span");
       text.textContent = verse.text;
       row.append(number, text);
+      if (questions.length) {
+        const badge = document.createElement("span");
+        badge.className = "verse-question-badge";
+        badge.textContent = pluralize(questions.length, "question");
+        row.append(badge);
+      }
       return row;
     }),
   );
@@ -221,6 +261,7 @@ function openReader() {
   const question = currentQuestion() || QUESTIONS[0];
   state.readerBook = question.book;
   state.readerChapter = question.chapter;
+  state.readerVerse = question.verse;
   state.readerOpen = true;
   renderReader();
   elements.readerBackdrop.hidden = false;
@@ -239,29 +280,48 @@ function closeReader() {
   elements.openReaderButton.focus();
 }
 
-function changeReaderChapter(direction) {
+function changeReaderVerse(direction) {
   let bookIndex = READER_BOOKS.indexOf(state.readerBook);
-  let nextChapter = state.readerChapter + direction;
-  const currentBook = bibleBook(state.readerBook);
+  let book = bibleBook(state.readerBook);
+  let chapter = book.chapters[state.readerChapter - 1];
+  const verseIndex = chapter.verses.findIndex(
+    (verse) => verse.num === state.readerVerse,
+  );
+  const nextVerseIndex = verseIndex + direction;
 
-  if (nextChapter < 1 && bookIndex > 0) {
-    bookIndex -= 1;
-    state.readerBook = READER_BOOKS[bookIndex];
-    nextChapter = bibleBook(state.readerBook).chapters.length;
-  } else if (nextChapter < 1) {
-    return;
-  } else if (
-    nextChapter > currentBook.chapters.length &&
-    bookIndex < READER_BOOKS.length - 1
-  ) {
-    bookIndex += 1;
-    state.readerBook = READER_BOOKS[bookIndex];
-    nextChapter = 1;
-  } else if (nextChapter > currentBook.chapters.length) {
+  if (nextVerseIndex >= 0 && nextVerseIndex < chapter.verses.length) {
+    state.readerVerse = chapter.verses[nextVerseIndex].num;
+    renderReader();
     return;
   }
 
-  state.readerChapter = nextChapter;
+  if (direction < 0) {
+    if (state.readerChapter > 1) {
+      state.readerChapter -= 1;
+    } else if (bookIndex > 0) {
+      bookIndex -= 1;
+      state.readerBook = READER_BOOKS[bookIndex];
+      book = bibleBook(state.readerBook);
+      state.readerChapter = book.chapters.length;
+    } else {
+      return;
+    }
+    chapter = bibleBook(state.readerBook).chapters[state.readerChapter - 1];
+    state.readerVerse = chapter.verses.at(-1).num;
+  } else {
+    if (state.readerChapter < book.chapters.length) {
+      state.readerChapter += 1;
+    } else if (bookIndex < READER_BOOKS.length - 1) {
+      bookIndex += 1;
+      state.readerBook = READER_BOOKS[bookIndex];
+      state.readerChapter = 1;
+    } else {
+      return;
+    }
+    chapter = bibleBook(state.readerBook).chapters[state.readerChapter - 1];
+    state.readerVerse = chapter.verses[0].num;
+  }
+
   renderReader();
 }
 
@@ -883,18 +943,21 @@ elements.openReaderButton.addEventListener("click", openReader);
 elements.closeReaderButton.addEventListener("click", closeReader);
 elements.readerBackdrop.addEventListener("click", closeReader);
 elements.previousChapterButton.addEventListener("click", () =>
-  changeReaderChapter(-1),
+  changeReaderVerse(-1),
 );
 elements.nextChapterButton.addEventListener("click", () =>
-  changeReaderChapter(1),
+  changeReaderVerse(1),
 );
 elements.readerBookSelect.addEventListener("change", (event) => {
   state.readerBook = event.target.value;
   state.readerChapter = 1;
+  state.readerVerse = bibleBook(state.readerBook).chapters[0].verses[0].num;
   renderReader();
 });
 elements.readerChapterSelect.addEventListener("change", (event) => {
   state.readerChapter = Number(event.target.value);
+  state.readerVerse =
+    bibleBook(state.readerBook).chapters[state.readerChapter - 1].verses[0].num;
   renderReader();
 });
 document.addEventListener("keydown", (event) => {

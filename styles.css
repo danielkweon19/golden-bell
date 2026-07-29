@@ -820,14 +820,35 @@ main {
 
 .verse-row {
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr);
+  grid-template-columns: 32px minmax(0, 1fr) auto;
   gap: 10px;
+  width: 100%;
   margin: 0;
   padding: 13px 10px;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
   border-bottom: 1px solid #e6e3da;
+  border-radius: 0;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 16px;
   line-height: 1.58;
+  text-align: left;
+}
+
+button.verse-row {
+  cursor: pointer;
+}
+
+button.verse-row:hover {
+  background: #f3f6f2;
+}
+
+button.verse-row:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid rgba(23, 107, 103, 0.22);
+  outline-offset: -3px;
 }
 
 .verse-row.is-current {
@@ -843,6 +864,22 @@ main {
   font-weight: 850;
   line-height: 1.9;
   text-align: right;
+}
+
+.verse-question-badge {
+  align-self: start;
+  margin-top: 2px;
+  padding: 3px 6px;
+  color: var(--teal-dark);
+  background: var(--teal-soft);
+  border: 1px solid rgba(23, 107, 103, 0.2);
+  border-radius: 4px;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 9px;
+  font-weight: 850;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-transform: uppercase;
 }
 
 footer {
