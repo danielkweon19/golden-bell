@@ -184,12 +184,13 @@ function questionsForReaderVerse(verseNumber) {
   );
 }
 
-function goToQuestionFromReader(questions) {
+function goToQuestionFromReader(questions, verseNumber) {
   const target =
     questions.find((question) => !state.correctIds.has(question.id)) ||
     questions[0];
-  closeReader();
+  state.readerVerse = verseNumber;
   goToQuestion(target.id);
+  renderReader();
 }
 
 function renderReader() {
@@ -221,7 +222,9 @@ function renderReader() {
             state.readerBook
           } ${state.readerChapter}:${verse.num}`,
         );
-        row.addEventListener("click", () => goToQuestionFromReader(questions));
+        row.addEventListener("click", () =>
+          goToQuestionFromReader(questions, verse.num),
+        );
       }
 
       const isCurrent = verse.num === state.readerVerse;
