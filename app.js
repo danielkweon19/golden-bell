@@ -108,8 +108,8 @@ const elements = {
   acceptAnswerButton: document.querySelector("#accept-answer-button"),
   nextButton: document.querySelector("#next-button"),
   shuffleButton: document.querySelector("#shuffle-button"),
-  skipButton: document.querySelector("#skip-button"),
-  inlineSkipButton: document.querySelector("#inline-skip-button"),
+  previousQuestionButton: document.querySelector("#previous-question-button"),
+  nextQuestionButton: document.querySelector("#next-question-button"),
   emptyMissed: document.querySelector("#empty-missed"),
   missedList: document.querySelector("#missed-list"),
   missedAsideCount: document.querySelector("#missed-aside-count"),
@@ -789,8 +789,6 @@ function updateStats() {
     ? "Return to main progress"
     : "Practice missed";
   elements.finishPracticeButton.disabled = state.missed.size === 0;
-  elements.skipButton.disabled = state.practiceMode;
-  elements.inlineSkipButton.disabled = state.practiceMode;
 
   elements.missedList.replaceChildren(
     ...[...state.missed.entries()].map(([id, entry]) => {
@@ -865,6 +863,7 @@ function renderQuestion() {
   updateQuestionStatus(question);
   updateProgress(question);
   updateStats();
+  updateQuestionNavigation();
 
   if (!state.practiceMode && state.correctIds.has(question.id)) {
     showCorrectFeedback(question, "Completed question.");
@@ -893,6 +892,20 @@ function goToNextQuestion() {
   }
   saveSession();
   renderQuestion();
+}
+
+function goToAdjacentQuestion(direction) {
+  const nextIndex = state.index + direction;
+  if (nextIndex < 0 || nextIndex >= state.deckIds.length) return;
+  state.index = nextIndex;
+  saveSession();
+  renderQuestion();
+}
+
+function updateQuestionNavigation() {
+  elements.previousQuestionButton.disabled = state.index <= 0;
+  elements.nextQuestionButton.disabled =
+    state.index >= state.deckIds.length - 1;
 }
 
 function handleSubmit(event) {
@@ -984,14 +997,6 @@ function markCurrentCorrect(acceptPermanently) {
   updateQuestionStatus(question);
   updateStats();
   saveSession();
-}
-
-function skipCurrentQuestion() {
-  const question = currentQuestion();
-  if (!question || state.advancing || state.practiceMode) return;
-  state.skippedIds.add(question.id);
-  saveSession();
-  goToNextQuestion();
 }
 
 function shuffle(items) {
@@ -1190,8 +1195,12 @@ elements.markCorrectButton.addEventListener("click", () =>
 elements.acceptAnswerButton.addEventListener("click", () =>
   markCurrentCorrect(true),
 );
-elements.skipButton.addEventListener("click", skipCurrentQuestion);
-elements.inlineSkipButton.addEventListener("click", skipCurrentQuestion);
+elements.previousQuestionButton.addEventListener("click", () =>
+  goToAdjacentQuestion(-1),
+);
+elements.nextQuestionButton.addEventListener("click", () =>
+  goToAdjacentQuestion(1),
+);
 elements.shuffleButton.addEventListener("click", shuffleRemaining);
 elements.questionSelect.addEventListener("change", (event) =>
   goToQuestion(Number(event.target.value)),
