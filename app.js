@@ -16,7 +16,13 @@ function loadQuestionLibrary() {
       localStorage.getItem(QUESTION_LIBRARY_KEY) || "null",
     );
     if (!saved || saved.version !== 1) {
-      return { edits: {}, fillEdits: {}, custom: [] };
+      return {
+        edits: {},
+        fillEdits: {},
+        removedStudy: [],
+        removedFill: [],
+        custom: [],
+      };
     }
     return {
       edits:
@@ -25,10 +31,22 @@ function loadQuestionLibrary() {
         saved.fillEdits && typeof saved.fillEdits === "object"
           ? saved.fillEdits
           : {},
+      removedStudy: Array.isArray(saved.removedStudy)
+        ? saved.removedStudy.map(Number)
+        : [],
+      removedFill: Array.isArray(saved.removedFill)
+        ? saved.removedFill.map(Number)
+        : [],
       custom: Array.isArray(saved.custom) ? saved.custom : [],
     };
   } catch {
-    return { edits: {}, fillEdits: {}, custom: [] };
+    return {
+      edits: {},
+      fillEdits: {},
+      removedStudy: [],
+      removedFill: [],
+      custom: [],
+    };
   }
 }
 
@@ -72,7 +90,7 @@ const STUDY_QUESTIONS = expandedQuestionBank.map((question, index) => {
     { ...question, ...(questionLibrary.edits[id] || {}) },
     id,
   );
-});
+}).filter((question) => !questionLibrary.removedStudy.includes(question.id));
 
 questionLibrary.custom.forEach((question) => {
   if (
@@ -155,6 +173,7 @@ const elements = {
   finishResetButton: document.querySelector("#finish-reset-button"),
   addQuestionButton: document.querySelector("#add-question-button"),
   editQuestionButton: document.querySelector("#edit-question-button"),
+  deleteQuestionButton: document.querySelector("#delete-question-button"),
   openReaderButton: document.querySelector("#open-reader-button"),
   readerBackdrop: document.querySelector("#reader-backdrop"),
   readerPanel: document.querySelector("#reader-panel"),
@@ -391,7 +410,7 @@ function buildFillQuestionBank() {
           : generated;
       }),
     );
-  });
+  }).filter((question) => !questionLibrary.removedFill.includes(question.id));
 }
 
 function questionById(id) {
@@ -656,6 +675,48 @@ function handleQuestionSave(event) {
   goToQuestion(question.id);
   if (state.readerOpen) renderReader();
   showToast(message);
+}
+
+function deleteCurrentQuestion() {
+  const question = currentQuestion();
+  if (!question) return;
+  if (!window.confirm(`Delete the question for ${question.source}?`)) return;
+
+  if (question.generated) {
+    if (!questionLibrary.removedFill.includes(question.id)) {
+      questionLibrary.removedFill.push(question.id);
+    }
+    delete questionLibrary.fillEdits[question.id];
+  } else if (question.id <= BASE_QUESTION_COUNT) {
+    if (!questionLibrary.removedStudy.includes(question.id)) {
+      questionLibrary.removedStudy.push(question.id);
+    }
+    delete questionLibrary.edits[question.id];
+  } else {
+    questionLibrary.custom = questionLibrary.custom.filter(
+      (item) => Number(item.id) !== question.id,
+    );
+  }
+
+  const questionIndex = QUESTIONS.indexOf(question);
+  if (questionIndex >= 0) QUESTIONS.splice(questionIndex, 1);
+  state.deckIds = state.deckIds.filter((id) => id !== question.id);
+  state.mainDeckIds =
+    state.mainDeckIds?.filter((id) => id !== question.id) || null;
+  state.correctIds.delete(question.id);
+  state.missed.delete(question.id);
+  state.skippedIds.delete(question.id);
+  state.practiceCorrectIds.delete(question.id);
+  state.acceptedAnswers.delete(question.id);
+  state.index = Math.min(state.index, Math.max(state.deckIds.length - 1, 0));
+
+  if (!saveQuestionLibrary()) return;
+  saveAcceptedAnswers();
+  populateQuestionSelect();
+  saveSession();
+  if (state.readerOpen) renderReader();
+  renderQuestion();
+  showToast("Question deleted.");
 }
 
 function populateReaderBooks() {
@@ -1563,6 +1624,7 @@ elements.addQuestionButton.addEventListener("click", () =>
 elements.editQuestionButton.addEventListener("click", () =>
   openQuestionEditor(currentQuestion()),
 );
+elements.deleteQuestionButton.addEventListener("click", deleteCurrentQuestion);
 elements.questionForm.addEventListener("submit", handleQuestionSave);
 elements.closeQuestionDialogButton.addEventListener(
   "click",
