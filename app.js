@@ -2,6 +2,7 @@ const SESSION_KEY = "minor-prophets-recall-session-v2";
 const ACCEPTED_KEY = "minor-prophets-recall-accepted-v2";
 const QUESTION_LIBRARY_KEY = "minor-prophets-recall-question-library-v1";
 const QUESTION_MODE_KEY = "minor-prophets-recall-question-mode-v1";
+const BOOK_ORDER = ["Haggai", "Zechariah", "Malachi"];
 
 function questionSource(question) {
   return `${question.book} ${question.chapter}:${question.verse}${
@@ -53,6 +54,16 @@ function hydrateQuestion(question, id) {
   return hydrated;
 }
 
+function compareQuestions(left, right) {
+  return (
+    BOOK_ORDER.indexOf(left.book) - BOOK_ORDER.indexOf(right.book) ||
+    left.chapter - right.chapter ||
+    left.verse - right.verse ||
+    (left.endVerse || left.verse) - (right.endVerse || right.verse) ||
+    left.id - right.id
+  );
+}
+
 const questionLibrary = loadQuestionLibrary();
 const BASE_QUESTION_COUNT = expandedQuestionBank.length;
 const STUDY_QUESTIONS = expandedQuestionBank.map((question, index) => {
@@ -72,13 +83,14 @@ questionLibrary.custom.forEach((question) => {
   }
   STUDY_QUESTIONS.push(hydrateQuestion(question, Number(question.id)));
 });
+STUDY_QUESTIONS.sort(compareQuestions);
 
 let QUESTIONS = STUDY_QUESTIONS;
 const QUESTION_BANKS = {
   study: STUDY_QUESTIONS,
   fill: [],
 };
-const READER_BOOKS = ["Haggai", "Zechariah", "Malachi"];
+const READER_BOOKS = BOOK_ORDER;
 
 const state = {
   bible: null,
@@ -573,6 +585,26 @@ function createQuestionId() {
   return id;
 }
 
+function sortQuestionBankAndDecks() {
+  const currentId = state.deckIds[state.index];
+  QUESTIONS.sort(compareQuestions);
+  const order = new Map(
+    QUESTIONS.map((question, index) => [question.id, index]),
+  );
+  const sortIds = (ids) =>
+    ids?.sort(
+      (left, right) =>
+        (order.get(left) ?? Number.MAX_SAFE_INTEGER) -
+        (order.get(right) ?? Number.MAX_SAFE_INTEGER),
+    );
+
+  sortIds(state.deckIds);
+  sortIds(state.mainDeckIds);
+  if (currentId !== undefined) {
+    state.index = Math.max(state.deckIds.indexOf(currentId), 0);
+  }
+}
+
 function handleQuestionSave(event) {
   event.preventDefault();
   if (!elements.questionForm.reportValidity()) return;
@@ -616,6 +648,7 @@ function handleQuestionSave(event) {
     message = "Question added.";
   }
 
+  sortQuestionBankAndDecks();
   if (!saveQuestionLibrary()) return;
   populateQuestionSelect();
   closeQuestionEditor();
