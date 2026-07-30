@@ -219,174 +219,36 @@ function normalizeAnswer(value) {
     .join(" ");
 }
 
-const FILL_STOP_WORDS = new Set([
-  "about",
-  "after",
-  "again",
-  "against",
-  "also",
-  "among",
-  "because",
-  "before",
-  "behold",
-  "being",
-  "between",
-  "came",
-  "come",
-  "could",
-  "does",
-  "from",
-  "have",
-  "into",
-  "made",
-  "many",
-  "more",
-  "most",
-  "other",
-  "over",
-  "people",
-  "said",
-  "says",
-  "shall",
-  "should",
-  "their",
-  "them",
-  "then",
-  "there",
-  "these",
-  "they",
-  "this",
-  "those",
-  "through",
-  "under",
-  "until",
-  "upon",
-  "were",
-  "what",
-  "when",
-  "where",
-  "which",
-  "while",
-  "with",
-  "would",
-  "your",
-]);
+const BOOK_ABBREVIATIONS = {
+  Haggai: "Hag",
+  Zechariah: "Zech",
+  Malachi: "Mal",
+};
 
-const FILL_KEY_WORDS = new Set([
-  "altar",
-  "branch",
-  "covenant",
-  "david",
-  "glory",
-  "god",
-  "haggai",
-  "holy",
-  "israel",
-  "jerusalem",
-  "judah",
-  "justice",
-  "king",
-  "lord",
-  "malachi",
-  "mercy",
-  "messiah",
-  "priest",
-  "righteousness",
-  "spirit",
-  "temple",
-  "truth",
-  "zechariah",
-  "zion",
-]);
-
-function fillWordScore(match, wordIndex) {
-  const normalized = match[0].toLowerCase().replace(/[’']/g, "");
-  let score = match[0].length;
-  if (FILL_KEY_WORDS.has(normalized)) score += 60;
-  if (/^[A-Z]/.test(match[0]) && wordIndex > 0) score += 24;
-  if (match[0].toUpperCase() === match[0] && match[0].length > 2) score += 30;
-  return score;
-}
-
-function stripFillInstruction(value) {
-  return String(value).replace(/^Fill in the blanks?:\s*/i, "");
-}
-
-function makeFillQuestion(book, chapter, verse, id) {
-  const text = verse.text;
-  const matches = [...text.matchAll(/[A-Za-z]+(?:[’'][A-Za-z]+)*/g)];
-  const candidateByWord = new Map();
-
-  matches.forEach((match, wordIndex) => {
-    const normalized = match[0].toLowerCase().replace(/[’']/g, "");
-    if (normalized.length < 4 || FILL_STOP_WORDS.has(normalized)) return;
-    const candidate = {
-      text: match[0],
-      index: match.index,
-      length: match[0].length,
-      score: fillWordScore(match, wordIndex),
-    };
-    const existing = candidateByWord.get(normalized);
-    if (!existing || candidate.score > existing.score) {
-      candidateByWord.set(normalized, candidate);
-    }
-  });
-
-  if (!candidateByWord.size) {
-    const fallback = matches
-      .filter((match) => !["a", "an", "the"].includes(match[0].toLowerCase()))
-      .sort((left, right) => right[0].length - left[0].length)[0];
-    if (fallback) {
-      candidateByWord.set(fallback[0].toLowerCase(), {
-        text: fallback[0],
-        index: fallback.index,
-        length: fallback[0].length,
-        score: fallback[0].length,
-      });
-    }
-  }
-
-  const blankCount = matches.length <= 10 ? 1 : matches.length <= 22 ? 2 : 3;
-  const selected = [...candidateByWord.values()]
-    .sort((left, right) => right.score - left.score || left.index - right.index)
-    .slice(0, blankCount)
-    .sort((left, right) => left.index - right.index);
-
-  let cursor = 0;
-  let blankedText = "";
-  selected.forEach((word) => {
-    blankedText += `${text.slice(cursor, word.index)}_____`;
-    cursor = word.index + word.length;
-  });
-  blankedText += text.slice(cursor);
-
-  const answerWords = selected.map((word) => word.text);
-  const displayAnswer = answerWords.join(", ");
+function makeReferenceQuestion(book, chapter, verse, id) {
+  const displayAnswer = `${book} ${chapter}:${verse.num}`;
   return hydrateQuestion(
     {
       book,
       chapter,
       verse: verse.num,
-      question: `“${blankedText}”`,
+      question: `“${verse.text}”`,
       displayAnswer,
-      aliases: [
-        answerWords.join(" "),
-        ...(answerWords.length > 1 ? [answerWords.join(" and ")] : []),
-      ],
+      aliases: [`${BOOK_ABBREVIATIONS[book]} ${chapter}:${verse.num}`],
       generated: true,
     },
     id,
   );
 }
 
-function buildFillQuestionBank() {
-  let id = 2_000_000;
+function buildReferenceQuestionBank() {
+  let id = 3_000_000;
   QUESTION_BANKS.fill = READER_BOOKS.flatMap((bookName) => {
     const book = bibleBook(bookName);
     return book.chapters.flatMap((chapter, chapterIndex) =>
       chapter.verses.map((verse) => {
         id += 1;
-        const generated = makeFillQuestion(
+        const generated = makeReferenceQuestion(
           bookName,
           chapterIndex + 1,
           verse,
@@ -398,9 +260,7 @@ function buildFillQuestionBank() {
               {
                 ...generated,
                 ...edit,
-                question: stripFillInstruction(
-                  edit.question || generated.question,
-                ),
+                question: edit.question || generated.question,
                 generated: true,
               },
               id,
@@ -513,18 +373,18 @@ function populateEditorVerses(selectedVerse = 1, selectedEndVerse = "") {
 
 function openQuestionEditor(question = null) {
   if (!state.bible) return;
-  const isFillQuestion = Boolean(question?.generated);
+  const isReferenceQuestion = Boolean(question?.generated);
   state.editingQuestionId = question?.id || null;
-  elements.questionDialogTitle.textContent = isFillQuestion
-    ? "Edit fill-in blanks"
+  elements.questionDialogTitle.textContent = isReferenceQuestion
+    ? "Edit verse question"
     : question
       ? "Edit question"
       : "Add question";
-  elements.questionPromptLabel.textContent = isFillQuestion
-    ? "Fill-in sentence"
+  elements.questionPromptLabel.textContent = isReferenceQuestion
+    ? "Verse text"
     : "Question";
-  elements.questionAnswerLabel.textContent = isFillQuestion
-    ? "Missing words in order"
+  elements.questionAnswerLabel.textContent = isReferenceQuestion
+    ? "Verse reference"
     : "Official answer";
   elements.saveQuestionButton.textContent = question
     ? "Save changes"
@@ -540,7 +400,7 @@ function openQuestionEditor(question = null) {
     elements.questionVerse,
     elements.questionEndVerse,
   ].forEach((select) => {
-    select.disabled = isFillQuestion;
+    select.disabled = isReferenceQuestion;
   });
   elements.questionPrompt.value = question?.question || "";
   elements.questionAnswer.value = question?.displayAnswer || "";
@@ -632,14 +492,6 @@ function handleQuestionSave(event) {
 
   if (state.editingQuestionId) {
     question = questionById(state.editingQuestionId);
-    if (question.generated) {
-      fields.question = stripFillInstruction(fields.question);
-    }
-    if (question.generated && !fields.question.includes("_____")) {
-      showToast("Keep at least one _____ blank in the sentence.");
-      elements.questionPrompt.focus();
-      return;
-    }
     Object.assign(question, hydrateQuestion(fields, question.id));
     if (question.generated) {
       questionLibrary.fillEdits[question.id] = storedQuestion(question);
@@ -1148,14 +1000,17 @@ function activateQuestionMode(mode, saveCurrent = true) {
 
 function populateQuestionSelect() {
   elements.questionSelect.replaceChildren(
-    ...QUESTIONS.map((question) => {
+    ...QUESTIONS.map((question, index) => {
       const option = document.createElement("option");
       option.value = question.id;
       const shortQuestion =
         question.question.length > 58
           ? `${question.question.slice(0, 58)}...`
           : question.question;
-      option.textContent = `${question.source} · ${shortQuestion}`;
+      option.textContent =
+        state.questionMode === "fill"
+          ? `Verse ${index + 1} · ${shortQuestion}`
+          : `${question.source} · ${shortQuestion}`;
       return option;
     }),
   );
@@ -1173,7 +1028,8 @@ function clearFeedback() {
   elements.answerInput.disabled = false;
   elements.answerInput.value = "";
   elements.answerInput.removeAttribute("aria-invalid");
-  elements.answerLabel.textContent = "Your answer";
+  elements.answerLabel.textContent =
+    state.questionMode === "fill" ? "Verse reference" : "Your answer";
 }
 
 function updateQuestionStatus(question) {
@@ -1204,7 +1060,8 @@ function updateProgress(question) {
   elements.progressLabel.textContent = state.practiceMode
     ? `Missed practice · ${state.index + 1} of ${state.deckIds.length}`
     : `Question ${QUESTIONS.indexOf(question) + 1} of ${QUESTIONS.length}`;
-  elements.bookLabel.textContent = question.book;
+  elements.bookLabel.textContent =
+    state.questionMode === "fill" ? "Verse reference" : question.book;
   elements.progressFill.style.width = `${percent}%`;
   elements.progressTrack.setAttribute("aria-valuenow", String(percent));
 }
@@ -1290,7 +1147,8 @@ function renderQuestion() {
 
   elements.finishView.hidden = true;
   elements.quizView.hidden = false;
-  elements.source.textContent = question.source;
+  elements.source.textContent =
+    state.questionMode === "fill" ? "NKJV verse" : question.source;
   elements.questionText.textContent = question.question;
   elements.questionSelect.value = String(question.id);
   clearFeedback();
@@ -1583,7 +1441,7 @@ async function initialize() {
     if (!response.ok) throw new Error(`Bible data returned ${response.status}`);
     state.bible = await response.json();
 
-    buildFillQuestionBank();
+    buildReferenceQuestionBank();
     let savedMode = "study";
     try {
       savedMode = localStorage.getItem(QUESTION_MODE_KEY) || "study";
