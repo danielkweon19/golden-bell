@@ -9,7 +9,7 @@
     />
     <meta name="color-scheme" content="light" />
     <title>Minor Prophets Recall</title>
-    <link rel="stylesheet" href="styles.css?v=20260729-8" />
+    <link rel="stylesheet" href="styles.css?v=20260729-9" />
   </head>
   <body>
     <header class="topbar">
@@ -101,8 +101,17 @@
         </div>
 
         <div class="study-toolbar">
-          <label for="question-select">Go to question</label>
-          <select id="question-select"></select>
+          <div class="toolbar-control mode-control">
+            <label for="question-mode-select">Question type</label>
+            <select id="question-mode-select">
+              <option value="study">Study questions</option>
+              <option value="fill">Verse fill-in-the-blank</option>
+            </select>
+          </div>
+          <div class="toolbar-control question-control">
+            <label for="question-select">Go to question</label>
+            <select id="question-select"></select>
+          </div>
           <span id="save-status">Progress saved in this browser</span>
         </div>
 
@@ -365,6 +374,6 @@
     <div class="toast" id="toast" role="status" hidden></div>
 
     <script src="questions.js?v=20260728-2"></script>
-    <script src="app.js?v=20260729-10"></script>
+    <script src="app.js?v=20260729-11"></script>
   </body>
 </html>

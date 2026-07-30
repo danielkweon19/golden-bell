@@ -1,6 +1,7 @@
 const SESSION_KEY = "minor-prophets-recall-session-v2";
 const ACCEPTED_KEY = "minor-prophets-recall-accepted-v2";
 const QUESTION_LIBRARY_KEY = "minor-prophets-recall-question-library-v1";
+const QUESTION_MODE_KEY = "minor-prophets-recall-question-mode-v1";
 
 function questionSource(question) {
   return `${question.book} ${question.chapter}:${question.verse}${
@@ -48,7 +49,7 @@ function hydrateQuestion(question, id) {
 
 const questionLibrary = loadQuestionLibrary();
 const BASE_QUESTION_COUNT = expandedQuestionBank.length;
-const QUESTIONS = expandedQuestionBank.map((question, index) => {
+const STUDY_QUESTIONS = expandedQuestionBank.map((question, index) => {
   const id = index + 1;
   return hydrateQuestion(
     { ...question, ...(questionLibrary.edits[id] || {}) },
@@ -57,14 +58,25 @@ const QUESTIONS = expandedQuestionBank.map((question, index) => {
 });
 
 questionLibrary.custom.forEach((question) => {
-  if (!question?.id || QUESTIONS.some((item) => item.id === question.id)) return;
-  QUESTIONS.push(hydrateQuestion(question, Number(question.id)));
+  if (
+    !question?.id ||
+    STUDY_QUESTIONS.some((item) => item.id === Number(question.id))
+  ) {
+    return;
+  }
+  STUDY_QUESTIONS.push(hydrateQuestion(question, Number(question.id)));
 });
 
-const READER_BOOKS = [...new Set(QUESTIONS.map((question) => question.book))];
+let QUESTIONS = STUDY_QUESTIONS;
+const QUESTION_BANKS = {
+  study: STUDY_QUESTIONS,
+  fill: [],
+};
+const READER_BOOKS = ["Haggai", "Zechariah", "Malachi"];
 
 const state = {
   bible: null,
+  questionMode: "study",
   deckIds: QUESTIONS.map((question) => question.id),
   index: 0,
   correctIds: new Set(),
@@ -95,6 +107,7 @@ const elements = {
   correctCount: document.querySelector("#correct-count"),
   missedCount: document.querySelector("#missed-count"),
   skippedCount: document.querySelector("#skipped-count"),
+  questionModeSelect: document.querySelector("#question-mode-select"),
   questionSelect: document.querySelector("#question-select"),
   saveStatus: document.querySelector("#save-status"),
   source: document.querySelector("#source"),
@@ -167,6 +180,175 @@ function normalizeAnswer(value) {
     .split(/\s+/)
     .filter((word) => word && !["a", "an", "the"].includes(word))
     .join(" ");
+}
+
+const FILL_STOP_WORDS = new Set([
+  "about",
+  "after",
+  "again",
+  "against",
+  "also",
+  "among",
+  "because",
+  "before",
+  "behold",
+  "being",
+  "between",
+  "came",
+  "come",
+  "could",
+  "does",
+  "from",
+  "have",
+  "into",
+  "made",
+  "many",
+  "more",
+  "most",
+  "other",
+  "over",
+  "people",
+  "said",
+  "says",
+  "shall",
+  "should",
+  "their",
+  "them",
+  "then",
+  "there",
+  "these",
+  "they",
+  "this",
+  "those",
+  "through",
+  "under",
+  "until",
+  "upon",
+  "were",
+  "what",
+  "when",
+  "where",
+  "which",
+  "while",
+  "with",
+  "would",
+  "your",
+]);
+
+const FILL_KEY_WORDS = new Set([
+  "altar",
+  "branch",
+  "covenant",
+  "david",
+  "glory",
+  "god",
+  "haggai",
+  "holy",
+  "israel",
+  "jerusalem",
+  "judah",
+  "justice",
+  "king",
+  "lord",
+  "malachi",
+  "mercy",
+  "messiah",
+  "priest",
+  "righteousness",
+  "spirit",
+  "temple",
+  "truth",
+  "zechariah",
+  "zion",
+]);
+
+function fillWordScore(match, wordIndex) {
+  const normalized = match[0].toLowerCase().replace(/[’']/g, "");
+  let score = match[0].length;
+  if (FILL_KEY_WORDS.has(normalized)) score += 60;
+  if (/^[A-Z]/.test(match[0]) && wordIndex > 0) score += 24;
+  if (match[0].toUpperCase() === match[0] && match[0].length > 2) score += 30;
+  return score;
+}
+
+function makeFillQuestion(book, chapter, verse, id) {
+  const text = verse.text;
+  const matches = [...text.matchAll(/[A-Za-z]+(?:[’'][A-Za-z]+)*/g)];
+  const candidateByWord = new Map();
+
+  matches.forEach((match, wordIndex) => {
+    const normalized = match[0].toLowerCase().replace(/[’']/g, "");
+    if (normalized.length < 4 || FILL_STOP_WORDS.has(normalized)) return;
+    const candidate = {
+      text: match[0],
+      index: match.index,
+      length: match[0].length,
+      score: fillWordScore(match, wordIndex),
+    };
+    const existing = candidateByWord.get(normalized);
+    if (!existing || candidate.score > existing.score) {
+      candidateByWord.set(normalized, candidate);
+    }
+  });
+
+  if (!candidateByWord.size) {
+    const fallback = matches
+      .filter((match) => !["a", "an", "the"].includes(match[0].toLowerCase()))
+      .sort((left, right) => right[0].length - left[0].length)[0];
+    if (fallback) {
+      candidateByWord.set(fallback[0].toLowerCase(), {
+        text: fallback[0],
+        index: fallback.index,
+        length: fallback[0].length,
+        score: fallback[0].length,
+      });
+    }
+  }
+
+  const blankCount = matches.length <= 10 ? 1 : matches.length <= 22 ? 2 : 3;
+  const selected = [...candidateByWord.values()]
+    .sort((left, right) => right.score - left.score || left.index - right.index)
+    .slice(0, blankCount)
+    .sort((left, right) => left.index - right.index);
+
+  let cursor = 0;
+  let blankedText = "";
+  selected.forEach((word) => {
+    blankedText += `${text.slice(cursor, word.index)}_____`;
+    cursor = word.index + word.length;
+  });
+  blankedText += text.slice(cursor);
+
+  const answerWords = selected.map((word) => word.text);
+  const displayAnswer = answerWords.join(", ");
+  return hydrateQuestion(
+    {
+      book,
+      chapter,
+      verse: verse.num,
+      question: `Fill in the ${answerWords.length === 1 ? "blank" : "blanks"}: “${blankedText}”`,
+      displayAnswer,
+      aliases: [
+        answerWords.join(" "),
+        ...(answerWords.length > 1 ? [answerWords.join(" and ")] : []),
+      ],
+      generated: true,
+    },
+    id,
+  );
+}
+
+function buildFillQuestionBank() {
+  let id = 2_000_000;
+  QUESTION_BANKS.fill = READER_BOOKS.flatMap((bookName) => {
+    const book = bibleBook(bookName);
+    return book.chapters.flatMap((chapter, chapterIndex) =>
+      chapter.verses.map((verse) => {
+        id += 1;
+        return makeFillQuestion(bookName, chapterIndex + 1, verse, id);
+      }),
+    );
+  });
 }
 
 function questionById(id) {
@@ -643,7 +825,7 @@ function loadAcceptedAnswers() {
 function saveSession() {
   try {
     localStorage.setItem(
-      SESSION_KEY,
+      sessionKey(),
       JSON.stringify({
         version: 2,
         deckIds: state.deckIds,
@@ -667,9 +849,15 @@ function saveSession() {
   }
 }
 
+function sessionKey() {
+  return state.questionMode === "study"
+    ? SESSION_KEY
+    : `${SESSION_KEY}-${state.questionMode}`;
+}
+
 function restoreSession() {
   try {
-    const saved = JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+    const saved = JSON.parse(localStorage.getItem(sessionKey()) || "null");
     if (!saved || saved.version !== 2) return;
 
     const validIds = new Set(QUESTIONS.map((question) => question.id));
@@ -708,8 +896,53 @@ function restoreSession() {
       : null;
     state.mainIndex = Number(saved.mainIndex) || 0;
   } catch {
-    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(sessionKey());
   }
+}
+
+function resetModeProgress() {
+  state.deckIds = QUESTIONS.map((question) => question.id);
+  state.index = 0;
+  state.correctIds = new Set();
+  state.missed = new Map();
+  state.skippedIds = new Set();
+  state.practiceMode = false;
+  state.practiceCorrectIds = new Set();
+  state.mainDeckIds = null;
+  state.mainIndex = 0;
+  state.pendingRejectedAnswer = "";
+  state.advancing = false;
+}
+
+function updateQuestionModeControls() {
+  elements.questionModeSelect.value = state.questionMode;
+  elements.quizView.dataset.mode = state.questionMode;
+  const isStudyMode = state.questionMode === "study";
+  elements.addQuestionButton.disabled = !isStudyMode;
+  elements.editQuestionButton.hidden = !isStudyMode;
+}
+
+function activateQuestionMode(mode, saveCurrent = true) {
+  if (!QUESTION_BANKS[mode] || mode === state.questionMode) return;
+  if (saveCurrent) saveSession();
+
+  state.questionMode = mode;
+  QUESTIONS = QUESTION_BANKS[mode];
+  resetModeProgress();
+  restoreSession();
+  populateQuestionSelect();
+  updateQuestionModeControls();
+  try {
+    localStorage.setItem(QUESTION_MODE_KEY, mode);
+  } catch {
+    // The selected mode still works for the current page session.
+  }
+
+  elements.finishView.hidden = true;
+  elements.quizView.hidden = false;
+  if (state.index >= state.deckIds.length) showFinish();
+  else renderQuestion();
+  if (state.readerOpen) renderReader();
 }
 
 function populateQuestionSelect() {
@@ -1131,20 +1364,12 @@ function showFinish() {
 
 function resetProgress() {
   const confirmed = window.confirm(
-    "Reset all correct, missed, skipped, and saved session progress?",
+    "Reset all progress for this question type?",
   );
   if (!confirmed) return;
 
-  localStorage.removeItem(SESSION_KEY);
-  state.deckIds = QUESTIONS.map((question) => question.id);
-  state.index = 0;
-  state.correctIds = new Set();
-  state.missed = new Map();
-  state.skippedIds = new Set();
-  state.practiceMode = false;
-  state.practiceCorrectIds = new Set();
-  state.mainDeckIds = null;
-  state.mainIndex = 0;
+  localStorage.removeItem(sessionKey());
+  resetModeProgress();
   elements.finishView.hidden = true;
   elements.quizView.hidden = false;
   renderQuestion();
@@ -1157,7 +1382,22 @@ async function initialize() {
     if (!response.ok) throw new Error(`Bible data returned ${response.status}`);
     state.bible = await response.json();
 
-    const missingReference = QUESTIONS.find((question) => !getVerse(question));
+    buildFillQuestionBank();
+    let savedMode = "study";
+    try {
+      savedMode = localStorage.getItem(QUESTION_MODE_KEY) || "study";
+    } catch {
+      savedMode = "study";
+    }
+    if (QUESTION_BANKS[savedMode]) {
+      state.questionMode = savedMode;
+      QUESTIONS = QUESTION_BANKS[savedMode];
+      resetModeProgress();
+    }
+
+    const missingReference = Object.values(QUESTION_BANKS)
+      .flat()
+      .find((question) => !getVerse(question));
     if (missingReference) {
       throw new Error(`Missing reference: ${missingReference.source}`);
     }
@@ -1166,6 +1406,7 @@ async function initialize() {
     restoreSession();
     populateQuestionSelect();
     populateReaderBooks();
+    updateQuestionModeControls();
     elements.loadingView.hidden = true;
     elements.quizView.hidden = false;
 
@@ -1202,6 +1443,9 @@ elements.nextQuestionButton.addEventListener("click", () =>
   goToAdjacentQuestion(1),
 );
 elements.shuffleButton.addEventListener("click", shuffleRemaining);
+elements.questionModeSelect.addEventListener("change", (event) =>
+  activateQuestionMode(event.target.value),
+);
 elements.questionSelect.addEventListener("change", (event) =>
   goToQuestion(Number(event.target.value)),
 );
