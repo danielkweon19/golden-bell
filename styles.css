@@ -990,6 +990,7 @@ main {
   overflow-y: auto;
   padding: 8px 24px 34px;
   scroll-behavior: smooth;
+  user-select: text;
 }
 
 .verse-row {
@@ -1010,15 +1011,15 @@ main {
   text-align: left;
 }
 
-button.verse-row {
-  cursor: pointer;
+.verse-row.has-question {
+  cursor: text;
 }
 
-button.verse-row:hover {
+.verse-row.has-question:hover {
   background: #f3f6f2;
 }
 
-button.verse-row:focus-visible {
+.verse-row.has-question:focus-visible {
   position: relative;
   z-index: 1;
   outline: 3px solid rgba(23, 107, 103, 0.22);
@@ -1054,6 +1055,8 @@ button.verse-row:focus-visible {
   line-height: 1.4;
   white-space: nowrap;
   text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
 }
 
 footer {

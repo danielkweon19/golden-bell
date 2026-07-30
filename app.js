@@ -703,19 +703,29 @@ function renderReader() {
   elements.readerVerses.replaceChildren(
     ...chapter.verses.map((verse) => {
       const questions = questionsForReaderVerse(verse.num);
-      const row = document.createElement(questions.length ? "button" : "p");
+      const row = document.createElement("div");
       row.className = "verse-row";
       if (questions.length) {
-        row.type = "button";
+        row.classList.add("has-question");
+        row.setAttribute("role", "button");
+        row.setAttribute("tabindex", "0");
         row.setAttribute(
           "aria-label",
           `Go to ${questions.length === 1 ? "question" : "questions"} for ${
             state.readerBook
           } ${state.readerChapter}:${verse.num}`,
         );
-        row.addEventListener("click", () =>
-          goToQuestionFromReader(questions, verse.num),
-        );
+        const openVerseQuestion = () =>
+          goToQuestionFromReader(questions, verse.num);
+        row.addEventListener("click", () => {
+          const selection = window.getSelection?.()?.toString().trim();
+          if (!selection) openVerseQuestion();
+        });
+        row.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          openVerseQuestion();
+        });
       }
 
       const isCurrent = verse.num === state.readerVerse;
