@@ -14,14 +14,20 @@ function loadQuestionLibrary() {
     const saved = JSON.parse(
       localStorage.getItem(QUESTION_LIBRARY_KEY) || "null",
     );
-    if (!saved || saved.version !== 1) return { edits: {}, custom: [] };
+    if (!saved || saved.version !== 1) {
+      return { edits: {}, fillEdits: {}, custom: [] };
+    }
     return {
       edits:
         saved.edits && typeof saved.edits === "object" ? saved.edits : {},
+      fillEdits:
+        saved.fillEdits && typeof saved.fillEdits === "object"
+          ? saved.fillEdits
+          : {},
       custom: Array.isArray(saved.custom) ? saved.custom : [],
     };
   } catch {
-    return { edits: {}, custom: [] };
+    return { edits: {}, fillEdits: {}, custom: [] };
   }
 }
 
@@ -150,6 +156,8 @@ const elements = {
   questionDialog: document.querySelector("#question-dialog"),
   questionForm: document.querySelector("#question-form"),
   questionDialogTitle: document.querySelector("#question-dialog-title"),
+  questionPromptLabel: document.querySelector("#question-prompt-label"),
+  questionAnswerLabel: document.querySelector("#question-answer-label"),
   closeQuestionDialogButton: document.querySelector(
     "#close-question-dialog-button",
   ),
@@ -345,7 +353,16 @@ function buildFillQuestionBank() {
     return book.chapters.flatMap((chapter, chapterIndex) =>
       chapter.verses.map((verse) => {
         id += 1;
-        return makeFillQuestion(bookName, chapterIndex + 1, verse, id);
+        const generated = makeFillQuestion(
+          bookName,
+          chapterIndex + 1,
+          verse,
+          id,
+        );
+        const edit = questionLibrary.fillEdits[id];
+        return edit
+          ? hydrateQuestion({ ...generated, ...edit, generated: true }, id)
+          : generated;
       }),
     );
   });
@@ -453,10 +470,19 @@ function populateEditorVerses(selectedVerse = 1, selectedEndVerse = "") {
 
 function openQuestionEditor(question = null) {
   if (!state.bible) return;
+  const isFillQuestion = Boolean(question?.generated);
   state.editingQuestionId = question?.id || null;
-  elements.questionDialogTitle.textContent = question
-    ? "Edit question"
-    : "Add question";
+  elements.questionDialogTitle.textContent = isFillQuestion
+    ? "Edit fill-in blanks"
+    : question
+      ? "Edit question"
+      : "Add question";
+  elements.questionPromptLabel.textContent = isFillQuestion
+    ? "Fill-in sentence"
+    : "Question";
+  elements.questionAnswerLabel.textContent = isFillQuestion
+    ? "Missing words in order"
+    : "Official answer";
   elements.saveQuestionButton.textContent = question
     ? "Save changes"
     : "Add question";
@@ -465,6 +491,14 @@ function openQuestionEditor(question = null) {
   populateEditorBooks(reference.book);
   populateEditorChapters(reference.chapter);
   populateEditorVerses(reference.verse, reference.endVerse);
+  [
+    elements.questionBook,
+    elements.questionChapter,
+    elements.questionVerse,
+    elements.questionEndVerse,
+  ].forEach((select) => {
+    select.disabled = isFillQuestion;
+  });
   elements.questionPrompt.value = question?.question || "";
   elements.questionAnswer.value = question?.displayAnswer || "";
   elements.questionAliases.value = question?.aliases?.join("\n") || "";
@@ -535,8 +569,15 @@ function handleQuestionSave(event) {
 
   if (state.editingQuestionId) {
     question = questionById(state.editingQuestionId);
+    if (question.generated && !fields.question.includes("_____")) {
+      showToast("Keep at least one _____ blank in the sentence.");
+      elements.questionPrompt.focus();
+      return;
+    }
     Object.assign(question, hydrateQuestion(fields, question.id));
-    if (question.id <= BASE_QUESTION_COUNT) {
+    if (question.generated) {
+      questionLibrary.fillEdits[question.id] = storedQuestion(question);
+    } else if (question.id <= BASE_QUESTION_COUNT) {
       questionLibrary.edits[question.id] = storedQuestion(question);
     } else {
       const index = questionLibrary.custom.findIndex(
@@ -919,7 +960,7 @@ function updateQuestionModeControls() {
   elements.quizView.dataset.mode = state.questionMode;
   const isStudyMode = state.questionMode === "study";
   elements.addQuestionButton.disabled = !isStudyMode;
-  elements.editQuestionButton.hidden = !isStudyMode;
+  elements.editQuestionButton.hidden = false;
 }
 
 function activateQuestionMode(mode, saveCurrent = true) {
