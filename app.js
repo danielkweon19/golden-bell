@@ -944,7 +944,20 @@ function acceptedAnswersMarkup(question) {
   if (!answers.length) return "";
 
   const items = answers
-    .map((answer) => `<li>${escapeHtml(answer)}</li>`)
+    .map(
+      (answer, index) => `
+        <li>
+          <span>${escapeHtml(answer)}</span>
+          <button
+            class="accepted-answer-remove"
+            type="button"
+            data-accepted-answer-index="${index}"
+            aria-label="Remove accepted answer"
+            title="Remove accepted answer"
+          >&times;</button>
+        </li>
+      `,
+    )
     .join("");
   return `
     <div class="accepted-answers">
@@ -983,6 +996,32 @@ function loadAcceptedAnswers() {
   } catch {
     state.acceptedAnswers = new Map();
   }
+}
+
+function removeAcceptedAnswer(question, index) {
+  const answers = [...(state.acceptedAnswers.get(question.id) || [])];
+  if (!Number.isInteger(index) || index < 0 || index >= answers.length) {
+    return false;
+  }
+  answers.splice(index, 1);
+  if (answers.length) state.acceptedAnswers.set(question.id, answers);
+  else state.acceptedAnswers.delete(question.id);
+  saveAcceptedAnswers();
+  return true;
+}
+
+function handleAcceptedAnswerRemoval(event) {
+  const button = event.target.closest("[data-accepted-answer-index]");
+  const question = currentQuestion();
+  if (!button || !question) return;
+  const index = Number(button.dataset.acceptedAnswerIndex);
+  if (!removeAcceptedAnswer(question, index)) return;
+
+  const currentList = elements.feedback.querySelector(".accepted-answers");
+  const replacement = acceptedAnswersMarkup(question);
+  if (!replacement) currentList?.remove();
+  else if (currentList) currentList.outerHTML = replacement;
+  showToast("Accepted answer removed.");
 }
 
 function saveSession() {
@@ -1591,6 +1630,7 @@ elements.answerForm.addEventListener("submit", handleSubmit);
 elements.answerInput.addEventListener("input", () => {
   elements.answerInput.removeAttribute("aria-invalid");
 });
+elements.feedback.addEventListener("click", handleAcceptedAnswerRemoval);
 elements.nextButton.addEventListener("click", goToNextQuestion);
 elements.markCorrectButton.addEventListener("click", () =>
   markCurrentCorrect(false),

@@ -544,11 +544,40 @@ main {
 
 .accepted-answers ul {
   margin: 5px 0 0;
-  padding-left: 20px;
+  padding: 0;
+  list-style: none;
 }
 
 .accepted-answers li + li {
   margin-top: 3px;
+}
+
+.accepted-answers li {
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.accepted-answer-remove {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+  color: currentColor;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  font-size: 19px;
+  line-height: 1;
+}
+
+.accepted-answer-remove:hover {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: currentColor;
 }
 
 .answer-actions {
