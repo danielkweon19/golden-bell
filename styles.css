@@ -355,6 +355,7 @@ main {
   width: min(340px, 32vw);
 }
 
+.add-toolbar-button,
 .reader-toolbar-button {
   min-height: 36px;
   white-space: nowrap;
@@ -832,6 +833,7 @@ main {
   }
 
   body.reader-open .study-toolbar select,
+  body.reader-open .add-toolbar-button,
   body.reader-open .reader-toolbar-button {
     width: 100%;
   }
@@ -1146,6 +1148,7 @@ footer {
     width: 100%;
   }
 
+  .add-toolbar-button,
   .reader-toolbar-button {
     width: 100%;
   }

@@ -1082,9 +1082,13 @@ function resetModeProgress() {
 function updateQuestionModeControls() {
   elements.questionModeSelect.value = state.questionMode;
   elements.quizView.dataset.mode = state.questionMode;
-  const isStudyMode = state.questionMode === "study";
-  elements.addQuestionButton.disabled = !isStudyMode;
+  elements.addQuestionButton.disabled = false;
   elements.editQuestionButton.hidden = false;
+}
+
+function openNewQuestionEditor() {
+  if (state.questionMode !== "study") activateQuestionMode("study");
+  openQuestionEditor();
 }
 
 function activateQuestionMode(mode, saveCurrent = true) {
@@ -1618,9 +1622,7 @@ elements.practiceMissedButton.addEventListener("click", toggleMissedPractice);
 elements.finishPracticeButton.addEventListener("click", startMissedPractice);
 elements.resetButton.addEventListener("click", resetProgress);
 elements.finishResetButton.addEventListener("click", resetProgress);
-elements.addQuestionButton.addEventListener("click", () =>
-  openQuestionEditor(),
-);
+elements.addQuestionButton.addEventListener("click", openNewQuestionEditor);
 elements.editQuestionButton.addEventListener("click", () =>
   openQuestionEditor(currentQuestion()),
 );

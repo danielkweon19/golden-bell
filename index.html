@@ -28,12 +28,6 @@
         </a>
 
         <div class="header-actions">
-          <button class="button" id="add-question-button" type="button">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            <span>Add question</span>
-          </button>
           <button class="button" id="shuffle-button" type="button">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="m16 3 4 4-4 4" />
@@ -100,6 +94,17 @@
             <label for="question-select">Go to question</label>
             <select id="question-select"></select>
           </div>
+          <button
+            class="button add-toolbar-button"
+            id="add-question-button"
+            type="button"
+            title="Add a study question"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span>Add question</span>
+          </button>
           <button
             class="button reader-toolbar-button"
             id="open-reader-button"
@@ -387,6 +392,6 @@
     <div class="toast" id="toast" role="status" hidden></div>
 
     <script src="questions.js?v=20260728-2"></script>
-    <script src="app.js?v=20260730-6"></script>
+    <script src="app.js?v=20260730-7"></script>
   </body>
 </html>
