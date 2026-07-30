@@ -145,7 +145,6 @@ const elements = {
   skippedCount: document.querySelector("#skipped-count"),
   questionModeSelect: document.querySelector("#question-mode-select"),
   questionSelect: document.querySelector("#question-select"),
-  saveStatus: document.querySelector("#save-status"),
   source: document.querySelector("#source"),
   questionStatus: document.querySelector("#question-status"),
   questionText: document.querySelector("#question-text"),
@@ -205,7 +204,6 @@ const elements = {
 };
 
 let toastTimer;
-let saveStatusTimer;
 
 function normalizeAnswer(value) {
   return value
@@ -1004,13 +1002,8 @@ function saveSession() {
         mainIndex: state.mainIndex,
       }),
     );
-    elements.saveStatus.textContent = "Progress saved";
-    window.clearTimeout(saveStatusTimer);
-    saveStatusTimer = window.setTimeout(() => {
-      elements.saveStatus.textContent = "Progress saved in this browser";
-    }, 1500);
   } catch {
-    elements.saveStatus.textContent = "Progress could not be saved";
+    showToast("Progress could not be saved.");
   }
 }
 

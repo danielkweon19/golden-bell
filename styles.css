@@ -376,12 +376,6 @@ main {
   line-height: 1;
 }
 
-#save-status {
-  margin-left: auto;
-  color: var(--muted);
-  font-size: 11px;
-}
-
 .workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 310px;
@@ -857,10 +851,6 @@ main {
     justify-self: start;
   }
 
-  body.reader-open #save-status {
-    width: 100%;
-    margin-left: 0;
-  }
 }
 
 @media (min-width: 900px) and (max-width: 1279px) {
@@ -1174,11 +1164,6 @@ footer {
   .add-toolbar-button {
     width: auto;
     justify-self: start;
-  }
-
-  #save-status {
-    width: 100%;
-    margin-left: 0;
   }
 
   .quiz-card {
