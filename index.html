@@ -9,7 +9,7 @@
     />
     <meta name="color-scheme" content="light" />
     <title>Minor Prophets Recall</title>
-    <link rel="stylesheet" href="styles.css?v=20260730-5" />
+    <link rel="stylesheet" href="styles.css?v=20260730-6" />
   </head>
   <body>
     <header class="topbar">
@@ -344,6 +344,14 @@
 
         <div class="reference-fields">
           <label>
+            <span>Reference type</span>
+            <select id="question-scope" name="scope" required>
+              <option value="verse">Verse</option>
+              <option value="chapter">Chapter overview</option>
+              <option value="book">Book overview</option>
+            </select>
+          </label>
+          <label>
             <span>Book</span>
             <select id="question-book" name="book" required></select>
           </label>
@@ -391,6 +399,6 @@
     <div class="toast" id="toast" role="status" hidden></div>
 
     <script src="questions.js?v=20260728-2"></script>
-    <script src="app.js?v=20260730-10"></script>
+    <script src="app.js?v=20260730-11"></script>
   </body>
 </html>

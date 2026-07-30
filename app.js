@@ -5,6 +5,10 @@ const QUESTION_MODE_KEY = "minor-prophets-recall-question-mode-v1";
 const BOOK_ORDER = ["Haggai", "Zechariah", "Malachi"];
 
 function questionSource(question) {
+  if (question.scope === "book") return `${question.book} overview`;
+  if (question.scope === "chapter") {
+    return `${question.book} ${question.chapter} overview`;
+  }
   return `${question.book} ${question.chapter}:${question.verse}${
     question.endVerse ? `-${question.endVerse}` : ""
   }`;
@@ -52,6 +56,13 @@ function loadQuestionLibrary() {
 
 function hydrateQuestion(question, id) {
   const displayAnswer = String(question.displayAnswer || "").trim();
+  const scope =
+    question.scope ||
+    (question.verse != null
+      ? "verse"
+      : question.chapter != null
+        ? "chapter"
+        : "book");
   const aliases = Array.isArray(question.aliases)
     ? question.aliases
     : Array.isArray(question.answers)
@@ -60,9 +71,13 @@ function hydrateQuestion(question, id) {
   const hydrated = {
     ...question,
     id,
-    chapter: Number(question.chapter),
-    verse: Number(question.verse),
-    endVerse: question.endVerse ? Number(question.endVerse) : undefined,
+    scope,
+    chapter: scope === "book" ? undefined : Number(question.chapter),
+    verse: scope === "verse" ? Number(question.verse) : undefined,
+    endVerse:
+      scope === "verse" && question.endVerse
+        ? Number(question.endVerse)
+        : undefined,
     question: String(question.question || "").trim(),
     displayAnswer,
     aliases: aliases.map(String).map((answer) => answer.trim()).filter(Boolean),
@@ -73,11 +88,14 @@ function hydrateQuestion(question, id) {
 }
 
 function compareQuestions(left, right) {
+  const scopeOrder = { book: 0, chapter: 1, verse: 2 };
   return (
     BOOK_ORDER.indexOf(left.book) - BOOK_ORDER.indexOf(right.book) ||
-    left.chapter - right.chapter ||
-    left.verse - right.verse ||
-    (left.endVerse || left.verse) - (right.endVerse || right.verse) ||
+    (left.chapter || 0) - (right.chapter || 0) ||
+    (scopeOrder[left.scope] ?? 2) - (scopeOrder[right.scope] ?? 2) ||
+    (left.verse || 0) - (right.verse || 0) ||
+    (left.endVerse || left.verse || 0) -
+      (right.endVerse || right.verse || 0) ||
     left.id - right.id
   );
 }
@@ -193,6 +211,7 @@ const elements = {
   ),
   cancelQuestionButton: document.querySelector("#cancel-question-button"),
   saveQuestionButton: document.querySelector("#save-question-button"),
+  questionScope: document.querySelector("#question-scope"),
   questionBook: document.querySelector("#question-book"),
   questionChapter: document.querySelector("#question-chapter"),
   questionVerse: document.querySelector("#question-verse"),
@@ -289,6 +308,7 @@ function answerIsCorrect(value, question) {
 }
 
 function getVerse(question) {
+  if (question.scope !== "verse") return "";
   const book = state.bible.books.find((item) => item.name === question.book);
   const chapter = book?.chapters[question.chapter - 1];
   if (!chapter) return "";
@@ -371,6 +391,15 @@ function populateEditorVerses(selectedVerse = 1, selectedEndVerse = "") {
     : "";
 }
 
+function updateEditorReferenceFields(lockReference = false) {
+  const scope = elements.questionScope.value;
+  elements.questionScope.disabled = lockReference;
+  elements.questionBook.disabled = lockReference;
+  elements.questionChapter.disabled = lockReference || scope === "book";
+  elements.questionVerse.disabled = lockReference || scope !== "verse";
+  elements.questionEndVerse.disabled = lockReference || scope !== "verse";
+}
+
 function openQuestionEditor(question = null) {
   if (!state.bible) return;
   const isReferenceQuestion = Boolean(question?.generated);
@@ -391,17 +420,11 @@ function openQuestionEditor(question = null) {
     : "Add question";
 
   const reference = question || currentQuestion() || QUESTIONS[0];
+  elements.questionScope.value = reference.scope || "verse";
   populateEditorBooks(reference.book);
-  populateEditorChapters(reference.chapter);
-  populateEditorVerses(reference.verse, reference.endVerse);
-  [
-    elements.questionBook,
-    elements.questionChapter,
-    elements.questionVerse,
-    elements.questionEndVerse,
-  ].forEach((select) => {
-    select.disabled = isReferenceQuestion;
-  });
+  populateEditorChapters(reference.chapter || 1);
+  populateEditorVerses(reference.verse || 1, reference.endVerse);
+  updateEditorReferenceFields(isReferenceQuestion);
   elements.questionPrompt.value = question?.question || "";
   elements.questionAnswer.value = question?.displayAnswer || "";
   elements.questionAliases.value = question?.aliases?.join("\n") || "";
@@ -415,12 +438,16 @@ function closeQuestionEditor() {
 }
 
 function questionFieldsFromEditor() {
+  const scope = elements.questionScope.value;
   const endVerse = Number(elements.questionEndVerse.value);
   return {
+    scope,
     book: elements.questionBook.value,
-    chapter: Number(elements.questionChapter.value),
-    verse: Number(elements.questionVerse.value),
-    endVerse: endVerse || undefined,
+    chapter:
+      scope === "book" ? undefined : Number(elements.questionChapter.value),
+    verse:
+      scope === "verse" ? Number(elements.questionVerse.value) : undefined,
+    endVerse: scope === "verse" && endVerse ? endVerse : undefined,
     question: elements.questionPrompt.value.trim(),
     displayAnswer: elements.questionAnswer.value.trim(),
     aliases: elements.questionAliases.value
@@ -433,6 +460,7 @@ function questionFieldsFromEditor() {
 function storedQuestion(question) {
   return {
     id: question.id,
+    scope: question.scope,
     book: question.book,
     chapter: question.chapter,
     verse: question.verse,
@@ -612,6 +640,7 @@ function updateReaderNavigation() {
 function questionsForReaderVerse(verseNumber) {
   return QUESTIONS.filter(
     (question) =>
+      question.scope === "verse" &&
       question.book === state.readerBook &&
       question.chapter === state.readerChapter &&
       verseNumber >= question.verse &&
@@ -708,8 +737,9 @@ function openReader() {
   if (!state.bible) return;
   const question = currentQuestion() || QUESTIONS[0];
   state.readerBook = question.book;
-  state.readerChapter = question.chapter;
-  state.readerVerse = question.verse;
+  state.readerChapter = question.chapter || 1;
+  const chapter = bibleBook(state.readerBook).chapters[state.readerChapter - 1];
+  state.readerVerse = question.verse || chapter.verses[0].num;
   state.readerOpen = true;
   const isOverlay =
     !window.matchMedia || window.matchMedia("(max-width: 899px)").matches;
@@ -817,6 +847,14 @@ function acceptedAnswersMarkup(question) {
       <ul>${items}</ul>
     </div>
   `;
+}
+
+function verseCitationMarkup(question) {
+  const verse = getVerse(question);
+  if (!verse) return "";
+  return `<p class="verse">“${escapeHtml(verse)}” — ${escapeHtml(
+    question.source,
+  )} NKJV</p>`;
 }
 
 function showToast(message) {
@@ -1124,9 +1162,7 @@ function showCorrectFeedback(question, heading = "Correct.") {
     <strong>${escapeHtml(heading)}</strong>
     <p><b>Official answer:</b> ${escapeHtml(question.displayAnswer)}</p>
     ${acceptedAnswersMarkup(question)}
-    <p class="verse">“${escapeHtml(getVerse(question))}” — ${escapeHtml(
-      question.source,
-    )} NKJV</p>
+    ${verseCitationMarkup(question)}
   `;
   elements.markCorrectButton.hidden = true;
   elements.acceptAnswerButton.hidden = true;
@@ -1243,9 +1279,7 @@ function handleSubmit(event) {
     <p><b>Official answer:</b> ${escapeHtml(question.displayAnswer)}</p>
     ${acceptedAnswersMarkup(question)}
     <p><b>You entered:</b> ${value ? escapeHtml(value) : "No answer"}</p>
-    <p class="verse">“${escapeHtml(getVerse(question))}” — ${escapeHtml(
-      question.source,
-    )} NKJV</p>
+    ${verseCitationMarkup(question)}
   `;
   elements.markCorrectButton.hidden = false;
   elements.acceptAnswerButton.hidden = !value;
@@ -1456,7 +1490,9 @@ async function initialize() {
 
     const missingReference = Object.values(QUESTION_BANKS)
       .flat()
-      .find((question) => !getVerse(question));
+      .find(
+        (question) => question.scope === "verse" && !getVerse(question),
+      );
     if (missingReference) {
       throw new Error(`Missing reference: ${missingReference.source}`);
     }
@@ -1527,6 +1563,9 @@ elements.cancelQuestionButton.addEventListener("click", closeQuestionEditor);
 elements.questionDialog.addEventListener("click", (event) => {
   if (event.target === elements.questionDialog) closeQuestionEditor();
 });
+elements.questionScope.addEventListener("change", () =>
+  updateEditorReferenceFields(false),
+);
 elements.questionBook.addEventListener("change", () => {
   populateEditorChapters();
   populateEditorVerses();
