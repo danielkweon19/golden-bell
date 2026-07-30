@@ -354,6 +354,11 @@ main {
   width: min(340px, 32vw);
 }
 
+.reader-toolbar-button {
+  min-height: 36px;
+  white-space: nowrap;
+}
+
 #save-status {
   margin-left: auto;
   color: var(--muted);
@@ -1083,6 +1088,10 @@ footer {
   }
 
   .study-toolbar select {
+    width: 100%;
+  }
+
+  .reader-toolbar-button {
     width: 100%;
   }
 
