@@ -318,9 +318,11 @@ main {
 .study-toolbar {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 9px;
   min-height: 52px;
   margin-bottom: 16px;
+  padding: 8px 0;
   border-bottom: 1px solid var(--line);
 }
 
@@ -359,6 +361,19 @@ main {
 .reader-toolbar-button {
   min-height: 36px;
   white-space: nowrap;
+}
+
+.add-toolbar-button {
+  min-width: 108px;
+  flex: 0 0 auto;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.add-toolbar-button span {
+  display: inline;
+  white-space: nowrap;
+  line-height: 1;
 }
 
 #save-status {
@@ -833,9 +848,13 @@ main {
   }
 
   body.reader-open .study-toolbar select,
-  body.reader-open .add-toolbar-button,
   body.reader-open .reader-toolbar-button {
     width: 100%;
+  }
+
+  body.reader-open .add-toolbar-button {
+    width: auto;
+    justify-self: start;
   }
 
   body.reader-open #save-status {
@@ -1148,9 +1167,13 @@ footer {
     width: 100%;
   }
 
-  .add-toolbar-button,
   .reader-toolbar-button {
     width: 100%;
+  }
+
+  .add-toolbar-button {
+    width: auto;
+    justify-self: start;
   }
 
   #save-status {
