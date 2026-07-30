@@ -757,9 +757,12 @@ function openReader() {
   state.readerChapter = question.chapter;
   state.readerVerse = question.verse;
   state.readerOpen = true;
+  const isOverlay =
+    !window.matchMedia || window.matchMedia("(max-width: 899px)").matches;
   renderReader();
-  elements.readerBackdrop.hidden = false;
+  elements.readerBackdrop.hidden = !isOverlay;
   elements.readerPanel.classList.add("is-open");
+  elements.readerPanel.setAttribute("aria-modal", String(isOverlay));
   elements.readerPanel.setAttribute("aria-hidden", "false");
   document.body.classList.add("reader-open");
   elements.closeReaderButton.focus();
