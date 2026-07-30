@@ -279,6 +279,10 @@ function fillWordScore(match, wordIndex) {
   return score;
 }
 
+function stripFillInstruction(value) {
+  return String(value).replace(/^Fill in the blanks?:\s*/i, "");
+}
+
 function makeFillQuestion(book, chapter, verse, id) {
   const text = verse.text;
   const matches = [...text.matchAll(/[A-Za-z]+(?:[’'][A-Za-z]+)*/g)];
@@ -334,7 +338,7 @@ function makeFillQuestion(book, chapter, verse, id) {
       book,
       chapter,
       verse: verse.num,
-      question: `Fill in the ${answerWords.length === 1 ? "blank" : "blanks"}: “${blankedText}”`,
+      question: `“${blankedText}”`,
       displayAnswer,
       aliases: [
         answerWords.join(" "),
@@ -361,7 +365,17 @@ function buildFillQuestionBank() {
         );
         const edit = questionLibrary.fillEdits[id];
         return edit
-          ? hydrateQuestion({ ...generated, ...edit, generated: true }, id)
+          ? hydrateQuestion(
+              {
+                ...generated,
+                ...edit,
+                question: stripFillInstruction(
+                  edit.question || generated.question,
+                ),
+                generated: true,
+              },
+              id,
+            )
           : generated;
       }),
     );
@@ -569,6 +583,9 @@ function handleQuestionSave(event) {
 
   if (state.editingQuestionId) {
     question = questionById(state.editingQuestionId);
+    if (question.generated) {
+      fields.question = stripFillInstruction(fields.question);
+    }
     if (question.generated && !fields.question.includes("_____")) {
       showToast("Keep at least one _____ blank in the sentence.");
       elements.questionPrompt.focus();
