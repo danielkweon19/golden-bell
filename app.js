@@ -1246,6 +1246,7 @@ function handleSubmit(event) {
   if (answerIsCorrect(value, question)) {
     if (state.practiceMode) {
       state.practiceCorrectIds.add(question.id);
+      state.missed.delete(question.id);
     } else {
       state.correctIds.add(question.id);
       state.skippedIds.delete(question.id);
