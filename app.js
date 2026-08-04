@@ -209,7 +209,6 @@ const elements = {
   closeQuestionDialogButton: document.querySelector(
     "#close-question-dialog-button",
   ),
-  cancelQuestionButton: document.querySelector("#cancel-question-button"),
   saveQuestionButton: document.querySelector("#save-question-button"),
   questionScope: document.querySelector("#question-scope"),
   questionBook: document.querySelector("#question-book"),
@@ -1559,9 +1558,8 @@ elements.closeQuestionDialogButton.addEventListener(
   "click",
   closeQuestionEditor,
 );
-elements.cancelQuestionButton.addEventListener("click", closeQuestionEditor);
-elements.questionDialog.addEventListener("click", (event) => {
-  if (event.target === elements.questionDialog) closeQuestionEditor();
+elements.questionDialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
 });
 elements.questionScope.addEventListener("change", () =>
   updateEditorReferenceFields(false),
