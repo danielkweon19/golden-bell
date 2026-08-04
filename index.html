@@ -9,7 +9,7 @@
     />
     <meta name="color-scheme" content="light" />
     <title>Minor Prophets Recall</title>
-    <link rel="stylesheet" href="styles.css?v=20260730-6" />
+    <link rel="stylesheet" href="styles.css?v=20260804-1" />
   </head>
   <body>
     <header class="topbar">
@@ -89,6 +89,32 @@
               <option value="study">Study questions</option>
               <option value="fill">Verse reference</option>
             </select>
+          </div>
+          <div
+            class="toolbar-control wording-control"
+            id="question-wording-control"
+          >
+            <span class="toolbar-label">Wording</span>
+            <div
+              class="segmented-control"
+              role="group"
+              aria-label="Question wording"
+            >
+              <button
+                type="button"
+                data-question-wording="preferred"
+                aria-pressed="true"
+              >
+                Preferred
+              </button>
+              <button
+                type="button"
+                data-question-wording="alternate"
+                aria-pressed="false"
+              >
+                Alternate
+              </button>
+            </div>
           </div>
           <div class="toolbar-control question-control">
             <label for="question-select">Go to question</label>
@@ -373,6 +399,14 @@
           <span id="question-prompt-label">Question</span>
           <textarea id="question-prompt" name="question" rows="3" required></textarea>
         </label>
+        <label id="alternate-question-field">
+          <span>Alternate question</span>
+          <textarea
+            id="alternate-question-prompt"
+            name="alternateQuestion"
+            rows="3"
+          ></textarea>
+        </label>
         <label>
           <span id="question-answer-label">Official answer</span>
           <input id="question-answer" name="displayAnswer" type="text" required />
@@ -398,6 +432,6 @@
     <div class="toast" id="toast" role="status" hidden></div>
 
     <script src="questions.js?v=20260728-2"></script>
-    <script src="app.js?v=20260804-1"></script>
+    <script src="app.js?v=20260804-2"></script>
   </body>
 </html>

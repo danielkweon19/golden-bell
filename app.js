@@ -2,6 +2,7 @@ const SESSION_KEY = "minor-prophets-recall-session-v2";
 const ACCEPTED_KEY = "minor-prophets-recall-accepted-v2";
 const QUESTION_LIBRARY_KEY = "minor-prophets-recall-question-library-v1";
 const QUESTION_MODE_KEY = "minor-prophets-recall-question-mode-v1";
+const QUESTION_WORDING_KEY = "minor-prophets-recall-question-wording-v1";
 const BOOK_ORDER = ["Haggai", "Zechariah", "Malachi"];
 
 function questionSource(question) {
@@ -79,6 +80,7 @@ function hydrateQuestion(question, id) {
         ? Number(question.endVerse)
         : undefined,
     question: String(question.question || "").trim(),
+    alternateQuestion: String(question.alternateQuestion || "").trim(),
     displayAnswer,
     aliases: aliases.map(String).map((answer) => answer.trim()).filter(Boolean),
   };
@@ -131,6 +133,7 @@ const READER_BOOKS = BOOK_ORDER;
 const state = {
   bible: null,
   questionMode: "study",
+  questionWording: "preferred",
   deckIds: QUESTIONS.map((question) => question.id),
   index: 0,
   correctIds: new Set(),
@@ -162,6 +165,10 @@ const elements = {
   missedCount: document.querySelector("#missed-count"),
   skippedCount: document.querySelector("#skipped-count"),
   questionModeSelect: document.querySelector("#question-mode-select"),
+  questionWordingControl: document.querySelector("#question-wording-control"),
+  questionWordingButtons: document.querySelectorAll(
+    "[data-question-wording]",
+  ),
   questionSelect: document.querySelector("#question-select"),
   source: document.querySelector("#source"),
   questionStatus: document.querySelector("#question-status"),
@@ -205,6 +212,9 @@ const elements = {
   questionForm: document.querySelector("#question-form"),
   questionDialogTitle: document.querySelector("#question-dialog-title"),
   questionPromptLabel: document.querySelector("#question-prompt-label"),
+  alternateQuestionField: document.querySelector(
+    "#alternate-question-field",
+  ),
   questionAnswerLabel: document.querySelector("#question-answer-label"),
   closeQuestionDialogButton: document.querySelector(
     "#close-question-dialog-button",
@@ -216,6 +226,9 @@ const elements = {
   questionVerse: document.querySelector("#question-verse"),
   questionEndVerse: document.querySelector("#question-end-verse"),
   questionPrompt: document.querySelector("#question-prompt"),
+  alternateQuestionPrompt: document.querySelector(
+    "#alternate-question-prompt",
+  ),
   questionAnswer: document.querySelector("#question-answer"),
   questionAliases: document.querySelector("#question-aliases"),
   toast: document.querySelector("#toast"),
@@ -304,6 +317,12 @@ function answerIsCorrect(value, question) {
     ...(state.acceptedAnswers.get(question.id) || []),
   ];
   return accepted.some((answer) => normalizeAnswer(answer) === normalized);
+}
+
+function displayedQuestion(question) {
+  return state.questionWording === "alternate" && question.alternateQuestion
+    ? question.alternateQuestion
+    : question.question;
 }
 
 function getVerse(question) {
@@ -410,7 +429,8 @@ function openQuestionEditor(question = null) {
       : "Add question";
   elements.questionPromptLabel.textContent = isReferenceQuestion
     ? "Verse text"
-    : "Question";
+    : "Preferred question";
+  elements.alternateQuestionField.hidden = isReferenceQuestion;
   elements.questionAnswerLabel.textContent = isReferenceQuestion
     ? "Verse reference"
     : "Official answer";
@@ -425,6 +445,7 @@ function openQuestionEditor(question = null) {
   populateEditorVerses(reference.verse || 1, reference.endVerse);
   updateEditorReferenceFields(isReferenceQuestion);
   elements.questionPrompt.value = question?.question || "";
+  elements.alternateQuestionPrompt.value = question?.alternateQuestion || "";
   elements.questionAnswer.value = question?.displayAnswer || "";
   elements.questionAliases.value = question?.aliases?.join("\n") || "";
   elements.questionDialog.showModal();
@@ -448,6 +469,7 @@ function questionFieldsFromEditor() {
       scope === "verse" ? Number(elements.questionVerse.value) : undefined,
     endVerse: scope === "verse" && endVerse ? endVerse : undefined,
     question: elements.questionPrompt.value.trim(),
+    alternateQuestion: elements.alternateQuestionPrompt.value.trim(),
     displayAnswer: elements.questionAnswer.value.trim(),
     aliases: elements.questionAliases.value
       .split(/\r?\n/)
@@ -465,6 +487,7 @@ function storedQuestion(question) {
     verse: question.verse,
     endVerse: question.endVerse,
     question: question.question,
+    alternateQuestion: question.alternateQuestion,
     displayAnswer: question.displayAnswer,
     aliases: question.aliases,
   };
@@ -1003,8 +1026,33 @@ function resetModeProgress() {
 function updateQuestionModeControls() {
   elements.questionModeSelect.value = state.questionMode;
   elements.quizView.dataset.mode = state.questionMode;
+  elements.questionWordingControl.hidden = state.questionMode !== "study";
   elements.addQuestionButton.disabled = false;
   elements.editQuestionButton.hidden = false;
+}
+
+function setQuestionWording(wording, save = true) {
+  state.questionWording =
+    wording === "alternate" ? "alternate" : "preferred";
+  elements.questionWordingButtons.forEach((button) => {
+    button.setAttribute(
+      "aria-pressed",
+      String(button.dataset.questionWording === state.questionWording),
+    );
+  });
+
+  if (save) {
+    try {
+      localStorage.setItem(QUESTION_WORDING_KEY, state.questionWording);
+    } catch {
+      // The selected wording still works for the current page session.
+    }
+  }
+
+  populateQuestionSelect();
+  const question = currentQuestion();
+  if (question) elements.questionText.textContent = displayedQuestion(question);
+  updateStats();
 }
 
 function openNewQuestionEditor() {
@@ -1040,10 +1088,11 @@ function populateQuestionSelect() {
     ...QUESTIONS.map((question, index) => {
       const option = document.createElement("option");
       option.value = question.id;
+      const questionText = displayedQuestion(question);
       const shortQuestion =
-        question.question.length > 58
-          ? `${question.question.slice(0, 58)}...`
-          : question.question;
+        questionText.length > 58
+          ? `${questionText.slice(0, 58)}...`
+          : questionText;
       option.textContent =
         state.questionMode === "fill"
           ? `Verse ${index + 1} · ${shortQuestion}`
@@ -1131,7 +1180,7 @@ function updateStats() {
       const source = document.createElement("strong");
       source.textContent = question.source;
       const prompt = document.createElement("span");
-      prompt.textContent = question.question;
+      prompt.textContent = displayedQuestion(question);
       openButton.append(source, prompt);
 
       const removeButton = document.createElement("button");
@@ -1184,7 +1233,7 @@ function renderQuestion() {
   elements.quizView.hidden = false;
   elements.source.textContent =
     state.questionMode === "fill" ? "NKJV verse" : question.source;
-  elements.questionText.textContent = question.question;
+  elements.questionText.textContent = displayedQuestion(question);
   elements.questionSelect.value = String(question.id);
   clearFeedback();
   updateQuestionStatus(question);
@@ -1417,7 +1466,7 @@ function buildReviewSection(title, entries, type) {
         <article class="review-row">
           <div class="review-source">${escapeHtml(question.source)}</div>
           <div>
-            <p><strong>${escapeHtml(question.question)}</strong></p>
+            <p><strong>${escapeHtml(displayedQuestion(question))}</strong></p>
             ${answerLine}
             <p class="correct-answer"><strong>Answer:</strong> ${escapeHtml(
               question.displayAnswer,
@@ -1478,8 +1527,13 @@ async function initialize() {
     let savedMode = "study";
     try {
       savedMode = localStorage.getItem(QUESTION_MODE_KEY) || "study";
+      state.questionWording =
+        localStorage.getItem(QUESTION_WORDING_KEY) === "alternate"
+          ? "alternate"
+          : "preferred";
     } catch {
       savedMode = "study";
+      state.questionWording = "preferred";
     }
     if (QUESTION_BANKS[savedMode]) {
       state.questionMode = savedMode;
@@ -1501,6 +1555,7 @@ async function initialize() {
     populateQuestionSelect();
     populateReaderBooks();
     updateQuestionModeControls();
+    setQuestionWording(state.questionWording, false);
     elements.loadingView.hidden = true;
     elements.quizView.hidden = false;
 
@@ -1541,6 +1596,11 @@ elements.shuffleButton.addEventListener("click", shuffleRemaining);
 elements.questionModeSelect.addEventListener("change", (event) =>
   activateQuestionMode(event.target.value),
 );
+elements.questionWordingButtons.forEach((button) => {
+  button.addEventListener("click", () =>
+    setQuestionWording(button.dataset.questionWording),
+  );
+});
 elements.questionSelect.addEventListener("change", (event) =>
   goToQuestion(Number(event.target.value)),
 );
