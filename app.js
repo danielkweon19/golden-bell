@@ -3,6 +3,7 @@ const ACCEPTED_KEY = "minor-prophets-recall-accepted-v2";
 const QUESTION_LIBRARY_KEY = "minor-prophets-recall-question-library-v1";
 const QUESTION_MODE_KEY = "minor-prophets-recall-question-mode-v1";
 const QUESTION_WORDING_KEY = "minor-prophets-recall-question-wording-v1";
+const QUESTION_LIBRARY_ASSET = "question-library.json?v=20260810-1";
 const BOOK_ORDER = ["Haggai", "Zechariah", "Malachi"];
 
 function emptyQuestionLibrary() {
@@ -11,6 +12,7 @@ function emptyQuestionLibrary() {
     fillEdits: {},
     removedStudy: [],
     removedFill: [],
+    removedCustom: [],
     custom: [],
   };
 }
@@ -30,7 +32,35 @@ function normalizedQuestionLibrary(saved) {
     removedFill: Array.isArray(saved.removedFill)
       ? saved.removedFill.map(Number)
       : [],
+    removedCustom: Array.isArray(saved.removedCustom)
+      ? saved.removedCustom.map(Number)
+      : [],
     custom: Array.isArray(saved.custom) ? saved.custom : [],
+  };
+}
+
+function mergeQuestionLibraries(defaults, local) {
+  const customById = new Map(
+    [...defaults.custom, ...local.custom]
+      .filter((question) => question?.id)
+      .map((question) => [Number(question.id), question]),
+  );
+  const removedCustom = [
+    ...new Set([...defaults.removedCustom, ...local.removedCustom]),
+  ];
+  removedCustom.forEach((id) => customById.delete(id));
+
+  return {
+    edits: { ...defaults.edits, ...local.edits },
+    fillEdits: { ...defaults.fillEdits, ...local.fillEdits },
+    removedStudy: [
+      ...new Set([...defaults.removedStudy, ...local.removedStudy]),
+    ],
+    removedFill: [
+      ...new Set([...defaults.removedFill, ...local.removedFill]),
+    ],
+    removedCustom,
+    custom: [...customById.values()],
   };
 }
 
@@ -44,15 +74,35 @@ function questionSource(question) {
   }`;
 }
 
-function loadQuestionLibrary() {
+function loadQuestionLibrary(defaults) {
   try {
-    const saved = JSON.parse(
-      localStorage.getItem(QUESTION_LIBRARY_KEY) || "null",
+    const saved = normalizedQuestionLibrary(
+      JSON.parse(localStorage.getItem(QUESTION_LIBRARY_KEY) || "null"),
     );
-    return normalizedQuestionLibrary(saved) || emptyQuestionLibrary();
+    return saved ? mergeQuestionLibraries(defaults, saved) : defaults;
   } catch {
-    return emptyQuestionLibrary();
+    return defaults;
   }
+}
+
+async function loadBundledQuestions() {
+  const response = await fetch(QUESTION_LIBRARY_ASSET);
+  if (!response.ok) {
+    throw new Error(`Question library returned ${response.status}`);
+  }
+  const exported = await response.json();
+  if (
+    exported?.format !== "golden-bell-question-export" ||
+    exported.version !== 1
+  ) {
+    throw new Error("Unsupported bundled question library.");
+  }
+  const library = normalizedQuestionLibrary(exported.questionLibrary);
+  if (!library) throw new Error("Invalid bundled question library.");
+  return {
+    library,
+    acceptedAnswers: normalizedAcceptedAnswers(exported.acceptedAnswers),
+  };
 }
 
 function hydrateQuestion(question, id) {
@@ -102,26 +152,10 @@ function compareQuestions(left, right) {
   );
 }
 
-const questionLibrary = loadQuestionLibrary();
+let questionLibrary = emptyQuestionLibrary();
+let bundledAcceptedAnswers = {};
 const BASE_QUESTION_COUNT = expandedQuestionBank.length;
-const STUDY_QUESTIONS = expandedQuestionBank.map((question, index) => {
-  const id = index + 1;
-  return hydrateQuestion(
-    { ...question, ...(questionLibrary.edits[id] || {}) },
-    id,
-  );
-}).filter((question) => !questionLibrary.removedStudy.includes(question.id));
-
-questionLibrary.custom.forEach((question) => {
-  if (
-    !question?.id ||
-    STUDY_QUESTIONS.some((item) => item.id === Number(question.id))
-  ) {
-    return;
-  }
-  STUDY_QUESTIONS.push(hydrateQuestion(question, Number(question.id)));
-});
-STUDY_QUESTIONS.sort(compareQuestions);
+const STUDY_QUESTIONS = [];
 
 let QUESTIONS = STUDY_QUESTIONS;
 const QUESTION_BANKS = {
@@ -129,6 +163,36 @@ const QUESTION_BANKS = {
   fill: [],
 };
 const READER_BOOKS = BOOK_ORDER;
+
+function buildStudyQuestionBank() {
+  STUDY_QUESTIONS.splice(
+    0,
+    STUDY_QUESTIONS.length,
+    ...expandedQuestionBank
+      .map((question, index) => {
+        const id = index + 1;
+        return hydrateQuestion(
+          { ...question, ...(questionLibrary.edits[id] || {}) },
+          id,
+        );
+      })
+      .filter(
+        (question) => !questionLibrary.removedStudy.includes(question.id),
+      ),
+  );
+
+  questionLibrary.custom.forEach((question) => {
+    if (
+      !question?.id ||
+      questionLibrary.removedCustom.includes(Number(question.id)) ||
+      STUDY_QUESTIONS.some((item) => item.id === Number(question.id))
+    ) {
+      return;
+    }
+    STUDY_QUESTIONS.push(hydrateQuestion(question, Number(question.id)));
+  });
+  STUDY_QUESTIONS.sort(compareQuestions);
+}
 
 const state = {
   bible: null,
@@ -674,6 +738,9 @@ function deleteCurrentQuestion() {
     questionLibrary.custom = questionLibrary.custom.filter(
       (item) => Number(item.id) !== question.id,
     );
+    if (!questionLibrary.removedCustom.includes(question.id)) {
+      questionLibrary.removedCustom.push(question.id);
+    }
   }
 
   const questionIndex = QUESTIONS.indexOf(question);
@@ -979,7 +1046,11 @@ function saveAcceptedAnswers() {
 
 function loadAcceptedAnswers() {
   try {
-    const saved = JSON.parse(localStorage.getItem(ACCEPTED_KEY) || "{}");
+    const local = localStorage.getItem(ACCEPTED_KEY);
+    const saved =
+      local === null
+        ? bundledAcceptedAnswers
+        : normalizedAcceptedAnswers(JSON.parse(local));
     state.acceptedAnswers = new Map(
       Object.entries(saved).map(([id, answers]) => [Number(id), answers]),
     );
@@ -1597,10 +1668,16 @@ function resetProgress() {
 
 async function initialize() {
   try {
-    const response = await fetch("nkjv.json");
+    const [response, bundledQuestions] = await Promise.all([
+      fetch("nkjv.json"),
+      loadBundledQuestions(),
+    ]);
     if (!response.ok) throw new Error(`Bible data returned ${response.status}`);
     state.bible = await response.json();
+    questionLibrary = loadQuestionLibrary(bundledQuestions.library);
+    bundledAcceptedAnswers = bundledQuestions.acceptedAnswers;
 
+    buildStudyQuestionBank();
     buildReferenceQuestionBank();
     let savedMode = "study";
     try {
@@ -1613,11 +1690,10 @@ async function initialize() {
       savedMode = "study";
       state.questionWording = "preferred";
     }
-    if (QUESTION_BANKS[savedMode]) {
-      state.questionMode = savedMode;
-      QUESTIONS = QUESTION_BANKS[savedMode];
-      resetModeProgress();
-    }
+    if (!QUESTION_BANKS[savedMode]) savedMode = "study";
+    state.questionMode = savedMode;
+    QUESTIONS = QUESTION_BANKS[savedMode];
+    resetModeProgress();
 
     const missingReference = Object.values(QUESTION_BANKS)
       .flat()
