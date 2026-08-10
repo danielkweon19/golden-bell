@@ -1,7 +1,7 @@
 {
   "format": "golden-bell-question-export",
   "version": 1,
-  "exportedAt": "2026-08-10T15:57:38.352Z",
+  "exportedAt": "2026-08-10T16:05:32.094Z",
   "questionLibrary": {
     "version": 1,
     "edits": {
@@ -413,6 +413,28 @@
         "question": "Yes, they made their hearts like ___________, refusing to hear the law and the words which the LORD of hosts had sent by His Spirit through the former prophets. Thus great wrath came from the LORD of hosts.",
         "alternateQuestion": "",
         "displayAnswer": "Flint",
+        "aliases": []
+      },
+      "47": {
+        "id": 47,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 5,
+        "question": "The streets of the city Shall be full of ________ and ________ Playing in its streets.'",
+        "alternateQuestion": "Who would fill Jerusalem's streets while playing?",
+        "displayAnswer": "boys, girls",
+        "aliases": []
+      },
+      "48": {
+        "id": 48,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 7,
+        "question": "\"Thus says the LORD of hosts: \"Behold, I will save My people from the land of the ________ And from the land of the ________;",
+        "alternateQuestion": "From which two directions would the LORD save His people?",
+        "displayAnswer": "east, west",
         "aliases": []
       }
     },
@@ -1065,6 +1087,61 @@
         "question": "\"But I scattered them with a _________ among all the nations which they had not known. Thus the land became desolate after them, so that no one passed through or returned; for they made the _______ land desolate.\"",
         "alternateQuestion": "",
         "displayAnswer": "whirlwind, pleasant,",
+        "aliases": []
+      },
+      {
+        "id": 1786377558769,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 2,
+        "question": "\"Thus says the LORD of hosts: \"I am zealous for Zion with great zeal; With __________ I am zealous for her.'",
+        "alternateQuestion": "",
+        "displayAnswer": "great fervor",
+        "aliases": []
+      },
+      {
+        "id": 1786377603567,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 4,
+        "question": "\"Thus says the LORD of hosts: \"__________ and _________ shall again sit In the ____________ of Jerusalem, Each one with his _________ in his hand Because of great _____.",
+        "alternateQuestion": "",
+        "displayAnswer": "Old men, old women, streets, staff, age",
+        "aliases": []
+      },
+      {
+        "id": 1786377725877,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 8,
+        "question": "I will bring them back, And they shall dwell in the midst of ___________. They shall be My people And I will be their God, In _______ and ___________.'",
+        "alternateQuestion": "",
+        "displayAnswer": "Jerusalem, truth, righteousness",
+        "aliases": []
+      },
+      {
+        "id": 1786377799267,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 10,
+        "question": "For before these days There were no _______ for man nor any _______ for beast; There was no ______ from the enemy for whoever went out or came in; For I set all men, everyone, against his neighbor.",
+        "alternateQuestion": "",
+        "displayAnswer": "wages, hire, peace",
+        "aliases": []
+      },
+      {
+        "id": 1786377850622,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 12,
+        "question": "\"For the __________ shall be prosperous, The _______ shall give its ______, The _________ shall give her ___________, And the _______ shall give their ___________-- I will cause the remnant of this people To possess all these.",
+        "alternateQuestion": "",
+        "displayAnswer": "seed, vine, fruit, ground, increase, heavens, dew",
         "aliases": []
       }
     ]

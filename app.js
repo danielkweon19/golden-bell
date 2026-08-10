@@ -3,7 +3,7 @@ const ACCEPTED_KEY = "minor-prophets-recall-accepted-v2";
 const QUESTION_LIBRARY_KEY = "minor-prophets-recall-question-library-v1";
 const QUESTION_MODE_KEY = "minor-prophets-recall-question-mode-v1";
 const QUESTION_WORDING_KEY = "minor-prophets-recall-question-wording-v1";
-const QUESTION_LIBRARY_ASSET = "question-library.json?v=20260810-1";
+const QUESTION_LIBRARY_ASSET = "question-library.json?v=20260810-2";
 const BOOK_ORDER = ["Haggai", "Zechariah", "Malachi"];
 
 function emptyQuestionLibrary() {
