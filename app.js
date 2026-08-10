@@ -5,6 +5,35 @@ const QUESTION_MODE_KEY = "minor-prophets-recall-question-mode-v1";
 const QUESTION_WORDING_KEY = "minor-prophets-recall-question-wording-v1";
 const BOOK_ORDER = ["Haggai", "Zechariah", "Malachi"];
 
+function emptyQuestionLibrary() {
+  return {
+    edits: {},
+    fillEdits: {},
+    removedStudy: [],
+    removedFill: [],
+    custom: [],
+  };
+}
+
+function normalizedQuestionLibrary(saved) {
+  if (!saved || saved.version !== 1) return null;
+  return {
+    edits:
+      saved.edits && typeof saved.edits === "object" ? saved.edits : {},
+    fillEdits:
+      saved.fillEdits && typeof saved.fillEdits === "object"
+        ? saved.fillEdits
+        : {},
+    removedStudy: Array.isArray(saved.removedStudy)
+      ? saved.removedStudy.map(Number)
+      : [],
+    removedFill: Array.isArray(saved.removedFill)
+      ? saved.removedFill.map(Number)
+      : [],
+    custom: Array.isArray(saved.custom) ? saved.custom : [],
+  };
+}
+
 function questionSource(question) {
   if (question.scope === "book") return `${question.book} overview`;
   if (question.scope === "chapter") {
@@ -20,38 +49,9 @@ function loadQuestionLibrary() {
     const saved = JSON.parse(
       localStorage.getItem(QUESTION_LIBRARY_KEY) || "null",
     );
-    if (!saved || saved.version !== 1) {
-      return {
-        edits: {},
-        fillEdits: {},
-        removedStudy: [],
-        removedFill: [],
-        custom: [],
-      };
-    }
-    return {
-      edits:
-        saved.edits && typeof saved.edits === "object" ? saved.edits : {},
-      fillEdits:
-        saved.fillEdits && typeof saved.fillEdits === "object"
-          ? saved.fillEdits
-          : {},
-      removedStudy: Array.isArray(saved.removedStudy)
-        ? saved.removedStudy.map(Number)
-        : [],
-      removedFill: Array.isArray(saved.removedFill)
-        ? saved.removedFill.map(Number)
-        : [],
-      custom: Array.isArray(saved.custom) ? saved.custom : [],
-    };
+    return normalizedQuestionLibrary(saved) || emptyQuestionLibrary();
   } catch {
-    return {
-      edits: {},
-      fillEdits: {},
-      removedStudy: [],
-      removedFill: [],
-      custom: [],
-    };
+    return emptyQuestionLibrary();
   }
 }
 
@@ -196,6 +196,9 @@ const elements = {
   finishPracticeButton: document.querySelector("#finish-practice-button"),
   finishResetButton: document.querySelector("#finish-reset-button"),
   addQuestionButton: document.querySelector("#add-question-button"),
+  exportQuestionsButton: document.querySelector("#export-questions-button"),
+  importQuestionsButton: document.querySelector("#import-questions-button"),
+  importQuestionsInput: document.querySelector("#import-questions-input"),
   editQuestionButton: document.querySelector("#edit-question-button"),
   deleteQuestionButton: document.querySelector("#delete-question-button"),
   openReaderButton: document.querySelector("#open-reader-button"),
@@ -503,6 +506,81 @@ function saveQuestionLibrary() {
   } catch {
     showToast("Question changes could not be saved.");
     return false;
+  }
+}
+
+function normalizedAcceptedAnswers(saved) {
+  if (!saved || typeof saved !== "object" || Array.isArray(saved)) return {};
+  return Object.fromEntries(
+    Object.entries(saved)
+      .filter(([, answers]) => Array.isArray(answers))
+      .map(([id, answers]) => [
+        String(Number(id)),
+        answers.map(String).map((answer) => answer.trim()).filter(Boolean),
+      ])
+      .filter(([id, answers]) => id !== "NaN" && answers.length),
+  );
+}
+
+function exportQuestions() {
+  const acceptedAnswers = normalizedAcceptedAnswers(
+    Object.fromEntries(state.acceptedAnswers),
+  );
+  const exported = {
+    format: "golden-bell-question-export",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    questionLibrary: { version: 1, ...questionLibrary },
+    acceptedAnswers,
+  };
+  const date = exported.exportedAt.slice(0, 10);
+  const blob = new Blob([`${JSON.stringify(exported, null, 2)}\n`], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `golden-bell-questions-${date}.json`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast("Question export downloaded.");
+}
+
+async function importQuestions(event) {
+  const [file] = event.target.files;
+  event.target.value = "";
+  if (!file) return;
+
+  try {
+    const exported = JSON.parse(await file.text());
+    if (
+      exported?.format !== "golden-bell-question-export" ||
+      exported.version !== 1
+    ) {
+      throw new Error("Unsupported question export.");
+    }
+    const importedLibrary = normalizedQuestionLibrary(
+      exported.questionLibrary,
+    );
+    if (!importedLibrary) throw new Error("Invalid question library.");
+    const acceptedAnswers = normalizedAcceptedAnswers(
+      exported.acceptedAnswers,
+    );
+    const confirmed = window.confirm(
+      "Replace the question changes saved in this browser with this export?",
+    );
+    if (!confirmed) return;
+
+    localStorage.setItem(
+      QUESTION_LIBRARY_KEY,
+      JSON.stringify({ version: 1, ...importedLibrary }),
+    );
+    localStorage.setItem(ACCEPTED_KEY, JSON.stringify(acceptedAnswers));
+    window.location.reload();
+  } catch {
+    showToast("That question export could not be imported.");
   }
 }
 
@@ -1609,6 +1687,11 @@ elements.finishPracticeButton.addEventListener("click", startMissedPractice);
 elements.resetButton.addEventListener("click", resetProgress);
 elements.finishResetButton.addEventListener("click", resetProgress);
 elements.addQuestionButton.addEventListener("click", openNewQuestionEditor);
+elements.exportQuestionsButton.addEventListener("click", exportQuestions);
+elements.importQuestionsButton.addEventListener("click", () =>
+  elements.importQuestionsInput.click(),
+);
+elements.importQuestionsInput.addEventListener("change", importQuestions);
 elements.editQuestionButton.addEventListener("click", () =>
   openQuestionEditor(currentQuestion()),
 );

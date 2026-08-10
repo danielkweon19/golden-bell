@@ -9,7 +9,7 @@
     />
     <meta name="color-scheme" content="light" />
     <title>Minor Prophets Recall</title>
-    <link rel="stylesheet" href="styles.css?v=20260804-1" />
+    <link rel="stylesheet" href="styles.css?v=20260810-1" />
   </head>
   <body>
     <header class="topbar">
@@ -131,6 +131,40 @@
             </svg>
             <span>Add question</span>
           </button>
+          <div class="library-data-actions">
+            <button
+              class="button data-toolbar-button"
+              id="export-questions-button"
+              type="button"
+              title="Export question changes"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12" />
+                <path d="m7 10 5 5 5-5" />
+                <path d="M5 21h14" />
+              </svg>
+              <span>Export</span>
+            </button>
+            <button
+              class="button data-toolbar-button"
+              id="import-questions-button"
+              type="button"
+              title="Import question changes"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 21V9" />
+                <path d="m7 14 5-5 5 5" />
+                <path d="M5 3h14" />
+              </svg>
+              <span>Import</span>
+            </button>
+            <input
+              id="import-questions-input"
+              type="file"
+              accept="application/json,.json"
+              hidden
+            />
+          </div>
           <button
             class="button reader-toolbar-button"
             id="open-reader-button"
@@ -432,6 +466,6 @@
     <div class="toast" id="toast" role="status" hidden></div>
 
     <script src="questions.js?v=20260728-2"></script>
-    <script src="app.js?v=20260804-2"></script>
+    <script src="app.js?v=20260810-1"></script>
   </body>
 </html>

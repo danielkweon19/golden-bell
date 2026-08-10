@@ -409,6 +409,18 @@ main {
   line-height: 1;
 }
 
+.library-data-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.data-toolbar-button {
+  min-height: 36px;
+  padding: 0 9px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 .workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 310px;
@@ -917,6 +929,10 @@ main {
     justify-self: start;
   }
 
+  body.reader-open .library-data-actions {
+    justify-self: start;
+  }
+
 }
 
 @media (min-width: 900px) and (max-width: 1279px) {
@@ -1234,6 +1250,14 @@ footer {
   .add-toolbar-button {
     width: auto;
     justify-self: start;
+  }
+
+  .library-data-actions {
+    width: 100%;
+  }
+
+  .data-toolbar-button {
+    flex: 1;
   }
 
   .quiz-card {
