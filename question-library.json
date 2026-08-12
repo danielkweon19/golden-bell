@@ -1,7 +1,7 @@
 {
   "format": "golden-bell-question-export",
   "version": 1,
-  "exportedAt": "2026-08-10T16:05:32.094Z",
+  "exportedAt": "2026-08-12T23:01:43.876Z",
   "questionLibrary": {
     "version": 1,
     "edits": {
@@ -256,7 +256,8 @@
         "book": "Zechariah",
         "chapter": 4,
         "verse": 14,
-        "question": "So he said, \"These are the __________________, who stand beside the Lord of the whole earth.\"",
+        "question": "Who are the two olive trees?",
+        "alternateQuestion": "So he said, \"These are the __________________, who stand beside the Lord of the whole earth.\"",
         "displayAnswer": "two anointed ones",
         "aliases": []
       },
@@ -266,10 +267,12 @@
         "book": "Zechariah",
         "chapter": 5,
         "verse": 2,
-        "question": "And he said to me, “What do you see?” So I answered, “I see a __________. Its length is _______ cubits and its width ______ cubits.”",
-        "alternateQuestion": "",
+        "question": "What did Zechariah see in Zechariah 5:1-2, and how many cubits was its length and width?",
+        "alternateQuestion": "And he said to me, “What do you see?” So I answered, “I see a __________. Its length is _______ cubits and its width ______ cubits.”",
         "displayAnswer": "flying scroll, twenty, ten",
-        "aliases": []
+        "aliases": [
+          "flying scroll, 20, 10"
+        ]
       },
       "33": {
         "id": 33,
@@ -445,7 +448,12 @@
       23,
       32
     ],
-    "removedFill": [],
+    "removedFill": [
+      3000154,
+      3000016,
+      3000026
+    ],
+    "removedCustom": [],
     "custom": [
       {
         "id": 1785384914327,
