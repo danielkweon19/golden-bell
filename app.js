@@ -3,6 +3,7 @@ const ACCEPTED_KEY = "minor-prophets-recall-accepted-v2";
 const QUESTION_LIBRARY_KEY = "minor-prophets-recall-question-library-v1";
 const QUESTION_MODE_KEY = "minor-prophets-recall-question-mode-v1";
 const QUESTION_WORDING_KEY = "minor-prophets-recall-question-wording-v1";
+const REFERENCE_DETAIL_KEY = "minor-prophets-recall-reference-detail-v1";
 const QUESTION_LIBRARY_ASSET = "question-library.json?v=20260810-2";
 const BOOK_ORDER = ["Haggai", "Zechariah", "Malachi"];
 
@@ -198,6 +199,7 @@ const state = {
   bible: null,
   questionMode: "study",
   questionWording: "preferred",
+  referenceDetail: "verse",
   deckIds: QUESTIONS.map((question) => question.id),
   index: 0,
   correctIds: new Set(),
@@ -229,6 +231,10 @@ const elements = {
   missedCount: document.querySelector("#missed-count"),
   skippedCount: document.querySelector("#skipped-count"),
   questionModeSelect: document.querySelector("#question-mode-select"),
+  referenceDetailControl: document.querySelector(
+    "#reference-detail-control",
+  ),
+  referenceDetailSelect: document.querySelector("#reference-detail-select"),
   questionWordingControl: document.querySelector("#question-wording-control"),
   questionWordingButtons: document.querySelectorAll(
     "[data-question-wording]",
@@ -379,11 +385,43 @@ function currentQuestion() {
 
 function answerIsCorrect(value, question) {
   const normalized = normalizeAnswer(value);
-  const accepted = [
-    ...question.answers,
-    ...(state.acceptedAnswers.get(question.id) || []),
-  ];
+  const expectedAnswers =
+    state.questionMode === "fill" &&
+    question.generated &&
+    state.referenceDetail !== "verse"
+      ? [referenceAnswer(question), referenceAnswer(question, true)]
+      : question.answers;
+  const customAnswers =
+    state.questionMode !== "fill" || state.referenceDetail === "verse"
+      ? state.acceptedAnswers.get(question.id) || []
+      : [];
+  const accepted = [...expectedAnswers, ...customAnswers];
   return accepted.some((answer) => normalizeAnswer(answer) === normalized);
+}
+
+function referenceAnswer(question, abbreviated = false) {
+  const book = abbreviated
+    ? BOOK_ABBREVIATIONS[question.book] || question.book
+    : question.book;
+  if (state.referenceDetail === "book") return book;
+  if (state.referenceDetail === "chapter") {
+    return `${book} ${question.chapter}`;
+  }
+  return `${book} ${question.chapter}:${question.verse}`;
+}
+
+function officialAnswer(question) {
+  return state.questionMode === "fill" &&
+    question.generated &&
+    state.referenceDetail !== "verse"
+    ? referenceAnswer(question)
+    : question.displayAnswer;
+}
+
+function referenceDetailLabel() {
+  if (state.referenceDetail === "book") return "Book";
+  if (state.referenceDetail === "chapter") return "Book and chapter";
+  return "Book, chapter, and verse";
 }
 
 function displayedQuestion(question) {
@@ -989,6 +1027,9 @@ function escapeHtml(value) {
 }
 
 function acceptedAnswersMarkup(question) {
+  if (state.questionMode === "fill" && state.referenceDetail !== "verse") {
+    return "";
+  }
   const answers = state.acceptedAnswers.get(question.id) || [];
   if (!answers.length) return "";
 
@@ -1108,9 +1149,11 @@ function saveSession() {
 }
 
 function sessionKey() {
-  return state.questionMode === "study"
-    ? SESSION_KEY
-    : `${SESSION_KEY}-${state.questionMode}`;
+  if (state.questionMode === "study") return SESSION_KEY;
+  if (state.referenceDetail === "verse") {
+    return `${SESSION_KEY}-${state.questionMode}`;
+  }
+  return `${SESSION_KEY}-${state.questionMode}-${state.referenceDetail}`;
 }
 
 function restoreSession() {
@@ -1174,7 +1217,9 @@ function resetModeProgress() {
 
 function updateQuestionModeControls() {
   elements.questionModeSelect.value = state.questionMode;
+  elements.referenceDetailSelect.value = state.referenceDetail;
   elements.quizView.dataset.mode = state.questionMode;
+  elements.referenceDetailControl.hidden = state.questionMode !== "fill";
   elements.questionWordingControl.hidden = state.questionMode !== "study";
   elements.addQuestionButton.disabled = false;
   elements.editQuestionButton.hidden = false;
@@ -1232,6 +1277,29 @@ function activateQuestionMode(mode, saveCurrent = true) {
   if (state.readerOpen) renderReader();
 }
 
+function setReferenceDetail(detail) {
+  const nextDetail = ["book", "chapter", "verse"].includes(detail)
+    ? detail
+    : "verse";
+  if (nextDetail === state.referenceDetail) return;
+
+  saveSession();
+  state.referenceDetail = nextDetail;
+  resetModeProgress();
+  restoreSession();
+  updateQuestionModeControls();
+  try {
+    localStorage.setItem(REFERENCE_DETAIL_KEY, nextDetail);
+  } catch {
+    // The selected detail still works for the current page session.
+  }
+
+  elements.finishView.hidden = true;
+  elements.quizView.hidden = false;
+  if (state.index >= state.deckIds.length) showFinish();
+  else renderQuestion();
+}
+
 function populateQuestionSelect() {
   elements.questionSelect.replaceChildren(
     ...QUESTIONS.map((question, index) => {
@@ -1264,7 +1332,7 @@ function clearFeedback() {
   elements.answerInput.value = "";
   elements.answerInput.removeAttribute("aria-invalid");
   elements.answerLabel.textContent =
-    state.questionMode === "fill" ? "Verse reference" : "Your answer";
+    state.questionMode === "fill" ? referenceDetailLabel() : "Your answer";
 }
 
 function updateQuestionStatus(question) {
@@ -1296,7 +1364,9 @@ function updateProgress(question) {
     ? `Missed practice · ${state.index + 1} of ${state.deckIds.length}`
     : `Question ${QUESTIONS.indexOf(question) + 1} of ${QUESTIONS.length}`;
   elements.bookLabel.textContent =
-    state.questionMode === "fill" ? "Verse reference" : question.book;
+    state.questionMode === "fill"
+      ? `Verse reference · ${referenceDetailLabel()}`
+      : question.book;
   elements.progressFill.style.width = `${percent}%`;
   elements.progressTrack.setAttribute("aria-valuenow", String(percent));
 }
@@ -1357,7 +1427,7 @@ function showCorrectFeedback(question, heading = "Correct.") {
   elements.feedback.hidden = false;
   elements.feedback.innerHTML = `
     <strong>${escapeHtml(heading)}</strong>
-    <p><b>Official answer:</b> ${escapeHtml(question.displayAnswer)}</p>
+    <p><b>Official answer:</b> ${escapeHtml(officialAnswer(question))}</p>
     ${acceptedAnswersMarkup(question)}
     ${verseCitationMarkup(question)}
   `;
@@ -1473,13 +1543,15 @@ function handleSubmit(event) {
   elements.feedback.hidden = false;
   elements.feedback.innerHTML = `
     <strong>Not quite.</strong>
-    <p><b>Official answer:</b> ${escapeHtml(question.displayAnswer)}</p>
+    <p><b>Official answer:</b> ${escapeHtml(officialAnswer(question))}</p>
     ${acceptedAnswersMarkup(question)}
     <p><b>You entered:</b> ${value ? escapeHtml(value) : "No answer"}</p>
     ${verseCitationMarkup(question)}
   `;
   elements.markCorrectButton.hidden = false;
-  elements.acceptAnswerButton.hidden = !value;
+  elements.acceptAnswerButton.hidden =
+    !value ||
+    (state.questionMode === "fill" && state.referenceDetail !== "verse");
   updateQuestionStatus(question);
   updateStats();
   saveSession();
@@ -1618,7 +1690,7 @@ function buildReviewSection(title, entries, type) {
             <p><strong>${escapeHtml(displayedQuestion(question))}</strong></p>
             ${answerLine}
             <p class="correct-answer"><strong>Answer:</strong> ${escapeHtml(
-              question.displayAnswer,
+              officialAnswer(question),
             )}</p>
           </div>
         </article>
@@ -1686,9 +1758,16 @@ async function initialize() {
         localStorage.getItem(QUESTION_WORDING_KEY) === "alternate"
           ? "alternate"
           : "preferred";
+      const savedReferenceDetail = localStorage.getItem(REFERENCE_DETAIL_KEY);
+      state.referenceDetail = ["book", "chapter", "verse"].includes(
+        savedReferenceDetail,
+      )
+        ? savedReferenceDetail
+        : "verse";
     } catch {
       savedMode = "study";
       state.questionWording = "preferred";
+      state.referenceDetail = "verse";
     }
     if (!QUESTION_BANKS[savedMode]) savedMode = "study";
     state.questionMode = savedMode;
@@ -1749,6 +1828,9 @@ elements.nextQuestionButton.addEventListener("click", () =>
 elements.shuffleButton.addEventListener("click", shuffleRemaining);
 elements.questionModeSelect.addEventListener("change", (event) =>
   activateQuestionMode(event.target.value),
+);
+elements.referenceDetailSelect.addEventListener("change", (event) =>
+  setReferenceDetail(event.target.value),
 );
 elements.questionWordingButtons.forEach((button) => {
   button.addEventListener("click", () =>

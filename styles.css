@@ -359,6 +359,10 @@ main {
   width: 190px;
 }
 
+.reference-detail-control select {
+  width: 205px;
+}
+
 .question-control select {
   width: min(270px, 26vw);
 }
