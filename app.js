@@ -14,6 +14,7 @@ function emptyQuestionLibrary() {
     removedStudy: [],
     removedFill: [],
     removedCustom: [],
+    memorizationVerses: [],
     custom: [],
   };
 }
@@ -35,6 +36,9 @@ function normalizedQuestionLibrary(saved) {
       : [],
     removedCustom: Array.isArray(saved.removedCustom)
       ? saved.removedCustom.map(Number)
+      : [],
+    memorizationVerses: Array.isArray(saved.memorizationVerses)
+      ? [...new Set(saved.memorizationVerses.map(String).filter(Boolean))]
       : [],
     custom: Array.isArray(saved.custom) ? saved.custom : [],
   };
@@ -61,6 +65,9 @@ function mergeQuestionLibraries(defaults, local) {
       ...new Set([...defaults.removedFill, ...local.removedFill]),
     ],
     removedCustom,
+    memorizationVerses: local.memorizationVerses.length
+      ? local.memorizationVerses
+      : defaults.memorizationVerses,
     custom: [...customById.values()],
   };
 }
@@ -276,6 +283,7 @@ const elements = {
   readerPanel: document.querySelector("#reader-panel"),
   closeReaderButton: document.querySelector("#close-reader-button"),
   readerTitle: document.querySelector("#reader-title"),
+  readerSelectionCount: document.querySelector("#reader-selection-count"),
   readerBookSelect: document.querySelector("#reader-book-select"),
   readerChapterSelect: document.querySelector("#reader-chapter-select"),
   previousChapterButton: document.querySelector("#previous-chapter-button"),
@@ -345,8 +353,13 @@ function makeReferenceQuestion(book, chapter, verse, id) {
   );
 }
 
+function memorizationVerseKey(book, chapter, verse) {
+  return `${book} ${chapter}:${verse}`;
+}
+
 function buildReferenceQuestionBank() {
   let id = 3_000_000;
+  const selectedVerses = new Set(questionLibrary.memorizationVerses);
   QUESTION_BANKS.fill = READER_BOOKS.flatMap((bookName) => {
     const book = bibleBook(bookName);
     return book.chapters.flatMap((chapter, chapterIndex) =>
@@ -372,7 +385,18 @@ function buildReferenceQuestionBank() {
           : generated;
       }),
     );
-  }).filter((question) => !questionLibrary.removedFill.includes(question.id));
+  }).filter(
+    (question) =>
+      !questionLibrary.removedFill.includes(question.id) &&
+      (!selectedVerses.size ||
+        selectedVerses.has(
+          memorizationVerseKey(
+            question.book,
+            question.chapter,
+            question.verse,
+          ),
+        )),
+  );
 }
 
 function questionById(id) {
@@ -862,6 +886,36 @@ function goToQuestionFromReader(questions, verseNumber) {
   renderReader();
 }
 
+function toggleMemorizationVerse(book, chapter, verse) {
+  const key = memorizationVerseKey(book, chapter, verse);
+  const selected = new Set(questionLibrary.memorizationVerses);
+  if (selected.has(key)) selected.delete(key);
+  else selected.add(key);
+  questionLibrary.memorizationVerses = [...selected];
+  if (!saveQuestionLibrary()) return;
+
+  if (state.questionMode === "fill") saveSession();
+  buildReferenceQuestionBank();
+
+  if (state.questionMode === "fill") {
+    QUESTIONS = QUESTION_BANKS.fill;
+    resetModeProgress();
+    restoreSession();
+    populateQuestionSelect();
+    elements.finishView.hidden = true;
+    elements.quizView.hidden = false;
+    if (state.index >= state.deckIds.length) showFinish();
+    else renderQuestion();
+  }
+
+  renderReader();
+  showToast(
+    selected.has(key)
+      ? `${key} added to the memorization set.`
+      : `${key} removed from the memorization set.`,
+  );
+}
+
 function renderReader() {
   const book = bibleBook(state.readerBook);
   const chapter = book?.chapters[state.readerChapter - 1];
@@ -873,6 +927,13 @@ function renderReader() {
 
   elements.readerTitle.textContent =
     `${state.readerBook} ${state.readerChapter}:${state.readerVerse}`;
+  elements.readerSelectionCount.textContent = questionLibrary
+    .memorizationVerses.length
+    ? `${pluralize(
+        questionLibrary.memorizationVerses.length,
+        "verse",
+      )} selected`
+    : "All verses included";
   elements.readerBookSelect.value = state.readerBook;
   populateReaderChapters();
   elements.readerChapterSelect.value = String(state.readerChapter);
@@ -882,27 +943,15 @@ function renderReader() {
     ...chapter.verses.map((verse) => {
       const questions = questionsForReaderVerse(verse.num);
       const row = document.createElement("div");
+      let openVerseQuestion = null;
       row.className = "verse-row";
       if (questions.length) {
         row.classList.add("has-question");
-        row.setAttribute("role", "button");
-        row.setAttribute("tabindex", "0");
-        row.setAttribute(
-          "aria-label",
-          `Go to ${questions.length === 1 ? "question" : "questions"} for ${
-            state.readerBook
-          } ${state.readerChapter}:${verse.num}`,
-        );
-        const openVerseQuestion = () =>
+        openVerseQuestion = () =>
           goToQuestionFromReader(questions, verse.num);
         row.addEventListener("click", () => {
           const selection = window.getSelection?.()?.toString().trim();
           if (!selection) openVerseQuestion();
-        });
-        row.addEventListener("keydown", (event) => {
-          if (event.key !== "Enter" && event.key !== " ") return;
-          event.preventDefault();
-          openVerseQuestion();
         });
       }
 
@@ -919,11 +968,51 @@ function renderReader() {
       text.textContent = verse.text;
       row.append(number, text);
       if (questions.length) {
-        const badge = document.createElement("span");
+        const badge = document.createElement("button");
         badge.className = "verse-question-badge";
+        badge.type = "button";
         badge.textContent = pluralize(questions.length, "question");
+        badge.setAttribute(
+          "aria-label",
+          `Go to ${questions.length === 1 ? "question" : "questions"} for ${
+            state.readerBook
+          } ${state.readerChapter}:${verse.num}`,
+        );
+        badge.addEventListener("click", (event) => {
+          event.stopPropagation();
+          openVerseQuestion();
+        });
         row.append(badge);
       }
+      const key = memorizationVerseKey(
+        state.readerBook,
+        state.readerChapter,
+        verse.num,
+      );
+      const isSelected = questionLibrary.memorizationVerses.includes(key);
+      const memoryButton = document.createElement("button");
+      memoryButton.className = "verse-memory-button";
+      if (isSelected) memoryButton.classList.add("is-selected");
+      memoryButton.type = "button";
+      memoryButton.title = isSelected
+        ? "Remove from memorization set"
+        : "Add to memorization set";
+      memoryButton.setAttribute("aria-label", `${memoryButton.title}: ${key}`);
+      memoryButton.setAttribute("aria-pressed", String(isSelected));
+      memoryButton.innerHTML = `
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 3h12v18l-6-4-6 4Z"></path>
+        </svg>
+      `;
+      memoryButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        toggleMemorizationVerse(
+          state.readerBook,
+          state.readerChapter,
+          verse.num,
+        );
+      });
+      row.append(memoryButton);
       return row;
     }),
   );
