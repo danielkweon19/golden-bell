@@ -6,6 +6,7 @@ const QUESTION_WORDING_KEY = "minor-prophets-recall-question-wording-v1";
 const REFERENCE_DETAIL_KEY = "minor-prophets-recall-reference-detail-v1";
 const QUESTION_LIBRARY_ASSET = "question-library.json?v=20260812-1";
 const BOOK_ORDER = ["Haggai", "Zechariah", "Malachi"];
+const REFERENCE_DETAILS = ["book", "chapter", "verse"];
 
 function emptyQuestionLibrary() {
   return {
@@ -14,13 +15,25 @@ function emptyQuestionLibrary() {
     removedStudy: [],
     removedFill: [],
     removedCustom: [],
-    memorizationVerses: [],
+    memorizationVersesByDetail: {
+      book: [],
+      chapter: [],
+      verse: [],
+    },
     custom: [],
   };
 }
 
 function normalizedQuestionLibrary(saved) {
   if (!saved || saved.version !== 1) return null;
+  const legacyMemorizationVerses = Array.isArray(saved.memorizationVerses)
+    ? [...new Set(saved.memorizationVerses.map(String).filter(Boolean))]
+    : [];
+  const savedVersesByDetail =
+    saved.memorizationVersesByDetail &&
+    typeof saved.memorizationVersesByDetail === "object"
+      ? saved.memorizationVersesByDetail
+      : {};
   return {
     edits:
       saved.edits && typeof saved.edits === "object" ? saved.edits : {},
@@ -37,9 +50,14 @@ function normalizedQuestionLibrary(saved) {
     removedCustom: Array.isArray(saved.removedCustom)
       ? saved.removedCustom.map(Number)
       : [],
-    memorizationVerses: Array.isArray(saved.memorizationVerses)
-      ? [...new Set(saved.memorizationVerses.map(String).filter(Boolean))]
-      : [],
+    memorizationVersesByDetail: Object.fromEntries(
+      REFERENCE_DETAILS.map((detail) => {
+        const verses = Array.isArray(savedVersesByDetail[detail])
+          ? savedVersesByDetail[detail]
+          : legacyMemorizationVerses;
+        return [detail, [...new Set(verses.map(String).filter(Boolean))]];
+      }),
+    ),
     custom: Array.isArray(saved.custom) ? saved.custom : [],
   };
 }
@@ -65,9 +83,14 @@ function mergeQuestionLibraries(defaults, local) {
       ...new Set([...defaults.removedFill, ...local.removedFill]),
     ],
     removedCustom,
-    memorizationVerses: local.memorizationVerses.length
-      ? local.memorizationVerses
-      : defaults.memorizationVerses,
+    memorizationVersesByDetail: Object.fromEntries(
+      REFERENCE_DETAILS.map((detail) => [
+        detail,
+        local.memorizationVersesByDetail[detail].length
+          ? local.memorizationVersesByDetail[detail]
+          : defaults.memorizationVersesByDetail[detail],
+      ]),
+    ),
     custom: [...customById.values()],
   };
 }
@@ -357,9 +380,13 @@ function memorizationVerseKey(book, chapter, verse) {
   return `${book} ${chapter}:${verse}`;
 }
 
+function memorizationVersesForDetail(detail = state.referenceDetail) {
+  return questionLibrary.memorizationVersesByDetail[detail];
+}
+
 function buildReferenceQuestionBank() {
   let id = 3_000_000;
-  const selectedVerses = new Set(questionLibrary.memorizationVerses);
+  const selectedVerses = new Set(memorizationVersesForDetail());
   QUESTION_BANKS.fill = READER_BOOKS.flatMap((bookName) => {
     const book = bibleBook(bookName);
     return book.chapters.flatMap((chapter, chapterIndex) =>
@@ -888,10 +915,12 @@ function goToQuestionFromReader(questions, verseNumber) {
 
 function toggleMemorizationVerse(book, chapter, verse) {
   const key = memorizationVerseKey(book, chapter, verse);
-  const selected = new Set(questionLibrary.memorizationVerses);
+  const selected = new Set(memorizationVersesForDetail());
   if (selected.has(key)) selected.delete(key);
   else selected.add(key);
-  questionLibrary.memorizationVerses = [...selected];
+  questionLibrary.memorizationVersesByDetail[state.referenceDetail] = [
+    ...selected,
+  ];
   if (!saveQuestionLibrary()) return;
 
   if (state.questionMode === "fill") saveSession();
@@ -927,12 +956,12 @@ function renderReader() {
 
   elements.readerTitle.textContent =
     `${state.readerBook} ${state.readerChapter}:${state.readerVerse}`;
-  elements.readerSelectionCount.textContent = questionLibrary
-    .memorizationVerses.length
+  const memorizationVerses = memorizationVersesForDetail();
+  elements.readerSelectionCount.textContent = memorizationVerses.length
     ? `${pluralize(
-        questionLibrary.memorizationVerses.length,
+        memorizationVerses.length,
         "verse",
-      )} selected`
+      )} selected for ${referenceDetailLabel().toLowerCase()}`
     : "All verses included";
   elements.readerBookSelect.value = state.readerBook;
   populateReaderChapters();
@@ -989,7 +1018,7 @@ function renderReader() {
         state.readerChapter,
         verse.num,
       );
-      const isSelected = questionLibrary.memorizationVerses.includes(key);
+      const isSelected = memorizationVerses.includes(key);
       const memoryButton = document.createElement("button");
       memoryButton.className = "verse-memory-button";
       if (isSelected) memoryButton.classList.add("is-selected");
@@ -1367,13 +1396,15 @@ function activateQuestionMode(mode, saveCurrent = true) {
 }
 
 function setReferenceDetail(detail) {
-  const nextDetail = ["book", "chapter", "verse"].includes(detail)
+  const nextDetail = REFERENCE_DETAILS.includes(detail)
     ? detail
     : "verse";
   if (nextDetail === state.referenceDetail) return;
 
   saveSession();
   state.referenceDetail = nextDetail;
+  buildReferenceQuestionBank();
+  QUESTIONS = QUESTION_BANKS[state.questionMode];
   resetModeProgress();
   restoreSession();
   updateQuestionModeControls();
@@ -1387,6 +1418,7 @@ function setReferenceDetail(detail) {
   elements.quizView.hidden = false;
   if (state.index >= state.deckIds.length) showFinish();
   else renderQuestion();
+  if (state.readerOpen) renderReader();
 }
 
 function populateQuestionSelect() {
@@ -1839,7 +1871,6 @@ async function initialize() {
     bundledAcceptedAnswers = bundledQuestions.acceptedAnswers;
 
     buildStudyQuestionBank();
-    buildReferenceQuestionBank();
     let savedMode = "study";
     try {
       savedMode = localStorage.getItem(QUESTION_MODE_KEY) || "study";
@@ -1848,9 +1879,7 @@ async function initialize() {
           ? "alternate"
           : "preferred";
       const savedReferenceDetail = localStorage.getItem(REFERENCE_DETAIL_KEY);
-      state.referenceDetail = ["book", "chapter", "verse"].includes(
-        savedReferenceDetail,
-      )
+      state.referenceDetail = REFERENCE_DETAILS.includes(savedReferenceDetail)
         ? savedReferenceDetail
         : "verse";
     } catch {
@@ -1859,6 +1888,7 @@ async function initialize() {
       state.referenceDetail = "verse";
     }
     if (!QUESTION_BANKS[savedMode]) savedMode = "study";
+    buildReferenceQuestionBank();
     state.questionMode = savedMode;
     QUESTIONS = QUESTION_BANKS[savedMode];
     resetModeProgress();
