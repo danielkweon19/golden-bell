@@ -359,6 +359,91 @@ main {
   width: 190px;
 }
 
+.multi-select {
+  position: relative;
+  width: 148px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.multi-select summary {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 32px 0 10px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+  list-style: none;
+  white-space: nowrap;
+}
+
+.multi-select summary::-webkit-details-marker {
+  display: none;
+}
+
+.multi-select summary::after {
+  position: absolute;
+  right: 12px;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted);
+  content: "";
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.multi-select[open] summary {
+  border-color: #9fa6a2;
+}
+
+.multi-select-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 5px);
+  left: 0;
+  width: 180px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 28px rgba(36, 43, 43, 0.16);
+}
+
+.multi-select-menu label {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 8px;
+  color: var(--ink);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.multi-select-menu label:hover {
+  background: #f0f2ef;
+}
+
+.multi-select-menu input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--teal);
+}
+
+.multi-select-menu .select-all-option {
+  font-weight: 800;
+}
+
+.multi-select-divider {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--line);
+}
+
 .reference-detail-control select {
   width: 205px;
 }
@@ -924,6 +1009,7 @@ main {
   }
 
   body.reader-open .study-toolbar select,
+  body.reader-open .multi-select,
   body.reader-open .reader-toolbar-button {
     width: 100%;
   }
@@ -1297,6 +1383,14 @@ footer {
   }
 
   .study-toolbar select {
+    width: 100%;
+  }
+
+  .multi-select {
+    width: 100%;
+  }
+
+  .multi-select-menu {
     width: 100%;
   }
 

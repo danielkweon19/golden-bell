@@ -9,7 +9,7 @@
     />
     <meta name="color-scheme" content="light" />
     <title>Minor Prophets Recall</title>
-    <link rel="stylesheet" href="styles.css?v=20260813-1" />
+    <link rel="stylesheet" href="styles.css?v=20260818-1" />
   </head>
   <body>
     <header class="topbar">
@@ -89,6 +89,48 @@
               <option value="study">Study questions</option>
               <option value="fill">Verse reference</option>
             </select>
+          </div>
+          <div class="toolbar-control book-control">
+            <span class="toolbar-label" id="book-filter-label">Books</span>
+            <details class="multi-select" id="book-filter">
+              <summary aria-labelledby="book-filter-label book-filter-summary">
+                <span id="book-filter-summary">All books</span>
+              </summary>
+              <div class="multi-select-menu">
+                <label class="select-all-option">
+                  <input id="select-all-books" type="checkbox" checked />
+                  <span>Select all</span>
+                </label>
+                <div class="multi-select-divider"></div>
+                <label>
+                  <input
+                    type="checkbox"
+                    name="study-book"
+                    value="Haggai"
+                    checked
+                  />
+                  <span>Haggai</span>
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    name="study-book"
+                    value="Zechariah"
+                    checked
+                  />
+                  <span>Zechariah</span>
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    name="study-book"
+                    value="Malachi"
+                    checked
+                  />
+                  <span>Malachi</span>
+                </label>
+              </div>
+            </details>
           </div>
           <div
             class="toolbar-control reference-detail-control"
@@ -481,6 +523,6 @@
     <div class="toast" id="toast" role="status" hidden></div>
 
     <script src="questions.js?v=20260728-2"></script>
-    <script src="app.js?v=20260817-1"></script>
+    <script src="app.js?v=20260818-1"></script>
   </body>
 </html>

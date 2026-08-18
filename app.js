@@ -4,6 +4,7 @@ const QUESTION_LIBRARY_KEY = "minor-prophets-recall-question-library-v1";
 const QUESTION_MODE_KEY = "minor-prophets-recall-question-mode-v1";
 const QUESTION_WORDING_KEY = "minor-prophets-recall-question-wording-v1";
 const REFERENCE_DETAIL_KEY = "minor-prophets-recall-reference-detail-v1";
+const SELECTED_BOOKS_KEY = "minor-prophets-recall-selected-books-v1";
 const QUESTION_LIBRARY_ASSET = "question-library.json?v=20260812-1";
 const BOOK_ORDER = ["Haggai", "Zechariah", "Malachi"];
 const REFERENCE_DETAILS = ["book", "chapter", "verse"];
@@ -230,6 +231,7 @@ const state = {
   questionMode: "study",
   questionWording: "preferred",
   referenceDetail: "verse",
+  selectedBooks: new Set(BOOK_ORDER),
   deckIds: QUESTIONS.map((question) => question.id),
   index: 0,
   correctIds: new Set(),
@@ -261,6 +263,10 @@ const elements = {
   missedCount: document.querySelector("#missed-count"),
   skippedCount: document.querySelector("#skipped-count"),
   questionModeSelect: document.querySelector("#question-mode-select"),
+  bookFilter: document.querySelector("#book-filter"),
+  bookFilterSummary: document.querySelector("#book-filter-summary"),
+  selectAllBooks: document.querySelector("#select-all-books"),
+  bookCheckboxes: document.querySelectorAll('input[name="study-book"]'),
   referenceDetailControl: document.querySelector(
     "#reference-detail-control",
   ),
@@ -434,6 +440,10 @@ function currentQuestion() {
   return questionById(state.deckIds[state.index]);
 }
 
+function eligibleQuestions() {
+  return QUESTIONS.filter((question) => state.selectedBooks.has(question.book));
+}
+
 function answerIsCorrect(value, question) {
   const normalized = normalizeAnswer(value);
   const expectedAnswers =
@@ -594,7 +604,8 @@ function openQuestionEditor(question = null) {
     ? "Save changes"
     : "Add question";
 
-  const reference = question || currentQuestion() || QUESTIONS[0];
+  const reference =
+    question || currentQuestion() || eligibleQuestions()[0] || QUESTIONS[0];
   elements.questionScope.value = reference.scope || "verse";
   populateEditorBooks(reference.book);
   populateEditorChapters(reference.chapter || 1);
@@ -770,6 +781,7 @@ function handleQuestionSave(event) {
   const fields = questionFieldsFromEditor();
   let question;
   let message;
+  let removedFromSelection = false;
 
   if (state.editingQuestionId) {
     question = questionById(state.editingQuestionId);
@@ -785,14 +797,24 @@ function handleQuestionSave(event) {
       if (index >= 0) questionLibrary.custom[index] = storedQuestion(question);
     }
     message = "Question updated.";
+    if (!state.selectedBooks.has(question.book)) {
+      state.deckIds = state.deckIds.filter((id) => id !== question.id);
+      state.mainDeckIds =
+        state.mainDeckIds?.filter((id) => id !== question.id) || null;
+      state.index = Math.min(
+        state.index,
+        Math.max(state.deckIds.length - 1, 0),
+      );
+      removedFromSelection = true;
+    }
   } else {
     question = hydrateQuestion(fields, createQuestionId());
     QUESTIONS.push(question);
     questionLibrary.custom.push(storedQuestion(question));
-    if (state.practiceMode) {
+    if (state.practiceMode && state.selectedBooks.has(question.book)) {
       state.mainDeckIds ||= expandedQuestionBank.map((_, index) => index + 1);
       state.mainDeckIds.push(question.id);
-    } else {
+    } else if (state.selectedBooks.has(question.book)) {
       state.deckIds.push(question.id);
     }
     message = "Question added.";
@@ -803,9 +825,14 @@ function handleQuestionSave(event) {
   populateQuestionSelect();
   closeQuestionEditor();
   saveSession();
-  goToQuestion(question.id);
+  if (state.selectedBooks.has(question.book)) goToQuestion(question.id);
+  else renderQuestion();
   if (state.readerOpen) renderReader();
-  showToast(message);
+  showToast(
+    removedFromSelection
+      ? "Question updated and hidden by the current book filter."
+      : message,
+  );
 }
 
 function deleteCurrentQuestion() {
@@ -894,7 +921,7 @@ function updateReaderNavigation() {
 }
 
 function questionsForReaderVerse(verseNumber) {
-  return QUESTIONS.filter(
+  return eligibleQuestions().filter(
     (question) =>
       question.scope === "verse" &&
       question.book === state.readerBook &&
@@ -1058,7 +1085,7 @@ function renderReader() {
 
 function openReader() {
   if (!state.bible) return;
-  const question = currentQuestion() || QUESTIONS[0];
+  const question = currentQuestion() || eligibleQuestions()[0] || QUESTIONS[0];
   state.readerBook = question.book;
   state.readerChapter = question.chapter || 1;
   const chapter = bibleBook(state.readerBook).chapters[state.readerChapter - 1];
@@ -1267,11 +1294,17 @@ function saveSession() {
 }
 
 function sessionKey() {
-  if (state.questionMode === "study") return SESSION_KEY;
+  const selectedBookSuffix =
+    state.selectedBooks.size === BOOK_ORDER.length
+      ? ""
+      : `-books-${BOOK_ORDER.filter((book) => state.selectedBooks.has(book))
+          .map((book) => book.toLowerCase())
+          .join("-")}`;
+  if (state.questionMode === "study") return `${SESSION_KEY}${selectedBookSuffix}`;
   if (state.referenceDetail === "verse") {
-    return `${SESSION_KEY}-${state.questionMode}`;
+    return `${SESSION_KEY}-${state.questionMode}${selectedBookSuffix}`;
   }
-  return `${SESSION_KEY}-${state.questionMode}-${state.referenceDetail}`;
+  return `${SESSION_KEY}-${state.questionMode}-${state.referenceDetail}${selectedBookSuffix}`;
 }
 
 function restoreSession() {
@@ -1279,9 +1312,12 @@ function restoreSession() {
     const saved = JSON.parse(localStorage.getItem(sessionKey()) || "null");
     if (!saved || saved.version !== 2) return;
 
-    const validIds = new Set(QUESTIONS.map((question) => question.id));
+    const availableQuestions = eligibleQuestions();
+    const validIds = new Set(
+      availableQuestions.map((question) => question.id),
+    );
     const restoredDeck = (saved.deckIds || []).filter((id) => validIds.has(id));
-    const missingIds = QUESTIONS.map((question) => question.id).filter(
+    const missingIds = availableQuestions.map((question) => question.id).filter(
       (id) => !restoredDeck.includes(id),
     );
 
@@ -1289,7 +1325,7 @@ function restoreSession() {
       ? restoredDeck
       : restoredDeck.length
         ? [...restoredDeck, ...missingIds]
-      : QUESTIONS.map((question) => question.id);
+      : availableQuestions.map((question) => question.id);
     state.index = Math.min(
       Math.max(Number(saved.index) || 0, 0),
       state.deckIds.length,
@@ -1320,7 +1356,7 @@ function restoreSession() {
 }
 
 function resetModeProgress() {
-  state.deckIds = QUESTIONS.map((question) => question.id);
+  state.deckIds = eligibleQuestions().map((question) => question.id);
   state.index = 0;
   state.correctIds = new Set();
   state.missed = new Map();
@@ -1341,6 +1377,57 @@ function updateQuestionModeControls() {
   elements.questionWordingControl.hidden = state.questionMode !== "study";
   elements.addQuestionButton.disabled = false;
   elements.editQuestionButton.hidden = false;
+}
+
+function updateBookFilterControls() {
+  const selected = BOOK_ORDER.filter((book) => state.selectedBooks.has(book));
+  elements.bookCheckboxes.forEach((checkbox) => {
+    checkbox.checked = state.selectedBooks.has(checkbox.value);
+  });
+  elements.selectAllBooks.checked = selected.length === BOOK_ORDER.length;
+  elements.selectAllBooks.indeterminate =
+    selected.length > 0 && selected.length < BOOK_ORDER.length;
+  elements.bookFilterSummary.textContent =
+    selected.length === BOOK_ORDER.length
+      ? "All books"
+      : selected.length === 1
+        ? selected[0]
+        : `${selected.length} books`;
+}
+
+function setSelectedBooks(books) {
+  const nextBooks = new Set(
+    BOOK_ORDER.filter((book) => books.includes(book)),
+  );
+  if (!nextBooks.size) {
+    updateBookFilterControls();
+    showToast("Select at least one book.");
+    return;
+  }
+  if (
+    nextBooks.size === state.selectedBooks.size &&
+    [...nextBooks].every((book) => state.selectedBooks.has(book))
+  ) {
+    updateBookFilterControls();
+    return;
+  }
+
+  saveSession();
+  state.selectedBooks = nextBooks;
+  try {
+    localStorage.setItem(SELECTED_BOOKS_KEY, JSON.stringify([...nextBooks]));
+  } catch {
+    // The selected books still work for the current page session.
+  }
+  resetModeProgress();
+  restoreSession();
+  populateQuestionSelect();
+  updateBookFilterControls();
+  elements.finishView.hidden = true;
+  elements.quizView.hidden = false;
+  if (state.index >= state.deckIds.length) showFinish();
+  else renderQuestion();
+  if (state.readerOpen) renderReader();
 }
 
 function setQuestionWording(wording, save = true) {
@@ -1422,8 +1509,9 @@ function setReferenceDetail(detail) {
 }
 
 function populateQuestionSelect() {
+  const availableQuestions = eligibleQuestions();
   elements.questionSelect.replaceChildren(
-    ...QUESTIONS.map((question, index) => {
+    ...availableQuestions.map((question, index) => {
       const option = document.createElement("option");
       option.value = question.id;
       const questionText = displayedQuestion(question);
@@ -1476,6 +1564,7 @@ function updateQuestionStatus(question) {
 }
 
 function updateProgress(question) {
+  const availableQuestions = eligibleQuestions();
   const complete = state.deckIds.filter((id) => isComplete(id)).length;
   const percent = state.deckIds.length
     ? Math.round((complete / state.deckIds.length) * 100)
@@ -1483,7 +1572,9 @@ function updateProgress(question) {
 
   elements.progressLabel.textContent = state.practiceMode
     ? `Missed practice · ${state.index + 1} of ${state.deckIds.length}`
-    : `Question ${QUESTIONS.indexOf(question) + 1} of ${QUESTIONS.length}`;
+    : `Question ${availableQuestions.indexOf(question) + 1} of ${
+        availableQuestions.length
+      }`;
   elements.bookLabel.textContent =
     state.questionMode === "fill"
       ? `Verse reference · ${referenceDetailLabel()}`
@@ -1778,7 +1869,7 @@ function returnFromPractice(showMessage = true) {
   state.practiceMode = false;
   state.practiceCorrectIds = new Set();
   state.deckIds =
-    state.mainDeckIds || QUESTIONS.map((question) => question.id);
+    state.mainDeckIds || eligibleQuestions().map((question) => question.id);
   state.index = state.mainIndex;
   state.mainDeckIds = null;
   saveSession();
@@ -1882,6 +1973,15 @@ async function initialize() {
       state.referenceDetail = REFERENCE_DETAILS.includes(savedReferenceDetail)
         ? savedReferenceDetail
         : "verse";
+      const savedBooks = JSON.parse(
+        localStorage.getItem(SELECTED_BOOKS_KEY) || "null",
+      );
+      if (Array.isArray(savedBooks)) {
+        const validBooks = BOOK_ORDER.filter((book) =>
+          savedBooks.includes(book),
+        );
+        if (validBooks.length) state.selectedBooks = new Set(validBooks);
+      }
     } catch {
       savedMode = "study";
       state.questionWording = "preferred";
@@ -1907,6 +2007,7 @@ async function initialize() {
     populateQuestionSelect();
     populateReaderBooks();
     updateQuestionModeControls();
+    updateBookFilterControls();
     setQuestionWording(state.questionWording, false);
     elements.loadingView.hidden = true;
     elements.quizView.hidden = false;
@@ -1948,6 +2049,23 @@ elements.shuffleButton.addEventListener("click", shuffleRemaining);
 elements.questionModeSelect.addEventListener("change", (event) =>
   activateQuestionMode(event.target.value),
 );
+elements.selectAllBooks.addEventListener("change", (event) => {
+  setSelectedBooks(event.target.checked ? BOOK_ORDER : []);
+});
+elements.bookCheckboxes.forEach((checkbox) => {
+  checkbox.addEventListener("change", () => {
+    setSelectedBooks(
+      [...elements.bookCheckboxes]
+        .filter((item) => item.checked)
+        .map((item) => item.value),
+    );
+  });
+});
+document.addEventListener("click", (event) => {
+  if (!elements.bookFilter.contains(event.target)) {
+    elements.bookFilter.removeAttribute("open");
+  }
+});
 elements.referenceDetailSelect.addEventListener("change", (event) =>
   setReferenceDetail(event.target.value),
 );
