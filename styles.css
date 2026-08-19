@@ -591,7 +591,7 @@ main {
   line-height: 1.45;
 }
 
-#answer-form label {
+#answer-label {
   display: block;
   margin-bottom: 8px;
   color: var(--muted);
@@ -618,6 +618,65 @@ main {
 #answer-input[aria-invalid="true"] {
   background: #fffafa;
   border-color: var(--coral);
+}
+
+.book-answer-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.book-answer-option {
+  position: relative;
+  min-width: 0;
+  margin: 0;
+}
+
+.book-answer-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.book-answer-option span {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid #acb1ad;
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--ink);
+  font-weight: 800;
+  cursor: pointer;
+  transition: border-color 140ms ease, background 140ms ease;
+}
+
+.book-answer-option input:checked + span {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+  color: var(--teal-dark);
+}
+
+.book-answer-option input:focus-visible + span {
+  outline: 3px solid rgba(23, 107, 103, 0.22);
+  outline-offset: 2px;
+}
+
+.book-answer-option input:disabled + span {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.book-answer-choices[aria-invalid="true"] .book-answer-option span {
+  border-color: var(--coral);
+  background: #fffafa;
 }
 
 .submit-button {
@@ -1426,6 +1485,10 @@ footer {
   }
 
   .input-row {
+    grid-template-columns: 1fr;
+  }
+
+  .book-answer-choices {
     grid-template-columns: 1fr;
   }
 

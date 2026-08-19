@@ -282,6 +282,9 @@ const elements = {
   answerForm: document.querySelector("#answer-form"),
   answerLabel: document.querySelector("#answer-label"),
   answerInput: document.querySelector("#answer-input"),
+  answerNote: document.querySelector("#answer-note"),
+  bookAnswerChoices: document.querySelector("#book-answer-choices"),
+  bookAnswerInputs: document.querySelectorAll('input[name="book-answer"]'),
   feedback: document.querySelector("#feedback"),
   markCorrectButton: document.querySelector("#mark-correct-button"),
   acceptAnswerButton: document.querySelector("#accept-answer-button"),
@@ -483,6 +486,17 @@ function referenceDetailLabel() {
   if (state.referenceDetail === "book") return "Book";
   if (state.referenceDetail === "chapter") return "Book and chapter";
   return "Book, chapter, and verse";
+}
+
+function usesBookAnswerChoices() {
+  return state.questionMode === "fill" && state.referenceDetail === "book";
+}
+
+function selectedAnswerValue() {
+  if (!usesBookAnswerChoices()) return elements.answerInput.value.trim();
+  return (
+    [...elements.bookAnswerInputs].find((input) => input.checked)?.value || ""
+  );
 }
 
 function displayedQuestion(question) {
@@ -1529,6 +1543,7 @@ function populateQuestionSelect() {
 }
 
 function clearFeedback() {
+  const showBookChoices = usesBookAnswerChoices();
   state.pendingRejectedAnswer = "";
   state.advancing = false;
   elements.feedback.hidden = true;
@@ -1537,9 +1552,18 @@ function clearFeedback() {
   elements.markCorrectButton.hidden = true;
   elements.acceptAnswerButton.hidden = true;
   elements.nextButton.hidden = true;
-  elements.answerInput.disabled = false;
+  elements.answerInput.hidden = showBookChoices;
+  elements.answerInput.disabled = showBookChoices;
+  elements.answerInput.required = !showBookChoices;
   elements.answerInput.value = "";
   elements.answerInput.removeAttribute("aria-invalid");
+  elements.bookAnswerChoices.hidden = !showBookChoices;
+  elements.bookAnswerChoices.removeAttribute("aria-invalid");
+  elements.bookAnswerInputs.forEach((input) => {
+    input.checked = false;
+    input.disabled = !showBookChoices;
+  });
+  elements.answerNote.hidden = showBookChoices;
   elements.answerLabel.textContent =
     state.questionMode === "fill" ? referenceDetailLabel() : "Your answer";
 }
@@ -1635,6 +1659,10 @@ function showCorrectFeedback(question, heading = "Correct.") {
   state.advancing = true;
   elements.answerInput.disabled = true;
   elements.answerInput.removeAttribute("aria-invalid");
+  elements.bookAnswerChoices.removeAttribute("aria-invalid");
+  elements.bookAnswerInputs.forEach((input) => {
+    input.disabled = true;
+  });
   elements.feedback.className = "feedback correct";
   elements.feedback.hidden = false;
   elements.feedback.innerHTML = `
@@ -1677,7 +1705,10 @@ function renderQuestion() {
   } else if (state.practiceMode && state.practiceCorrectIds.has(question.id)) {
     showCorrectFeedback(question, "Reviewed correctly.");
   } else {
-    requestAnimationFrame(() => elements.answerInput.focus());
+    requestAnimationFrame(() => {
+      if (usesBookAnswerChoices()) elements.bookAnswerInputs[0]?.focus();
+      else elements.answerInput.focus();
+    });
   }
 }
 
@@ -1720,7 +1751,7 @@ function handleSubmit(event) {
   if (state.advancing) return;
 
   const question = currentQuestion();
-  const value = elements.answerInput.value.trim();
+  const value = selectedAnswerValue();
 
   if (answerIsCorrect(value, question)) {
     if (state.practiceMode) {
@@ -1750,6 +1781,10 @@ function handleSubmit(event) {
   state.pendingRejectedAnswer = value;
   elements.answerInput.value = "";
   elements.answerInput.setAttribute("aria-invalid", "true");
+  elements.bookAnswerInputs.forEach((input) => {
+    input.checked = false;
+  });
+  elements.bookAnswerChoices.setAttribute("aria-invalid", "true");
   elements.answerLabel.textContent = "Try the same question again";
   elements.feedback.className = "feedback wrong";
   elements.feedback.hidden = false;
@@ -1767,7 +1802,8 @@ function handleSubmit(event) {
   updateQuestionStatus(question);
   updateStats();
   saveSession();
-  elements.answerInput.focus();
+  if (usesBookAnswerChoices()) elements.bookAnswerInputs[0]?.focus();
+  else elements.answerInput.focus();
 }
 
 function markCurrentCorrect(acceptPermanently) {
@@ -2030,6 +2066,11 @@ async function initialize() {
 elements.answerForm.addEventListener("submit", handleSubmit);
 elements.answerInput.addEventListener("input", () => {
   elements.answerInput.removeAttribute("aria-invalid");
+});
+elements.bookAnswerInputs.forEach((input) => {
+  input.addEventListener("change", () => {
+    elements.bookAnswerChoices.removeAttribute("aria-invalid");
+  });
 });
 elements.feedback.addEventListener("click", handleAcceptedAnswerRemoval);
 elements.nextButton.addEventListener("click", goToNextQuestion);
