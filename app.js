@@ -311,6 +311,9 @@ const elements = {
   editQuestionButton: document.querySelector("#edit-question-button"),
   deleteQuestionButton: document.querySelector("#delete-question-button"),
   openReaderButton: document.querySelector("#open-reader-button"),
+  openEditorReaderButton: document.querySelector(
+    "#open-editor-reader-button",
+  ),
   readerBackdrop: document.querySelector("#reader-backdrop"),
   readerPanel: document.querySelector("#reader-panel"),
   closeReaderButton: document.querySelector("#close-reader-button"),
@@ -322,6 +325,9 @@ const elements = {
   nextChapterButton: document.querySelector("#next-chapter-button"),
   readerVerses: document.querySelector("#reader-verses"),
   questionDialog: document.querySelector("#question-dialog"),
+  questionDialogBackdrop: document.querySelector(
+    "#question-dialog-backdrop",
+  ),
   questionForm: document.querySelector("#question-form"),
   questionDialogTitle: document.querySelector("#question-dialog-title"),
   questionPromptLabel: document.querySelector("#question-prompt-label"),
@@ -629,12 +635,16 @@ function openQuestionEditor(question = null) {
   elements.alternateQuestionPrompt.value = question?.alternateQuestion || "";
   elements.questionAnswer.value = question?.displayAnswer || "";
   elements.questionAliases.value = question?.aliases?.join("\n") || "";
-  elements.questionDialog.showModal();
+  elements.questionDialogBackdrop.hidden = false;
+  elements.questionDialog.show();
+  document.body.classList.add("editor-open");
   requestAnimationFrame(() => elements.questionPrompt.focus());
 }
 
 function closeQuestionEditor() {
   elements.questionDialog.close();
+  elements.questionDialogBackdrop.hidden = true;
+  document.body.classList.remove("editor-open");
   state.editingQuestionId = null;
 }
 
@@ -1097,20 +1107,32 @@ function renderReader() {
   });
 }
 
-function openReader() {
+let readerReturnFocus = elements.openReaderButton;
+
+function updateReaderLayout() {
+  const isOverlay =
+    !window.matchMedia || window.matchMedia("(max-width: 899px)").matches;
+  elements.readerPanel.style.width = isOverlay
+    ? `${document.documentElement.clientWidth}px`
+    : "";
+  elements.readerPanel.style.maxWidth = isOverlay ? "none" : "";
+  elements.readerBackdrop.hidden = !state.readerOpen || !isOverlay;
+  elements.readerPanel.setAttribute("aria-modal", String(isOverlay));
+}
+
+function openReader(reference = null, returnFocus = elements.openReaderButton) {
   if (!state.bible) return;
-  const question = currentQuestion() || eligibleQuestions()[0] || QUESTIONS[0];
+  const question =
+    reference || currentQuestion() || eligibleQuestions()[0] || QUESTIONS[0];
   state.readerBook = question.book;
   state.readerChapter = question.chapter || 1;
   const chapter = bibleBook(state.readerBook).chapters[state.readerChapter - 1];
   state.readerVerse = question.verse || chapter.verses[0].num;
+  readerReturnFocus = returnFocus;
   state.readerOpen = true;
-  const isOverlay =
-    !window.matchMedia || window.matchMedia("(max-width: 899px)").matches;
   renderReader();
-  elements.readerBackdrop.hidden = !isOverlay;
+  updateReaderLayout();
   elements.readerPanel.classList.add("is-open");
-  elements.readerPanel.setAttribute("aria-modal", String(isOverlay));
   elements.readerPanel.setAttribute("aria-hidden", "false");
   document.body.classList.add("reader-open");
   elements.closeReaderButton.focus();
@@ -1122,7 +1144,24 @@ function closeReader() {
   elements.readerPanel.setAttribute("aria-hidden", "true");
   elements.readerBackdrop.hidden = true;
   document.body.classList.remove("reader-open");
-  elements.openReaderButton.focus();
+  const returnDialog = readerReturnFocus?.closest("dialog");
+  const returnTargetIsVisible = !returnDialog || returnDialog.open;
+  (returnTargetIsVisible ? readerReturnFocus : elements.openReaderButton).focus();
+  readerReturnFocus = elements.openReaderButton;
+}
+
+function openReaderFromQuestionEditor() {
+  const book = elements.questionBook.value;
+  const chapter = Number(elements.questionChapter.value) || 1;
+  const selectedChapter = bibleBook(book)?.chapters[chapter - 1];
+  if (!selectedChapter) return;
+  const selectedVerse = Number(elements.questionVerse.value);
+  const verse = selectedChapter.verses.some(
+    (item) => item.num === selectedVerse,
+  )
+    ? selectedVerse
+    : selectedChapter.verses[0].num;
+  openReader({ book, chapter, verse }, elements.openEditorReaderButton);
 }
 
 function changeReaderVerse(direction) {
@@ -2153,7 +2192,11 @@ elements.questionChapter.addEventListener("change", () =>
 elements.questionVerse.addEventListener("change", () =>
   populateEditorVerses(elements.questionVerse.value),
 );
-elements.openReaderButton.addEventListener("click", openReader);
+elements.openReaderButton.addEventListener("click", () => openReader());
+elements.openEditorReaderButton.addEventListener(
+  "click",
+  openReaderFromQuestionEditor,
+);
 elements.closeReaderButton.addEventListener("click", closeReader);
 elements.readerBackdrop.addEventListener("click", closeReader);
 elements.previousChapterButton.addEventListener("click", () =>
@@ -2176,6 +2219,9 @@ elements.readerChapterSelect.addEventListener("change", (event) => {
 });
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && state.readerOpen) closeReader();
+});
+window.addEventListener("resize", () => {
+  if (state.readerOpen) updateReaderLayout();
 });
 elements.missedList.addEventListener("click", (event) => {
   const removeButton = event.target.closest("[data-remove-missed-id]");

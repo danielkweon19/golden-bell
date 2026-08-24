@@ -40,6 +40,10 @@ body.reader-open {
   overflow: hidden;
 }
 
+body.editor-open {
+  overflow: hidden;
+}
+
 button,
 input,
 select,
@@ -993,7 +997,7 @@ main {
   position: fixed;
   right: 20px;
   bottom: 20px;
-  z-index: 10;
+  z-index: 40;
   padding: 11px 14px;
   color: #fff;
   background: var(--ink);
@@ -1007,7 +1011,7 @@ main {
 .reader-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 20;
+  z-index: 32;
   background: rgba(36, 43, 43, 0.42);
 }
 
@@ -1015,8 +1019,9 @@ main {
   position: fixed;
   top: 0;
   right: 0;
-  z-index: 21;
-  width: min(510px, 100%);
+  z-index: 33;
+  width: 100%;
+  max-width: 510px;
   height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -1031,6 +1036,15 @@ main {
 
 .reader-panel.is-open {
   transform: translateX(0);
+}
+
+@media (max-width: 899px) {
+  .reader-panel {
+    right: 0;
+    left: 0;
+    width: auto;
+    max-width: none;
+  }
 }
 
 @media (min-width: 900px) {
@@ -1050,6 +1064,14 @@ main {
   .reader-panel {
     width: var(--reader-panel-width);
     box-shadow: none;
+  }
+
+  body.reader-open .question-dialog[open] {
+    left: calc((100vw - var(--reader-panel-width)) / 2);
+    width: min(
+      650px,
+      calc(100vw - var(--reader-panel-width) - 40px)
+    );
   }
 
   body.reader-open .study-toolbar {
@@ -1095,17 +1117,25 @@ main {
 }
 
 .question-dialog {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  z-index: 31;
   width: min(650px, calc(100% - 28px));
   max-height: calc(100dvh - 28px);
+  margin: 0;
   padding: 0;
   color: var(--ink);
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: 0 24px 70px rgba(36, 43, 43, 0.25);
+  transform: translate(-50%, -50%);
 }
 
-.question-dialog::backdrop {
+.question-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
   background: rgba(36, 43, 43, 0.48);
 }
 
@@ -1122,6 +1152,17 @@ main {
   gap: 16px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--line);
+}
+
+.dialog-header-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.dialog-reader-button {
+  min-height: 40px;
 }
 
 .dialog-header h2 {
@@ -1536,6 +1577,15 @@ footer {
 
   .question-form {
     padding: 18px;
+  }
+
+  .dialog-reader-button {
+    width: 40px;
+    padding: 0;
+  }
+
+  .dialog-reader-button span {
+    display: none;
   }
 
   .reference-fields {
