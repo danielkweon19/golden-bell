@@ -1567,7 +1567,9 @@ function populateQuestionSelect() {
     ...availableQuestions.map((question, index) => {
       const option = document.createElement("option");
       option.value = question.id;
-      const questionText = displayedQuestion(question);
+      const questionText = displayedQuestion(question)
+        .replace(/\s+/g, " ")
+        .trim();
       const shortQuestion =
         questionText.length > 58
           ? `${questionText.slice(0, 58)}...`
@@ -1974,7 +1976,9 @@ function buildReviewSection(title, entries, type) {
         <article class="review-row">
           <div class="review-source">${escapeHtml(question.source)}</div>
           <div>
-            <p><strong>${escapeHtml(displayedQuestion(question))}</strong></p>
+            <p class="review-question"><strong>${escapeHtml(
+              displayedQuestion(question),
+            )}</strong></p>
             ${answerLine}
             <p class="correct-answer"><strong>Answer:</strong> ${escapeHtml(
               officialAnswer(question),
