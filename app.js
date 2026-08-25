@@ -141,15 +141,27 @@ async function loadBundledQuestions() {
 function normalizedMatchingPairs(pairs) {
   if (!Array.isArray(pairs)) return [];
   return pairs
-    .map((pair) => ({
-      prompt: String(pair?.prompt || "").trim(),
-      answer: String(pair?.answer || "").trim(),
-    }))
-    .filter((pair) => pair.prompt && pair.answer);
+    .map((pair) => {
+      const answers = [
+        ...new Set(
+          (Array.isArray(pair?.answers) ? pair.answers : [pair?.answer])
+            .map((answer) => String(answer || "").trim())
+            .filter(Boolean),
+        ),
+      ];
+      return {
+        prompt: String(pair?.prompt || "").trim(),
+        answer: answers[0] || "",
+        answers,
+      };
+    })
+    .filter((pair) => pair.prompt && pair.answers.length);
 }
 
 function matchingAnswerSummary(pairs) {
-  return pairs.map((pair) => `${pair.prompt}: ${pair.answer}`).join("; ");
+  return pairs
+    .map((pair) => `${pair.prompt}: ${pair.answers.join(", ")}`)
+    .join("; ");
 }
 
 function isMatchingQuestion(question) {
@@ -681,7 +693,41 @@ function updateMatchingPairRemoveButtons() {
   });
 }
 
-function addMatchingPairEditorRow(pair = { prompt: "", answer: "" }) {
+function updateMatchingAnswerRemoveButtons(answerEditor) {
+  const buttons = answerEditor.querySelectorAll(".matching-answer-remove");
+  buttons.forEach((button) => {
+    button.disabled = buttons.length <= 1;
+  });
+}
+
+function addMatchingAnswerEditorRow(answerEditor, value = "") {
+  const row = document.createElement("div");
+  row.className = "matching-answer-row";
+
+  const answer = document.createElement("input");
+  answer.className = "matching-pair-answer";
+  answer.type = "text";
+  answer.placeholder = "Match";
+  answer.setAttribute("aria-label", "Matching answer");
+  answer.value = value;
+  answer.required = elements.questionType.value === "matching";
+
+  const remove = document.createElement("button");
+  remove.className = "matching-answer-remove";
+  remove.type = "button";
+  remove.setAttribute("aria-label", "Remove this match");
+  remove.title = "Remove match";
+  remove.textContent = "×";
+
+  row.append(answer, remove);
+  answerEditor.insertBefore(
+    row,
+    answerEditor.querySelector(".matching-answer-add"),
+  );
+  updateMatchingAnswerRemoveButtons(answerEditor);
+}
+
+function addMatchingPairEditorRow(pair = { prompt: "", answers: [""] }) {
   const row = document.createElement("div");
   row.className = "matching-pair-row";
 
@@ -692,12 +738,21 @@ function addMatchingPairEditorRow(pair = { prompt: "", answer: "" }) {
   prompt.setAttribute("aria-label", "Matching prompt");
   prompt.value = pair.prompt;
 
-  const answer = document.createElement("input");
-  answer.className = "matching-pair-answer";
-  answer.type = "text";
-  answer.placeholder = "Match";
-  answer.setAttribute("aria-label", "Matching answer");
-  answer.value = pair.answer;
+  const answerEditor = document.createElement("div");
+  answerEditor.className = "matching-answer-editor";
+
+  const addAnswer = document.createElement("button");
+  addAnswer.className = "button matching-answer-add";
+  addAnswer.type = "button";
+  addAnswer.textContent = "Add match";
+  answerEditor.append(addAnswer);
+  const answers =
+    pair.answers?.length
+      ? pair.answers
+      : [pair.answer || ""];
+  answers.forEach((answer) =>
+    addMatchingAnswerEditorRow(answerEditor, answer),
+  );
 
   const remove = document.createElement("button");
   remove.className = "matching-pair-remove";
@@ -708,8 +763,7 @@ function addMatchingPairEditorRow(pair = { prompt: "", answer: "" }) {
 
   const matching = elements.questionType.value === "matching";
   prompt.required = matching;
-  answer.required = matching;
-  row.append(prompt, answer, remove);
+  row.append(prompt, answerEditor, remove);
   elements.matchingPairEditor.append(row);
   updateMatchingPairRemoveButtons();
 }
@@ -719,8 +773,8 @@ function populateMatchingPairEditor(pairs = []) {
   const initialPairs = pairs.length
     ? pairs
     : [
-        { prompt: "", answer: "" },
-        { prompt: "", answer: "" },
+        { prompt: "", answers: [""] },
+        { prompt: "", answers: [""] },
       ];
   initialPairs.forEach(addMatchingPairEditorRow);
 }
@@ -743,7 +797,9 @@ function readMatchingPairEditor() {
     ...elements.matchingPairEditor.querySelectorAll(".matching-pair-row"),
   ].map((row) => ({
     prompt: row.querySelector(".matching-pair-prompt").value.trim(),
-    answer: row.querySelector(".matching-pair-answer").value.trim(),
+    answers: [...row.querySelectorAll(".matching-pair-answer")]
+      .map((input) => input.value.trim())
+      .filter(Boolean),
   }));
 }
 
@@ -973,13 +1029,13 @@ function handleQuestionSave(event) {
   if (fields.type === "matching") {
     if (
       fields.pairs.length < 2 ||
-      fields.pairs.some((pair) => !pair.prompt || !pair.answer)
+      fields.pairs.some((pair) => !pair.prompt || !pair.answers.length)
     ) {
       showToast("Add at least two complete matching pairs.");
       return;
     }
-    const normalizedAnswers = fields.pairs.map((pair) =>
-      normalizeAnswer(pair.answer),
+    const normalizedAnswers = fields.pairs.flatMap((pair) =>
+      pair.answers.map(normalizeAnswer),
     );
     if (new Set(normalizedAnswers).size !== normalizedAnswers.length) {
       showToast("Each match must have a distinct answer.");
@@ -1408,10 +1464,14 @@ function escapeHtml(value) {
 }
 
 function createMatchingState(question) {
+  const options = question.pairs.flatMap((pair, promptIndex) =>
+    pair.answers.map((answer) => ({ answer, promptIndex })),
+  );
   return {
     questionId: question.id,
-    optionOrder: shuffle(question.pairs.map((_, index) => index)),
-    assignments: Array(question.pairs.length).fill(null),
+    options,
+    optionOrder: shuffle(options.map((_, index) => index)),
+    assignments: question.pairs.map(() => []),
     selectedAnswerIndex: null,
     results: null,
   };
@@ -1427,21 +1487,23 @@ function renderMatchingBoard() {
     elements.matchingBoard.replaceChildren();
     return;
   }
+  const itemCount = Math.max(
+    question.pairs.length,
+    matchingState.options.length,
+  );
   elements.matchingBoard.className = [
     "matching-board",
-    question.pairs.length > 6 ? "is-compact" : "",
-    question.pairs.length > 12 ? "is-dense" : "",
+    itemCount > 6 ? "is-compact" : "",
+    itemCount > 12 ? "is-dense" : "",
   ]
     .filter(Boolean)
     .join(" ");
 
-  const assignedAnswers = new Set(
-    matchingState.assignments.filter((index) => index !== null),
-  );
+  const assignedAnswers = new Set(matchingState.assignments.flat());
   const rows = question.pairs
     .map((pair, promptIndex) => {
-      const answerIndex = matchingState.assignments[promptIndex];
-      const assigned = answerIndex !== null;
+      const answerIndices = matchingState.assignments[promptIndex];
+      const assigned = answerIndices.length > 0;
       const result = matchingState.results?.[promptIndex];
       const resultClass =
         result === true
@@ -1452,12 +1514,32 @@ function renderMatchingBoard() {
       return `
         <div class="match-row">
           <div class="match-prompt">${escapeHtml(pair.prompt)}</div>
-          <button
+          <div
             class="match-target${assigned ? " filled" : ""}${resultClass}"
-            type="button"
             data-prompt-index="${promptIndex}"
-            ${state.advancing ? "disabled" : ""}
-          >${assigned ? escapeHtml(question.pairs[answerIndex].answer) : "Drop match here"}</button>
+            role="button"
+            tabindex="${state.advancing ? "-1" : "0"}"
+            aria-disabled="${state.advancing}"
+          >${
+            assigned
+              ? answerIndices
+                  .map(
+                    (answerIndex) => `
+                      <button
+                        class="match-value"
+                        type="button"
+                        data-remove-answer-index="${answerIndex}"
+                        aria-label="Remove this match"
+                        ${state.advancing ? "disabled" : ""}
+                      >
+                        <span>${escapeHtml(matchingState.options[answerIndex].answer)}</span>
+                        <b aria-hidden="true">&times;</b>
+                      </button>
+                    `,
+                  )
+                  .join("")
+              : '<span class="match-placeholder">Drop match here</span>'
+          }</div>
         </div>
       `;
     })
@@ -1474,7 +1556,7 @@ function renderMatchingBoard() {
           data-answer-index="${answerIndex}"
           aria-pressed="${matchingState.selectedAnswerIndex === answerIndex}"
           ${state.advancing ? "disabled" : ""}
-        >${escapeHtml(question.pairs[answerIndex].answer)}</button>
+        >${escapeHtml(matchingState.options[answerIndex].answer)}</button>
       `,
     )
     .join("");
@@ -1500,15 +1582,34 @@ function assignMatchingAnswer(promptIndex, answerIndex) {
     promptIndex < 0 ||
     promptIndex >= question.pairs.length ||
     answerIndex < 0 ||
-    answerIndex >= question.pairs.length
+    answerIndex >= matchingState.options.length
   ) {
     return;
   }
 
-  const previousPrompt = matchingState.assignments.indexOf(answerIndex);
-  if (previousPrompt >= 0) matchingState.assignments[previousPrompt] = null;
-  matchingState.assignments[promptIndex] = answerIndex;
+  matchingState.assignments.forEach((answers, index) => {
+    matchingState.assignments[index] = answers.filter(
+      (assignedIndex) => assignedIndex !== answerIndex,
+    );
+  });
+  matchingState.assignments[promptIndex].push(answerIndex);
   matchingState.selectedAnswerIndex = null;
+  matchingState.results = null;
+  clearFeedback();
+  renderMatchingBoard();
+}
+
+function removeMatchingAnswer(promptIndex, answerIndex) {
+  if (
+    state.advancing ||
+    !matchingState ||
+    !matchingState.assignments[promptIndex]?.includes(answerIndex)
+  ) {
+    return;
+  }
+  matchingState.assignments[promptIndex] = matchingState.assignments[
+    promptIndex
+  ].filter((assignedIndex) => assignedIndex !== answerIndex);
   matchingState.results = null;
   clearFeedback();
   renderMatchingBoard();
@@ -1517,12 +1618,10 @@ function assignMatchingAnswer(promptIndex, answerIndex) {
 function matchingSubmissionSummary(question) {
   return question.pairs
     .map((pair, promptIndex) => {
-      const answerIndex = matchingState.assignments[promptIndex];
-      const answer =
-        answerIndex === null
-          ? "No match"
-          : question.pairs[answerIndex].answer;
-      return `${pair.prompt}: ${answer}`;
+      const answers = matchingState.assignments[promptIndex].map(
+        (answerIndex) => matchingState.options[answerIndex].answer,
+      );
+      return `${pair.prompt}: ${answers.join(", ") || "No match"}`;
     })
     .join("; ");
 }
@@ -1533,7 +1632,7 @@ function matchingAnswersMarkup(question) {
       ${question.pairs
         .map(
           (pair) =>
-            `<div><strong>${escapeHtml(pair.prompt)}:</strong> ${escapeHtml(pair.answer)}</div>`,
+            `<div><strong>${escapeHtml(pair.prompt)}:</strong> ${escapeHtml(pair.answers.join(", "))}</div>`,
         )
         .join("")}
     </div>
@@ -2030,7 +2129,12 @@ function showCorrectFeedback(question, heading = "Correct.") {
   elements.feedback.className = "feedback correct";
   elements.feedback.hidden = false;
   if (isMatchingQuestion(question)) {
-    matchingState.assignments = question.pairs.map((_, index) => index);
+    matchingState.assignments = question.pairs.map((_, promptIndex) =>
+      matchingState.options
+        .map((option, answerIndex) => ({ option, answerIndex }))
+        .filter(({ option }) => option.promptIndex === promptIndex)
+        .map(({ answerIndex }) => answerIndex),
+    );
     matchingState.results = question.pairs.map(() => true);
     renderMatchingBoard();
     elements.feedback.innerHTML = `
@@ -2137,23 +2241,32 @@ function handleSubmit(event) {
 
   const question = currentQuestion();
   if (isMatchingQuestion(question)) {
-    const firstUnmatched = matchingState.assignments.indexOf(null);
-    if (firstUnmatched >= 0) {
+    const assignedAnswers = new Set(matchingState.assignments.flat());
+    const firstUnmatchedOption = matchingState.optionOrder.find(
+      (answerIndex) => !assignedAnswers.has(answerIndex),
+    );
+    if (firstUnmatchedOption !== undefined) {
       elements.feedback.className = "feedback wrong";
       elements.feedback.hidden = false;
       elements.feedback.innerHTML =
-        "<strong>Match every prompt before checking.</strong>";
+        "<strong>Place every option before checking.</strong>";
       elements.matchingBoard
-        .querySelector(`[data-prompt-index="${firstUnmatched}"]`)
+        .querySelector(`[data-answer-index="${firstUnmatchedOption}"]`)
         ?.focus();
       return;
     }
 
     const results = question.pairs.map((pair, promptIndex) => {
-      const answerIndex = matchingState.assignments[promptIndex];
+      const expected = pair.answers.map(normalizeAnswer).sort();
+      const actual = matchingState.assignments[promptIndex]
+        .map(
+          (answerIndex) =>
+            normalizeAnswer(matchingState.options[answerIndex].answer),
+        )
+        .sort();
       return (
-        normalizeAnswer(question.pairs[answerIndex].answer) ===
-        normalizeAnswer(pair.answer)
+        expected.length === actual.length &&
+        expected.every((answer, index) => answer === actual[index])
       );
     });
     if (results.every(Boolean)) {
@@ -2597,6 +2710,24 @@ elements.addPairButton.addEventListener("click", () => {
   prompts[prompts.length - 1]?.focus();
 });
 elements.matchingPairEditor.addEventListener("click", (event) => {
+  const addAnswerButton = event.target.closest(".matching-answer-add");
+  if (addAnswerButton) {
+    const answerEditor = addAnswerButton.closest(".matching-answer-editor");
+    addMatchingAnswerEditorRow(answerEditor);
+    answerEditor
+      .querySelector(".matching-answer-row:last-of-type input")
+      ?.focus();
+    return;
+  }
+
+  const removeAnswerButton = event.target.closest(".matching-answer-remove");
+  if (removeAnswerButton && !removeAnswerButton.disabled) {
+    const answerEditor = removeAnswerButton.closest(".matching-answer-editor");
+    removeAnswerButton.closest(".matching-answer-row")?.remove();
+    updateMatchingAnswerRemoveButtons(answerEditor);
+    return;
+  }
+
   const removeButton = event.target.closest(".matching-pair-remove");
   if (!removeButton || removeButton.disabled) return;
   removeButton.closest(".matching-pair-row")?.remove();
@@ -2624,6 +2755,16 @@ elements.questionVerse.addEventListener("change", () =>
 );
 elements.matchingBoard.addEventListener("click", (event) => {
   if (state.advancing || !matchingState) return;
+  const removeAnswer = event.target.closest("[data-remove-answer-index]");
+  if (removeAnswer) {
+    const target = removeAnswer.closest("[data-prompt-index]");
+    removeMatchingAnswer(
+      Number(target.dataset.promptIndex),
+      Number(removeAnswer.dataset.removeAnswerIndex),
+    );
+    return;
+  }
+
   const option = event.target.closest("[data-answer-index]");
   if (option) {
     const answerIndex = Number(option.dataset.answerIndex);
@@ -2640,12 +2781,23 @@ elements.matchingBoard.addEventListener("click", (event) => {
   const promptIndex = Number(target.dataset.promptIndex);
   if (matchingState.selectedAnswerIndex !== null) {
     assignMatchingAnswer(promptIndex, matchingState.selectedAnswerIndex);
-  } else if (matchingState.assignments[promptIndex] !== null) {
-    matchingState.assignments[promptIndex] = null;
-    matchingState.results = null;
-    clearFeedback();
-    renderMatchingBoard();
   }
+});
+elements.matchingBoard.addEventListener("keydown", (event) => {
+  if (
+    state.advancing ||
+    matchingState?.selectedAnswerIndex === null ||
+    !["Enter", " "].includes(event.key)
+  ) {
+    return;
+  }
+  const target = event.target.closest("[data-prompt-index]");
+  if (!target || event.target !== target) return;
+  event.preventDefault();
+  assignMatchingAnswer(
+    Number(target.dataset.promptIndex),
+    matchingState.selectedAnswerIndex,
+  );
 });
 elements.matchingBoard.addEventListener("dragstart", (event) => {
   const option = event.target.closest("[data-answer-index]");
