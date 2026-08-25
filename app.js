@@ -137,8 +137,34 @@ async function loadBundledQuestions() {
   };
 }
 
+function normalizedMatchingPairs(pairs) {
+  if (!Array.isArray(pairs)) return [];
+  return pairs
+    .map((pair) => ({
+      prompt: String(pair?.prompt || "").trim(),
+      answer: String(pair?.answer || "").trim(),
+    }))
+    .filter((pair) => pair.prompt && pair.answer);
+}
+
+function matchingAnswerSummary(pairs) {
+  return pairs.map((pair) => `${pair.prompt}: ${pair.answer}`).join("; ");
+}
+
+function isMatchingQuestion(question) {
+  return question?.type === "matching" && question.pairs?.length >= 2;
+}
+
 function hydrateQuestion(question, id) {
-  const displayAnswer = String(question.displayAnswer || "").trim();
+  const matchingPairs = normalizedMatchingPairs(question.pairs);
+  const type =
+    question.type === "matching" && matchingPairs.length >= 2
+      ? "matching"
+      : "text";
+  const displayAnswer =
+    type === "matching"
+      ? matchingAnswerSummary(matchingPairs)
+      : String(question.displayAnswer || "").trim();
   const scope =
     question.scope ||
     (question.verse != null
@@ -163,6 +189,8 @@ function hydrateQuestion(question, id) {
         : undefined,
     question: String(question.question || "").trim(),
     alternateQuestion: String(question.alternateQuestion || "").trim(),
+    type,
+    pairs: type === "matching" ? matchingPairs : [],
     displayAnswer,
     aliases: aliases.map(String).map((answer) => answer.trim()).filter(Boolean),
   };
@@ -280,11 +308,14 @@ const elements = {
   questionStatus: document.querySelector("#question-status"),
   questionText: document.querySelector("#question-text"),
   answerForm: document.querySelector("#answer-form"),
+  textAnswerArea: document.querySelector("#text-answer-area"),
   answerLabel: document.querySelector("#answer-label"),
   answerInput: document.querySelector("#answer-input"),
   answerNote: document.querySelector("#answer-note"),
   bookAnswerChoices: document.querySelector("#book-answer-choices"),
   bookAnswerInputs: document.querySelectorAll('input[name="book-answer"]'),
+  matchingArea: document.querySelector("#matching-area"),
+  matchingBoard: document.querySelector("#matching-board"),
   feedback: document.querySelector("#feedback"),
   markCorrectButton: document.querySelector("#mark-correct-button"),
   acceptAnswerButton: document.querySelector("#accept-answer-button"),
@@ -348,12 +379,21 @@ const elements = {
   alternateQuestionPrompt: document.querySelector(
     "#alternate-question-prompt",
   ),
+  questionTypeField: document.querySelector("#question-type-field"),
+  questionType: document.querySelector("#question-type"),
+  questionTextAnswerFields: document.querySelector(
+    "#question-text-answer-fields",
+  ),
   questionAnswer: document.querySelector("#question-answer"),
   questionAliases: document.querySelector("#question-aliases"),
+  matchingPairField: document.querySelector("#matching-pair-field"),
+  matchingPairEditor: document.querySelector("#matching-pair-editor"),
+  addPairButton: document.querySelector("#add-pair-button"),
   toast: document.querySelector("#toast"),
 };
 
 let toastTimer;
+let matchingState = null;
 
 function normalizeAnswer(value) {
   return value
@@ -604,6 +644,81 @@ function updateEditorReferenceFields(lockReference = false) {
   elements.questionEndVerse.disabled = lockReference || scope !== "verse";
 }
 
+function updateMatchingPairRemoveButtons() {
+  const buttons = elements.matchingPairEditor.querySelectorAll(
+    ".matching-pair-remove",
+  );
+  buttons.forEach((button) => {
+    button.disabled = buttons.length <= 2;
+  });
+}
+
+function addMatchingPairEditorRow(pair = { prompt: "", answer: "" }) {
+  const row = document.createElement("div");
+  row.className = "matching-pair-row";
+
+  const prompt = document.createElement("input");
+  prompt.className = "matching-pair-prompt";
+  prompt.type = "text";
+  prompt.placeholder = "Prompt";
+  prompt.setAttribute("aria-label", "Matching prompt");
+  prompt.value = pair.prompt;
+
+  const answer = document.createElement("input");
+  answer.className = "matching-pair-answer";
+  answer.type = "text";
+  answer.placeholder = "Match";
+  answer.setAttribute("aria-label", "Matching answer");
+  answer.value = pair.answer;
+
+  const remove = document.createElement("button");
+  remove.className = "matching-pair-remove";
+  remove.type = "button";
+  remove.setAttribute("aria-label", "Remove matching pair");
+  remove.title = "Remove pair";
+  remove.textContent = "×";
+
+  const matching = elements.questionType.value === "matching";
+  prompt.required = matching;
+  answer.required = matching;
+  row.append(prompt, answer, remove);
+  elements.matchingPairEditor.append(row);
+  updateMatchingPairRemoveButtons();
+}
+
+function populateMatchingPairEditor(pairs = []) {
+  elements.matchingPairEditor.replaceChildren();
+  const initialPairs = pairs.length
+    ? pairs
+    : [
+        { prompt: "", answer: "" },
+        { prompt: "", answer: "" },
+      ];
+  initialPairs.forEach(addMatchingPairEditorRow);
+}
+
+function setEditorQuestionType(type, lockType = false) {
+  const matching = !lockType && type === "matching";
+  elements.questionType.value = matching ? "matching" : "text";
+  elements.questionType.disabled = lockType;
+  elements.questionTypeField.hidden = lockType;
+  elements.questionTextAnswerFields.hidden = matching;
+  elements.matchingPairField.hidden = !matching;
+  elements.questionAnswer.required = !matching;
+  elements.matchingPairEditor.querySelectorAll("input").forEach((input) => {
+    input.required = matching;
+  });
+}
+
+function readMatchingPairEditor() {
+  return [
+    ...elements.matchingPairEditor.querySelectorAll(".matching-pair-row"),
+  ].map((row) => ({
+    prompt: row.querySelector(".matching-pair-prompt").value.trim(),
+    answer: row.querySelector(".matching-pair-answer").value.trim(),
+  }));
+}
+
 function openQuestionEditor(question = null) {
   if (!state.bible) return;
   const isReferenceQuestion = Boolean(question?.generated);
@@ -633,7 +748,14 @@ function openQuestionEditor(question = null) {
   updateEditorReferenceFields(isReferenceQuestion);
   elements.questionPrompt.value = question?.question || "";
   elements.alternateQuestionPrompt.value = question?.alternateQuestion || "";
-  elements.questionAnswer.value = question?.displayAnswer || "";
+  elements.questionType.value = isMatchingQuestion(question)
+    ? "matching"
+    : "text";
+  populateMatchingPairEditor(isMatchingQuestion(question) ? question.pairs : []);
+  setEditorQuestionType(elements.questionType.value, isReferenceQuestion);
+  elements.questionAnswer.value = isMatchingQuestion(question)
+    ? ""
+    : question?.displayAnswer || "";
   elements.questionAliases.value = question?.aliases?.join("\n") || "";
   elements.questionDialogBackdrop.hidden = false;
   elements.questionDialog.show();
@@ -645,12 +767,15 @@ function closeQuestionEditor() {
   elements.questionDialog.close();
   elements.questionDialogBackdrop.hidden = true;
   document.body.classList.remove("editor-open");
+  elements.matchingPairEditor.replaceChildren();
   state.editingQuestionId = null;
 }
 
 function questionFieldsFromEditor() {
   const scope = elements.questionScope.value;
   const endVerse = Number(elements.questionEndVerse.value);
+  const type = elements.questionType.value;
+  const pairs = type === "matching" ? readMatchingPairEditor() : [];
   return {
     scope,
     book: elements.questionBook.value,
@@ -661,11 +786,19 @@ function questionFieldsFromEditor() {
     endVerse: scope === "verse" && endVerse ? endVerse : undefined,
     question: elements.questionPrompt.value.trim(),
     alternateQuestion: elements.alternateQuestionPrompt.value.trim(),
-    displayAnswer: elements.questionAnswer.value.trim(),
-    aliases: elements.questionAliases.value
-      .split(/\r?\n/)
-      .map((answer) => answer.trim())
-      .filter(Boolean),
+    type,
+    pairs,
+    displayAnswer:
+      type === "matching"
+        ? matchingAnswerSummary(pairs)
+        : elements.questionAnswer.value.trim(),
+    aliases:
+      type === "matching"
+        ? []
+        : elements.questionAliases.value
+            .split(/\r?\n/)
+            .map((answer) => answer.trim())
+            .filter(Boolean),
   };
 }
 
@@ -679,6 +812,8 @@ function storedQuestion(question) {
     endVerse: question.endVerse,
     question: question.question,
     alternateQuestion: question.alternateQuestion,
+    type: question.type,
+    pairs: question.pairs,
     displayAnswer: question.displayAnswer,
     aliases: question.aliases,
   };
@@ -803,6 +938,22 @@ function handleQuestionSave(event) {
   if (!elements.questionForm.reportValidity()) return;
 
   const fields = questionFieldsFromEditor();
+  if (fields.type === "matching") {
+    if (
+      fields.pairs.length < 2 ||
+      fields.pairs.some((pair) => !pair.prompt || !pair.answer)
+    ) {
+      showToast("Add at least two complete matching pairs.");
+      return;
+    }
+    const normalizedAnswers = fields.pairs.map((pair) =>
+      normalizeAnswer(pair.answer),
+    );
+    if (new Set(normalizedAnswers).size !== normalizedAnswers.length) {
+      showToast("Each match must have a distinct answer.");
+      return;
+    }
+  }
   let question;
   let message;
   let removedFromSelection = false;
@@ -1224,7 +1375,133 @@ function escapeHtml(value) {
   return node.innerHTML;
 }
 
+function createMatchingState(question) {
+  return {
+    questionId: question.id,
+    optionOrder: shuffle(question.pairs.map((_, index) => index)),
+    assignments: Array(question.pairs.length).fill(null),
+    selectedAnswerIndex: null,
+    results: null,
+  };
+}
+
+function renderMatchingBoard() {
+  const question = currentQuestion();
+  if (
+    !isMatchingQuestion(question) ||
+    matchingState?.questionId !== question.id
+  ) {
+    elements.matchingBoard.replaceChildren();
+    return;
+  }
+
+  const assignedAnswers = new Set(
+    matchingState.assignments.filter((index) => index !== null),
+  );
+  const rows = question.pairs
+    .map((pair, promptIndex) => {
+      const answerIndex = matchingState.assignments[promptIndex];
+      const assigned = answerIndex !== null;
+      const result = matchingState.results?.[promptIndex];
+      const resultClass =
+        result === true
+          ? " correct-match"
+          : result === false
+            ? " wrong-match"
+            : "";
+      return `
+        <div class="match-row">
+          <div class="match-prompt">${escapeHtml(pair.prompt)}</div>
+          <button
+            class="match-target${assigned ? " filled" : ""}${resultClass}"
+            type="button"
+            data-prompt-index="${promptIndex}"
+            ${state.advancing ? "disabled" : ""}
+          >${assigned ? escapeHtml(question.pairs[answerIndex].answer) : "Drop match here"}</button>
+        </div>
+      `;
+    })
+    .join("");
+
+  const options = matchingState.optionOrder
+    .filter((answerIndex) => !assignedAnswers.has(answerIndex))
+    .map(
+      (answerIndex) => `
+        <button
+          class="match-option${matchingState.selectedAnswerIndex === answerIndex ? " selected" : ""}"
+          type="button"
+          draggable="${state.advancing ? "false" : "true"}"
+          data-answer-index="${answerIndex}"
+          aria-pressed="${matchingState.selectedAnswerIndex === answerIndex}"
+          ${state.advancing ? "disabled" : ""}
+        >${escapeHtml(question.pairs[answerIndex].answer)}</button>
+      `,
+    )
+    .join("");
+
+  elements.matchingBoard.innerHTML = `
+    <div class="match-pairs">
+      <p class="match-column-label">Prompts and matches</p>
+      ${rows}
+    </div>
+    <div class="match-options">
+      <p class="match-column-label">Options</p>
+      ${options || '<div class="match-empty">All options placed</div>'}
+    </div>
+  `;
+}
+
+function assignMatchingAnswer(promptIndex, answerIndex) {
+  const question = currentQuestion();
+  if (
+    state.advancing ||
+    !isMatchingQuestion(question) ||
+    !matchingState ||
+    promptIndex < 0 ||
+    promptIndex >= question.pairs.length ||
+    answerIndex < 0 ||
+    answerIndex >= question.pairs.length
+  ) {
+    return;
+  }
+
+  const previousPrompt = matchingState.assignments.indexOf(answerIndex);
+  if (previousPrompt >= 0) matchingState.assignments[previousPrompt] = null;
+  matchingState.assignments[promptIndex] = answerIndex;
+  matchingState.selectedAnswerIndex = null;
+  matchingState.results = null;
+  clearFeedback();
+  renderMatchingBoard();
+}
+
+function matchingSubmissionSummary(question) {
+  return question.pairs
+    .map((pair, promptIndex) => {
+      const answerIndex = matchingState.assignments[promptIndex];
+      const answer =
+        answerIndex === null
+          ? "No match"
+          : question.pairs[answerIndex].answer;
+      return `${pair.prompt}: ${answer}`;
+    })
+    .join("; ");
+}
+
+function matchingAnswersMarkup(question) {
+  return `
+    <div class="matching-answer-list">
+      ${question.pairs
+        .map(
+          (pair) =>
+            `<div><strong>${escapeHtml(pair.prompt)}:</strong> ${escapeHtml(pair.answer)}</div>`,
+        )
+        .join("")}
+    </div>
+  `;
+}
+
 function acceptedAnswersMarkup(question) {
+  if (isMatchingQuestion(question)) return "";
   if (state.questionMode === "fill" && state.referenceDetail !== "verse") {
     return "";
   }
@@ -1584,7 +1861,8 @@ function populateQuestionSelect() {
 }
 
 function clearFeedback() {
-  const showBookChoices = usesBookAnswerChoices();
+  const matching = isMatchingQuestion(currentQuestion());
+  const showBookChoices = !matching && usesBookAnswerChoices();
   state.pendingRejectedAnswer = "";
   state.advancing = false;
   elements.feedback.hidden = true;
@@ -1595,7 +1873,7 @@ function clearFeedback() {
   elements.nextButton.hidden = true;
   elements.answerInput.hidden = showBookChoices;
   elements.answerInput.disabled = showBookChoices;
-  elements.answerInput.required = !showBookChoices;
+  elements.answerInput.required = !showBookChoices && !matching;
   elements.answerInput.value = "";
   elements.answerInput.removeAttribute("aria-invalid");
   elements.bookAnswerChoices.hidden = !showBookChoices;
@@ -1604,6 +1882,8 @@ function clearFeedback() {
     input.checked = false;
     input.disabled = !showBookChoices;
   });
+  elements.textAnswerArea.hidden = matching;
+  elements.matchingArea.hidden = !matching;
   elements.answerNote.hidden = showBookChoices;
   elements.answerLabel.textContent =
     state.questionMode === "fill" ? referenceDetailLabel() : "Your answer";
@@ -1706,12 +1986,24 @@ function showCorrectFeedback(question, heading = "Correct.") {
   });
   elements.feedback.className = "feedback correct";
   elements.feedback.hidden = false;
-  elements.feedback.innerHTML = `
-    <strong>${escapeHtml(heading)}</strong>
-    <p><b>Official answer:</b> ${escapeHtml(officialAnswer(question))}</p>
-    ${acceptedAnswersMarkup(question)}
-    ${verseCitationMarkup(question)}
-  `;
+  if (isMatchingQuestion(question)) {
+    matchingState.assignments = question.pairs.map((_, index) => index);
+    matchingState.results = question.pairs.map(() => true);
+    renderMatchingBoard();
+    elements.feedback.innerHTML = `
+      <strong>${escapeHtml(heading)}</strong>
+      <p><b>Official matches:</b></p>
+      ${matchingAnswersMarkup(question)}
+      ${verseCitationMarkup(question)}
+    `;
+  } else {
+    elements.feedback.innerHTML = `
+      <strong>${escapeHtml(heading)}</strong>
+      <p><b>Official answer:</b> ${escapeHtml(officialAnswer(question))}</p>
+      ${acceptedAnswersMarkup(question)}
+      ${verseCitationMarkup(question)}
+    `;
+  }
   elements.markCorrectButton.hidden = true;
   elements.acceptAnswerButton.hidden = true;
   elements.nextButton.hidden = false;
@@ -1735,7 +2027,11 @@ function renderQuestion() {
     state.questionMode === "fill" ? "NKJV verse" : question.source;
   elements.questionText.textContent = displayedQuestion(question);
   elements.questionSelect.value = String(question.id);
+  matchingState = isMatchingQuestion(question)
+    ? createMatchingState(question)
+    : null;
   clearFeedback();
+  if (matchingState) renderMatchingBoard();
   updateQuestionStatus(question);
   updateProgress(question);
   updateStats();
@@ -1747,8 +2043,13 @@ function renderQuestion() {
     showCorrectFeedback(question, "Reviewed correctly.");
   } else {
     requestAnimationFrame(() => {
-      if (usesBookAnswerChoices()) elements.bookAnswerInputs[0]?.focus();
-      else elements.answerInput.focus();
+      if (matchingState) {
+        elements.matchingBoard.querySelector(".match-option")?.focus();
+      } else if (usesBookAnswerChoices()) {
+        elements.bookAnswerInputs[0]?.focus();
+      } else {
+        elements.answerInput.focus();
+      }
     });
   }
 }
@@ -1792,6 +2093,67 @@ function handleSubmit(event) {
   if (state.advancing) return;
 
   const question = currentQuestion();
+  if (isMatchingQuestion(question)) {
+    const firstUnmatched = matchingState.assignments.indexOf(null);
+    if (firstUnmatched >= 0) {
+      elements.feedback.className = "feedback wrong";
+      elements.feedback.hidden = false;
+      elements.feedback.innerHTML =
+        "<strong>Match every prompt before checking.</strong>";
+      elements.matchingBoard
+        .querySelector(`[data-prompt-index="${firstUnmatched}"]`)
+        ?.focus();
+      return;
+    }
+
+    const results = question.pairs.map((pair, promptIndex) => {
+      const answerIndex = matchingState.assignments[promptIndex];
+      return (
+        normalizeAnswer(question.pairs[answerIndex].answer) ===
+        normalizeAnswer(pair.answer)
+      );
+    });
+    if (results.every(Boolean)) {
+      if (state.practiceMode) {
+        state.practiceCorrectIds.add(question.id);
+      } else {
+        state.correctIds.add(question.id);
+        state.skippedIds.delete(question.id);
+      }
+      showCorrectFeedback(question);
+      updateQuestionStatus(question);
+      updateStats();
+      saveSession();
+      return;
+    }
+
+    const submittedMatches = matchingSubmissionSummary(question);
+    const existing = state.missed.get(question.id);
+    if (existing) {
+      existing.attempts += 1;
+      existing.answers.push(submittedMatches);
+    } else {
+      state.missed.set(question.id, {
+        attempts: 1,
+        answers: [submittedMatches],
+      });
+    }
+
+    matchingState.results = results;
+    matchingState.selectedAnswerIndex = null;
+    renderMatchingBoard();
+    elements.feedback.className = "feedback wrong";
+    elements.feedback.hidden = false;
+    elements.feedback.innerHTML =
+      "<strong>Not quite. Adjust the highlighted matches and try again.</strong>";
+    elements.markCorrectButton.hidden = false;
+    elements.acceptAnswerButton.hidden = true;
+    updateQuestionStatus(question);
+    updateStats();
+    saveSession();
+    return;
+  }
+
   const value = selectedAnswerValue();
 
   if (answerIsCorrect(value, question)) {
@@ -1980,9 +2342,14 @@ function buildReviewSection(title, entries, type) {
               displayedQuestion(question),
             )}</strong></p>
             ${answerLine}
-            <p class="correct-answer"><strong>Answer:</strong> ${escapeHtml(
-              officialAnswer(question),
-            )}</p>
+            <div class="correct-answer">
+              <strong>${isMatchingQuestion(question) ? "Matches:" : "Answer:"}</strong>
+              ${
+                isMatchingQuestion(question)
+                  ? matchingAnswersMarkup(question)
+                  : escapeHtml(officialAnswer(question))
+              }
+            </div>
           </div>
         </article>
       `;
@@ -2176,6 +2543,22 @@ elements.editQuestionButton.addEventListener("click", () =>
 );
 elements.deleteQuestionButton.addEventListener("click", deleteCurrentQuestion);
 elements.questionForm.addEventListener("submit", handleQuestionSave);
+elements.questionType.addEventListener("change", () => {
+  setEditorQuestionType(elements.questionType.value);
+});
+elements.addPairButton.addEventListener("click", () => {
+  addMatchingPairEditorRow();
+  const prompts = elements.matchingPairEditor.querySelectorAll(
+    ".matching-pair-prompt",
+  );
+  prompts[prompts.length - 1]?.focus();
+});
+elements.matchingPairEditor.addEventListener("click", (event) => {
+  const removeButton = event.target.closest(".matching-pair-remove");
+  if (!removeButton || removeButton.disabled) return;
+  removeButton.closest(".matching-pair-row")?.remove();
+  updateMatchingPairRemoveButtons();
+});
 elements.closeQuestionDialogButton.addEventListener(
   "click",
   closeQuestionEditor,
@@ -2196,6 +2579,63 @@ elements.questionChapter.addEventListener("change", () =>
 elements.questionVerse.addEventListener("change", () =>
   populateEditorVerses(elements.questionVerse.value),
 );
+elements.matchingBoard.addEventListener("click", (event) => {
+  if (state.advancing || !matchingState) return;
+  const option = event.target.closest("[data-answer-index]");
+  if (option) {
+    const answerIndex = Number(option.dataset.answerIndex);
+    matchingState.selectedAnswerIndex =
+      matchingState.selectedAnswerIndex === answerIndex ? null : answerIndex;
+    matchingState.results = null;
+    clearFeedback();
+    renderMatchingBoard();
+    return;
+  }
+
+  const target = event.target.closest("[data-prompt-index]");
+  if (!target) return;
+  const promptIndex = Number(target.dataset.promptIndex);
+  if (matchingState.selectedAnswerIndex !== null) {
+    assignMatchingAnswer(promptIndex, matchingState.selectedAnswerIndex);
+  } else if (matchingState.assignments[promptIndex] !== null) {
+    matchingState.assignments[promptIndex] = null;
+    matchingState.results = null;
+    clearFeedback();
+    renderMatchingBoard();
+  }
+});
+elements.matchingBoard.addEventListener("dragstart", (event) => {
+  const option = event.target.closest("[data-answer-index]");
+  if (!option || state.advancing) return;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData(
+    "text/plain",
+    `match:${option.dataset.answerIndex}`,
+  );
+});
+elements.matchingBoard.addEventListener("dragover", (event) => {
+  const target = event.target.closest("[data-prompt-index]");
+  if (!target || state.advancing) return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+  target.classList.add("drag-over");
+});
+elements.matchingBoard.addEventListener("dragleave", (event) => {
+  event.target.closest("[data-prompt-index]")?.classList.remove("drag-over");
+});
+elements.matchingBoard.addEventListener("drop", (event) => {
+  const target = event.target.closest("[data-prompt-index]");
+  if (!target || state.advancing) return;
+  event.preventDefault();
+  target.classList.remove("drag-over");
+  const payload = event.dataTransfer.getData("text/plain");
+  const payloadMatch = payload.match(/^match:(\d+)$/);
+  if (!payloadMatch) return;
+  assignMatchingAnswer(
+    Number(target.dataset.promptIndex),
+    Number(payloadMatch[1]),
+  );
+});
 elements.openReaderButton.addEventListener("click", () => openReader());
 elements.openEditorReaderButton.addEventListener(
   "click",

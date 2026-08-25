@@ -9,7 +9,7 @@
     />
     <meta name="color-scheme" content="light" />
     <title>Minor Prophets Recall</title>
-    <link rel="stylesheet" href="styles.css?v=20260824-1" />
+    <link rel="stylesheet" href="styles.css?v=20260825-1" />
   </head>
   <body>
     <header class="topbar">
@@ -265,48 +265,59 @@
             <h1 id="question-text"></h1>
 
             <form id="answer-form" novalidate>
-              <div id="answer-label">Your answer</div>
-              <div class="input-row">
-                <input
-                  id="answer-input"
-                  name="answer"
-                  type="text"
-                  autocomplete="off"
-                  autocapitalize="sentences"
-                  spellcheck="false"
-                  aria-describedby="answer-note feedback"
-                  required
-                />
-                <fieldset
-                  class="book-answer-choices"
-                  id="book-answer-choices"
-                  aria-labelledby="answer-label"
-                  aria-describedby="answer-note feedback"
-                  hidden
-                >
-                  <label class="book-answer-option">
-                    <input type="radio" name="book-answer" value="Haggai" />
-                    <span>Haggai</span>
-                  </label>
-                  <label class="book-answer-option">
-                    <input type="radio" name="book-answer" value="Zechariah" />
-                    <span>Zechariah</span>
-                  </label>
-                  <label class="book-answer-option">
-                    <input type="radio" name="book-answer" value="Malachi" />
-                    <span>Malachi</span>
-                  </label>
-                </fieldset>
-                <button class="button primary submit-button" type="submit">
-                  Check answer
+              <div id="text-answer-area">
+                <div id="answer-label">Your answer</div>
+                <div class="input-row">
+                  <input
+                    id="answer-input"
+                    name="answer"
+                    type="text"
+                    autocomplete="off"
+                    autocapitalize="sentences"
+                    spellcheck="false"
+                    aria-describedby="answer-note feedback"
+                    required
+                  />
+                  <fieldset
+                    class="book-answer-choices"
+                    id="book-answer-choices"
+                    aria-labelledby="answer-label"
+                    aria-describedby="answer-note feedback"
+                    hidden
+                  >
+                    <label class="book-answer-option">
+                      <input type="radio" name="book-answer" value="Haggai" />
+                      <span>Haggai</span>
+                    </label>
+                    <label class="book-answer-option">
+                      <input type="radio" name="book-answer" value="Zechariah" />
+                      <span>Zechariah</span>
+                    </label>
+                    <label class="book-answer-option">
+                      <input type="radio" name="book-answer" value="Malachi" />
+                      <span>Malachi</span>
+                    </label>
+                  </fieldset>
+                  <button class="button primary submit-button" type="submit">
+                    Check answer
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="m9 18 6-6-6-6" />
+                    </svg>
+                  </button>
+                </div>
+                <p id="answer-note">
+                  Spelling matters. Capitalization, punctuation, and articles do not.
+                </p>
+              </div>
+              <div class="matching-area" id="matching-area" hidden>
+                <div class="matching-board" id="matching-board"></div>
+                <button class="button primary matching-submit" type="submit">
+                  Check matches
                   <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="m9 18 6-6-6-6" />
                   </svg>
                 </button>
               </div>
-              <p id="answer-note">
-                Spelling matters. Capitalization, punctuation, and articles do not.
-              </p>
             </form>
 
             <div class="question-navigation" aria-label="Question navigation">
@@ -525,6 +536,13 @@
           </label>
         </div>
 
+        <label id="question-type-field">
+          <span>Question type</span>
+          <select id="question-type" name="type">
+            <option value="text">Free response</option>
+            <option value="matching">Matching</option>
+          </select>
+        </label>
         <label>
           <span id="question-prompt-label">Question</span>
           <textarea id="question-prompt" name="question" rows="3" required></textarea>
@@ -537,19 +555,28 @@
             rows="3"
           ></textarea>
         </label>
-        <label>
-          <span id="question-answer-label">Official answer</span>
-          <input id="question-answer" name="displayAnswer" type="text" required />
-        </label>
-        <label>
-          <span>Other accepted answers</span>
-          <textarea
-            id="question-aliases"
-            name="aliases"
-            rows="4"
-            placeholder="Enter one answer per line"
-          ></textarea>
-        </label>
+        <div class="question-text-answer-fields" id="question-text-answer-fields">
+          <label>
+            <span id="question-answer-label">Official answer</span>
+            <input id="question-answer" name="displayAnswer" type="text" required />
+          </label>
+          <label>
+            <span>Other accepted answers</span>
+            <textarea
+              id="question-aliases"
+              name="aliases"
+              rows="4"
+              placeholder="Enter one answer per line"
+            ></textarea>
+          </label>
+        </div>
+        <div class="matching-pair-field" id="matching-pair-field" hidden>
+          <span>Matching pairs</span>
+          <div class="matching-pair-editor" id="matching-pair-editor"></div>
+          <button class="button add-pair-button" id="add-pair-button" type="button">
+            Add pair
+          </button>
+        </div>
 
         <div class="dialog-actions">
           <button class="button primary" id="save-question-button" type="submit">
@@ -562,6 +589,6 @@
     <div class="toast" id="toast" role="status" hidden></div>
 
     <script src="questions.js?v=20260728-2"></script>
-    <script src="app.js?v=20260824-1"></script>
+    <script src="app.js?v=20260825-1"></script>
   </body>
 </html>
