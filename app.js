@@ -97,6 +97,7 @@ function mergeQuestionLibraries(defaults, local) {
 }
 
 function questionSource(question) {
+  if (question.scope === "all-books") return "All three books overview";
   if (question.scope === "book") return `${question.book} overview`;
   if (question.scope === "chapter") {
     return `${question.book} ${question.chapter} overview`;
@@ -181,7 +182,11 @@ function hydrateQuestion(question, id) {
     ...question,
     id,
     scope,
-    chapter: scope === "book" ? undefined : Number(question.chapter),
+    books: scope === "all-books" ? [...BOOK_ORDER] : undefined,
+    chapter:
+      scope === "book" || scope === "all-books"
+        ? undefined
+        : Number(question.chapter),
     verse: scope === "verse" ? Number(question.verse) : undefined,
     endVerse:
       scope === "verse" && question.endVerse
@@ -200,9 +205,13 @@ function hydrateQuestion(question, id) {
 }
 
 function compareQuestions(left, right) {
-  const scopeOrder = { book: 0, chapter: 1, verse: 2 };
+  const scopeOrder = { "all-books": -1, book: 0, chapter: 1, verse: 2 };
+  const leftBookIndex =
+    left.scope === "all-books" ? -1 : BOOK_ORDER.indexOf(left.book);
+  const rightBookIndex =
+    right.scope === "all-books" ? -1 : BOOK_ORDER.indexOf(right.book);
   return (
-    BOOK_ORDER.indexOf(left.book) - BOOK_ORDER.indexOf(right.book) ||
+    leftBookIndex - rightBookIndex ||
     (left.chapter || 0) - (right.chapter || 0) ||
     (scopeOrder[left.scope] ?? 2) - (scopeOrder[right.scope] ?? 2) ||
     (left.verse || 0) - (right.verse || 0) ||
@@ -371,6 +380,11 @@ const elements = {
   ),
   saveQuestionButton: document.querySelector("#save-question-button"),
   questionScope: document.querySelector("#question-scope"),
+  referenceFields: document.querySelector("#reference-fields"),
+  questionBookField: document.querySelector("#question-book-field"),
+  questionChapterField: document.querySelector("#question-chapter-field"),
+  questionVerseField: document.querySelector("#question-verse-field"),
+  questionEndVerseField: document.querySelector("#question-end-verse-field"),
   questionBook: document.querySelector("#question-book"),
   questionChapter: document.querySelector("#question-chapter"),
   questionVerse: document.querySelector("#question-verse"),
@@ -490,7 +504,14 @@ function currentQuestion() {
 }
 
 function eligibleQuestions() {
-  return QUESTIONS.filter((question) => state.selectedBooks.has(question.book));
+  return QUESTIONS.filter(questionMatchesBookFilter);
+}
+
+function questionMatchesBookFilter(question) {
+  if (question.scope === "all-books") {
+    return BOOK_ORDER.every((book) => state.selectedBooks.has(book));
+  }
+  return state.selectedBooks.has(question.book);
 }
 
 function answerIsCorrect(value, question) {
@@ -637,9 +658,16 @@ function populateEditorVerses(selectedVerse = 1, selectedEndVerse = "") {
 
 function updateEditorReferenceFields(lockReference = false) {
   const scope = elements.questionScope.value;
+  const allBooks = scope === "all-books";
+  elements.referenceFields.classList.toggle("is-all-books", allBooks);
+  elements.questionBookField.hidden = allBooks;
+  elements.questionChapterField.hidden = allBooks;
+  elements.questionVerseField.hidden = allBooks;
+  elements.questionEndVerseField.hidden = allBooks;
   elements.questionScope.disabled = lockReference;
-  elements.questionBook.disabled = lockReference;
-  elements.questionChapter.disabled = lockReference || scope === "book";
+  elements.questionBook.disabled = lockReference || allBooks;
+  elements.questionChapter.disabled =
+    lockReference || scope === "book" || allBooks;
   elements.questionVerse.disabled = lockReference || scope !== "verse";
   elements.questionEndVerse.disabled = lockReference || scope !== "verse";
 }
@@ -778,9 +806,12 @@ function questionFieldsFromEditor() {
   const pairs = type === "matching" ? readMatchingPairEditor() : [];
   return {
     scope,
-    book: elements.questionBook.value,
+    book: scope === "all-books" ? BOOK_ORDER[0] : elements.questionBook.value,
+    books: scope === "all-books" ? [...BOOK_ORDER] : undefined,
     chapter:
-      scope === "book" ? undefined : Number(elements.questionChapter.value),
+      scope === "book" || scope === "all-books"
+        ? undefined
+        : Number(elements.questionChapter.value),
     verse:
       scope === "verse" ? Number(elements.questionVerse.value) : undefined,
     endVerse: scope === "verse" && endVerse ? endVerse : undefined,
@@ -807,6 +838,7 @@ function storedQuestion(question) {
     id: question.id,
     scope: question.scope,
     book: question.book,
+    books: question.books,
     chapter: question.chapter,
     verse: question.verse,
     endVerse: question.endVerse,
@@ -972,7 +1004,7 @@ function handleQuestionSave(event) {
       if (index >= 0) questionLibrary.custom[index] = storedQuestion(question);
     }
     message = "Question updated.";
-    if (!state.selectedBooks.has(question.book)) {
+    if (!questionMatchesBookFilter(question)) {
       state.deckIds = state.deckIds.filter((id) => id !== question.id);
       state.mainDeckIds =
         state.mainDeckIds?.filter((id) => id !== question.id) || null;
@@ -986,10 +1018,10 @@ function handleQuestionSave(event) {
     question = hydrateQuestion(fields, createQuestionId());
     QUESTIONS.push(question);
     questionLibrary.custom.push(storedQuestion(question));
-    if (state.practiceMode && state.selectedBooks.has(question.book)) {
+    if (state.practiceMode && questionMatchesBookFilter(question)) {
       state.mainDeckIds ||= expandedQuestionBank.map((_, index) => index + 1);
       state.mainDeckIds.push(question.id);
-    } else if (state.selectedBooks.has(question.book)) {
+    } else if (questionMatchesBookFilter(question)) {
       state.deckIds.push(question.id);
     }
     message = "Question added.";
@@ -1000,7 +1032,7 @@ function handleQuestionSave(event) {
   populateQuestionSelect();
   closeQuestionEditor();
   saveSession();
-  if (state.selectedBooks.has(question.book)) goToQuestion(question.id);
+  if (questionMatchesBookFilter(question)) goToQuestion(question.id);
   else renderQuestion();
   if (state.readerOpen) renderReader();
   showToast(
@@ -1932,7 +1964,9 @@ function updateProgress(question) {
   elements.bookLabel.textContent =
     state.questionMode === "fill"
       ? `Verse reference · ${referenceDetailLabel()}`
-      : question.book;
+      : question.scope === "all-books"
+        ? "All three books"
+        : question.book;
   elements.progressFill.style.width = `${percent}%`;
   elements.progressTrack.setAttribute("aria-valuenow", String(percent));
 }

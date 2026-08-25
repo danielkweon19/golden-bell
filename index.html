@@ -9,7 +9,7 @@
     />
     <meta name="color-scheme" content="light" />
     <title>Minor Prophets Recall</title>
-    <link rel="stylesheet" href="styles.css?v=20260825-3" />
+    <link rel="stylesheet" href="styles.css?v=20260825-4" />
   </head>
   <body>
     <header class="topbar">
@@ -509,28 +509,29 @@
           </div>
         </div>
 
-        <div class="reference-fields">
+        <div class="reference-fields" id="reference-fields">
           <label>
             <span>Reference type</span>
             <select id="question-scope" name="scope" required>
               <option value="verse">Verse</option>
               <option value="chapter">Chapter overview</option>
               <option value="book">Book overview</option>
+              <option value="all-books">All three books overview</option>
             </select>
           </label>
-          <label>
+          <label id="question-book-field">
             <span>Book</span>
             <select id="question-book" name="book" required></select>
           </label>
-          <label>
+          <label id="question-chapter-field">
             <span>Chapter</span>
             <select id="question-chapter" name="chapter" required></select>
           </label>
-          <label>
+          <label id="question-verse-field">
             <span>Verse</span>
             <select id="question-verse" name="verse" required></select>
           </label>
-          <label>
+          <label id="question-end-verse-field">
             <span>End verse</span>
             <select id="question-end-verse" name="endVerse"></select>
           </label>
@@ -589,6 +590,6 @@
     <div class="toast" id="toast" role="status" hidden></div>
 
     <script src="questions.js?v=20260728-2"></script>
-    <script src="app.js?v=20260825-2"></script>
+    <script src="app.js?v=20260825-3"></script>
   </body>
 </html>

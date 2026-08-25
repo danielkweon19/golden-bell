@@ -1381,6 +1381,10 @@ main {
   gap: 10px;
 }
 
+.reference-fields.is-all-books {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .question-text-answer-fields {
   display: grid;
   gap: 17px;
