@@ -1391,9 +1391,17 @@ function renderMatchingBoard() {
     !isMatchingQuestion(question) ||
     matchingState?.questionId !== question.id
   ) {
+    elements.matchingBoard.className = "matching-board";
     elements.matchingBoard.replaceChildren();
     return;
   }
+  elements.matchingBoard.className = [
+    "matching-board",
+    question.pairs.length > 6 ? "is-compact" : "",
+    question.pairs.length > 12 ? "is-dense" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const assignedAnswers = new Set(
     matchingState.assignments.filter((index) => index !== null),
@@ -1863,6 +1871,7 @@ function populateQuestionSelect() {
 function clearFeedback() {
   const matching = isMatchingQuestion(currentQuestion());
   const showBookChoices = !matching && usesBookAnswerChoices();
+  elements.quizView.dataset.answerType = matching ? "matching" : "text";
   state.pendingRejectedAnswer = "";
   state.advancing = false;
   elements.feedback.hidden = true;

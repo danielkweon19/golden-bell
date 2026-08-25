@@ -596,6 +596,12 @@ main {
   line-height: 1.45;
 }
 
+#quiz-view[data-answer-type="matching"] #question-text {
+  min-height: 0;
+  margin-bottom: 24px;
+  font-size: 30px;
+}
+
 #answer-label {
   display: block;
   margin-bottom: 8px;
@@ -709,26 +715,54 @@ main {
 .match-pairs,
 .match-options {
   display: grid;
-  max-height: min(620px, 55dvh);
+  min-width: 0;
   align-content: start;
   gap: 8px;
-  overflow-y: auto;
-  padding-right: 4px;
-  scrollbar-gutter: stable;
-  overscroll-behavior: contain;
 }
 
 .match-column-label {
-  position: sticky;
-  top: 0;
-  z-index: 1;
   margin: 0 0 2px;
-  padding: 4px 0 6px;
   color: var(--muted);
-  background: var(--surface);
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
+}
+
+.matching-board.is-compact {
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.matching-board.is-compact .match-pairs {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.matching-board.is-compact .match-options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.matching-board.is-compact .match-column-label {
+  grid-column: 1 / -1;
+}
+
+.matching-board.is-compact .match-prompt,
+.matching-board.is-compact .match-target,
+.matching-board.is-compact .match-option {
+  min-height: 42px;
+  padding: 7px 9px;
+  font-size: 13px;
+}
+
+.matching-board.is-dense .match-options {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.matching-board.is-dense .match-prompt,
+.matching-board.is-dense .match-target,
+.matching-board.is-dense .match-option {
+  min-height: 38px;
+  padding: 5px 7px;
+  font-size: 12px;
 }
 
 .match-row {
@@ -1629,6 +1663,14 @@ footer {
   .missed-list {
     max-height: 300px;
   }
+
+  .matching-board.is-compact .match-pairs {
+    grid-template-columns: 1fr;
+  }
+
+  .matching-board.is-compact .match-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 580px) {
@@ -1734,17 +1776,17 @@ footer {
     font-size: 21px;
   }
 
+  #quiz-view[data-answer-type="matching"] #question-text {
+    min-height: 0;
+    font-size: 24px;
+  }
+
   .input-row {
     grid-template-columns: 1fr;
   }
 
   .matching-board {
     grid-template-columns: 1fr;
-  }
-
-  .match-pairs,
-  .match-options {
-    max-height: 42dvh;
   }
 
   .match-row {
