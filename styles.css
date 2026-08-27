@@ -190,6 +190,12 @@ select {
   border-color: #9fa6a2;
 }
 
+#shuffle-button[aria-pressed="true"] {
+  color: var(--teal-dark);
+  background: var(--teal-soft);
+  border-color: var(--teal);
+}
+
 .button:active {
   transform: translateY(1px);
 }

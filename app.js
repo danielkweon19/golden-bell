@@ -298,6 +298,7 @@ const state = {
   readerChapter: 1,
   readerVerse: 1,
   editingQuestionId: null,
+  shuffleEnabled: false,
 };
 
 const elements = {
@@ -1004,6 +1005,8 @@ function createQuestionId() {
 function sortQuestionBankAndDecks() {
   const currentId = state.deckIds[state.index];
   QUESTIONS.sort(compareQuestions);
+  if (state.shuffleEnabled) return;
+
   const order = new Map(
     QUESTIONS.map((question, index) => [question.id, index]),
   );
@@ -1755,6 +1758,7 @@ function saveSession() {
         practiceCorrectIds: [...state.practiceCorrectIds],
         mainDeckIds: state.mainDeckIds,
         mainIndex: state.mainIndex,
+        shuffleEnabled: state.shuffleEnabled,
       }),
     );
   } catch {
@@ -1819,6 +1823,8 @@ function restoreSession() {
         ]
       : null;
     state.mainIndex = Number(saved.mainIndex) || 0;
+    state.shuffleEnabled = Boolean(saved.shuffleEnabled);
+    updateShuffleControl();
   } catch {
     localStorage.removeItem(sessionKey());
   }
@@ -1836,6 +1842,8 @@ function resetModeProgress() {
   state.mainIndex = 0;
   state.pendingRejectedAnswer = "";
   state.advancing = false;
+  state.shuffleEnabled = false;
+  updateShuffleControl();
 }
 
 function updateQuestionModeControls() {
@@ -2410,19 +2418,41 @@ function shuffle(items) {
   return result;
 }
 
-function shuffleRemaining() {
+function updateShuffleControl() {
+  elements.shuffleButton.setAttribute(
+    "aria-pressed",
+    String(state.shuffleEnabled),
+  );
+  elements.shuffleButton.title = state.shuffleEnabled
+    ? "Turn shuffle off"
+    : "Shuffle remaining questions";
+}
+
+function toggleShuffle() {
   if (state.advancing) return;
+  if (state.shuffleEnabled) {
+    state.shuffleEnabled = false;
+    sortQuestionBankAndDecks();
+    updateShuffleControl();
+    saveSession();
+    renderQuestion();
+    showToast("Shuffle off.");
+    return;
+  }
+
   const complete = state.deckIds.filter((id) => isComplete(id));
   const remaining = state.deckIds.filter((id) => !isComplete(id));
   if (remaining.length < 2) {
     showToast("There are not enough remaining questions to shuffle.");
     return;
   }
+  state.shuffleEnabled = true;
   state.deckIds = [...complete, ...shuffle(remaining)];
   state.index = complete.length;
+  updateShuffleControl();
   saveSession();
   renderQuestion();
-  showToast("Remaining questions shuffled.");
+  showToast("Shuffle on.");
 }
 
 function goToQuestion(questionId) {
@@ -2652,7 +2682,7 @@ elements.previousQuestionButton.addEventListener("click", () =>
 elements.nextQuestionButton.addEventListener("click", () =>
   goToAdjacentQuestion(1),
 );
-elements.shuffleButton.addEventListener("click", shuffleRemaining);
+elements.shuffleButton.addEventListener("click", toggleShuffle);
 elements.questionModeSelect.addEventListener("change", (event) =>
   activateQuestionMode(event.target.value),
 );
