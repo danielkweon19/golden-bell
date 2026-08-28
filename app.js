@@ -168,12 +168,18 @@ function isMatchingQuestion(question) {
   return question?.type === "matching" && question.pairs?.length >= 2;
 }
 
+function isReferenceQuestion(question) {
+  return question?.type === "reference";
+}
+
 function hydrateQuestion(question, id) {
   const matchingPairs = normalizedMatchingPairs(question.pairs);
   const type =
     question.type === "matching" && matchingPairs.length >= 2
       ? "matching"
-      : "text";
+      : question.type === "reference"
+        ? "reference"
+        : "text";
   const displayAnswer =
     type === "matching"
       ? matchingAnswerSummary(matchingPairs)
@@ -585,6 +591,10 @@ function displayedQuestion(question) {
     : question.question;
 }
 
+function concealsQuestionReference(question = currentQuestion()) {
+  return state.questionMode === "study" && isReferenceQuestion(question);
+}
+
 function getVerse(question) {
   if (question.scope !== "verse") return "";
   const book = state.bible.books.find((item) => item.name === question.book);
@@ -781,8 +791,10 @@ function populateMatchingPairEditor(pairs = []) {
 }
 
 function setEditorQuestionType(type, lockType = false) {
-  const matching = !lockType && type === "matching";
-  elements.questionType.value = matching ? "matching" : "text";
+  const questionType =
+    !lockType && ["matching", "reference"].includes(type) ? type : "text";
+  const matching = questionType === "matching";
+  elements.questionType.value = questionType;
   elements.questionType.disabled = lockType;
   elements.questionTypeField.hidden = lockType;
   elements.questionTextAnswerFields.hidden = matching;
@@ -806,18 +818,18 @@ function readMatchingPairEditor() {
 
 function openQuestionEditor(question = null) {
   if (!state.bible) return;
-  const isReferenceQuestion = Boolean(question?.generated);
+  const isGeneratedVerseQuestion = Boolean(question?.generated);
   state.editingQuestionId = question?.id || null;
-  elements.questionDialogTitle.textContent = isReferenceQuestion
+  elements.questionDialogTitle.textContent = isGeneratedVerseQuestion
     ? "Edit verse question"
     : question
       ? "Edit question"
       : "Add question";
-  elements.questionPromptLabel.textContent = isReferenceQuestion
+  elements.questionPromptLabel.textContent = isGeneratedVerseQuestion
     ? "Verse text"
     : "Preferred question";
-  elements.alternateQuestionField.hidden = isReferenceQuestion;
-  elements.questionAnswerLabel.textContent = isReferenceQuestion
+  elements.alternateQuestionField.hidden = isGeneratedVerseQuestion;
+  elements.questionAnswerLabel.textContent = isGeneratedVerseQuestion
     ? "Verse reference"
     : "Official answer";
   elements.saveQuestionButton.textContent = question
@@ -830,14 +842,19 @@ function openQuestionEditor(question = null) {
   populateEditorBooks(reference.book);
   populateEditorChapters(reference.chapter || 1);
   populateEditorVerses(reference.verse || 1, reference.endVerse);
-  updateEditorReferenceFields(isReferenceQuestion);
+  updateEditorReferenceFields(isGeneratedVerseQuestion);
   elements.questionPrompt.value = question?.question || "";
   elements.alternateQuestionPrompt.value = question?.alternateQuestion || "";
   elements.questionType.value = isMatchingQuestion(question)
     ? "matching"
-    : "text";
+    : isReferenceQuestion(question)
+      ? "reference"
+      : "text";
   populateMatchingPairEditor(isMatchingQuestion(question) ? question.pairs : []);
-  setEditorQuestionType(elements.questionType.value, isReferenceQuestion);
+  setEditorQuestionType(
+    elements.questionType.value,
+    isGeneratedVerseQuestion,
+  );
   elements.questionAnswer.value = isMatchingQuestion(question)
     ? ""
     : question?.displayAnswer || "";
@@ -1104,7 +1121,10 @@ function handleQuestionSave(event) {
 function deleteCurrentQuestion() {
   const question = currentQuestion();
   if (!question) return;
-  if (!window.confirm(`Delete the question for ${question.source}?`)) return;
+  const description = concealsQuestionReference()
+    ? "this question"
+    : `the question for ${question.source}`;
+  if (!window.confirm(`Delete ${description}?`)) return;
 
   if (question.generated) {
     if (!questionLibrary.removedFill.includes(question.id)) {
@@ -1677,6 +1697,9 @@ function acceptedAnswersMarkup(question) {
 function verseCitationMarkup(question) {
   const verse = getVerse(question);
   if (!verse) return "";
+  if (concealsQuestionReference(question)) {
+    return `<p class="verse">“${escapeHtml(verse)}” NKJV</p>`;
+  }
   return `<p class="verse">“${escapeHtml(verse)}” — ${escapeHtml(
     question.source,
   )} NKJV</p>`;
@@ -2001,7 +2024,9 @@ function populateQuestionSelect() {
       option.textContent =
         state.questionMode === "fill"
           ? `Verse ${index + 1} · ${shortQuestion}`
-          : `${question.source} · ${shortQuestion}`;
+          : concealsQuestionReference(question)
+            ? `Question ${index + 1} · ${shortQuestion}`
+            : `${question.source} · ${shortQuestion}`;
       return option;
     }),
   );
@@ -2071,9 +2096,11 @@ function updateProgress(question) {
   elements.bookLabel.textContent =
     state.questionMode === "fill"
       ? `Verse reference · ${referenceDetailLabel()}`
-      : question.scope === "all-books"
-        ? "All three books"
-        : question.book;
+      : concealsQuestionReference(question)
+        ? "Reference question"
+        : question.scope === "all-books"
+          ? "All three books"
+          : question.book;
   elements.progressFill.style.width = `${percent}%`;
   elements.progressTrack.setAttribute("aria-valuenow", String(percent));
 }
@@ -2104,7 +2131,9 @@ function updateStats() {
       openButton.type = "button";
       openButton.dataset.questionId = question.id;
       const source = document.createElement("strong");
-      source.textContent = question.source;
+      source.textContent = concealsQuestionReference(question)
+        ? "Question"
+        : question.source;
       const prompt = document.createElement("span");
       prompt.textContent = displayedQuestion(question);
       openButton.append(source, prompt);
@@ -2115,7 +2144,9 @@ function updateStats() {
       removeButton.dataset.removeMissedId = question.id;
       removeButton.setAttribute(
         "aria-label",
-        `Remove ${question.source} from review`,
+        concealsQuestionReference(question)
+          ? "Remove question from review"
+          : `Remove ${question.source} from review`,
       );
       removeButton.title = "Remove from review";
       removeButton.textContent = "×";
@@ -2178,8 +2209,15 @@ function renderQuestion() {
 
   elements.finishView.hidden = true;
   elements.quizView.hidden = false;
+  const concealReference = concealsQuestionReference(question);
   elements.source.textContent =
-    state.questionMode === "fill" ? "NKJV verse" : question.source;
+    state.questionMode === "fill"
+      ? "NKJV verse"
+      : concealReference
+        ? "Reference question"
+        : question.source;
+  elements.openReaderButton.hidden = concealReference;
+  if (concealReference && state.readerOpen) closeReader();
   elements.questionText.textContent = displayedQuestion(question);
   elements.questionSelect.value = String(question.id);
   matchingState = isMatchingQuestion(question)
@@ -2522,7 +2560,11 @@ function buildReviewSection(title, entries, type) {
           : "";
       return `
         <article class="review-row">
-          <div class="review-source">${escapeHtml(question.source)}</div>
+          <div class="review-source">${
+            concealsQuestionReference(question)
+              ? "Question"
+              : escapeHtml(question.source)
+          }</div>
           <div>
             <p class="review-question"><strong>${escapeHtml(
               displayedQuestion(question),
