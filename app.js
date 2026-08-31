@@ -2473,8 +2473,6 @@ function renderQuestion() {
       : concealReference
         ? "Reference question"
         : question.source;
-  elements.openReaderButton.hidden = concealReference;
-  if (concealReference && state.readerOpen) closeReader();
   renderQuestionPrompt(question);
   elements.questionSelect.value = String(question.id);
   matchingState = isMatchingQuestion(question)
