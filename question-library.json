@@ -1,7 +1,7 @@
 {
   "format": "golden-bell-question-export",
   "version": 1,
-  "exportedAt": "2026-08-12T23:01:43.876Z",
+  "exportedAt": "2026-08-31T12:59:46.582Z",
   "questionLibrary": {
     "version": 1,
     "edits": {
@@ -16,22 +16,30 @@
       },
       "3": {
         "id": 3,
+        "scope": "verse",
         "book": "Haggai",
         "chapter": 1,
         "verse": 6,
-        "question": "“You have ________ much, and bring in little; You ________, but do not have enough; You __________, but you are not filled with drink; You ________ yourselves, but no one is warm; And he who earns ________, Earns wages to put into a ___________.”",
-        "displayAnswer": "sown, eat, drink, clothe, wages, bag with holes",
+        "question": "“You have ________ much, and bring in _____; You ________, but do not have __________; You __________, but you are not filled with ______; You ________ yourselves, but no one is _______; And he who earns ________, Earns ________ to put into a ___________.”",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "sown, little, eat, enough, drink, drink, clothe, warm, wages, wages, bag with holes",
         "aliases": [
           "Bag with holes"
         ]
       },
       "6": {
         "id": 6,
+        "scope": "verse",
         "book": "Haggai",
         "chapter": 2,
         "verse": 4,
-        "question": "Yet now be strong, Zerubbabel,' says the LORD; \"and be strong, Joshua, son of Jehozadak, the high priest; and be strong, all you ______________,' says the LORD, \"and work; for I am with you,' says the LORD of hosts.",
-        "displayAnswer": "people of the land",
+        "question": "Yet now be _________, Zerubbabel,' says the LORD; \"and be strong, Joshua, son of Jehozadak, the high priest; and be strong, all you ______________,' says the LORD, \"and __________; for I am with you,' says the LORD of hosts.",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "strong, people of the land, work",
         "aliases": []
       },
       "7": {
@@ -102,11 +110,10 @@
         "book": "Zechariah",
         "chapter": 1,
         "verse": 12,
-        "question": "Then the Angel of the Lord answered and said, “O Lord of hosts, how long will You not have mercy on Jerusalem and on the cities of Judah, against which You were angry these _____________?”",
-        "displayAnswer": "Seventy years",
-        "aliases": [
-          "70 years"
-        ]
+        "question": "Then the Angel of the Lord answered and said, “O Lord of hosts, how long will You not have mercy on ____________ and on the cities of __________, against which You were angry these _____________?”",
+        "alternateQuestion": "",
+        "displayAnswer": "Jerusalem, Judah, Seventy years",
+        "aliases": []
       },
       "15": {
         "id": 15,
@@ -176,8 +183,11 @@
         "book": "Zechariah",
         "chapter": 3,
         "verse": 1,
-        "question": "Then he showed me _________________ standing before the ______________, and __________ standing at his right hand to oppose him.",
-        "displayAnswer": "Joshua the high priest, Angel of the LORD, Satan",
+        "question": "Then he showed me _________________ standing before the ______________, and __________ standing at his ________ hand to _________ him.",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "Joshua the high priest, Angel of the LORD, Satan, right, oppose",
         "aliases": []
       },
       "22": {
@@ -256,8 +266,10 @@
         "book": "Zechariah",
         "chapter": 4,
         "verse": 14,
-        "question": "Who are the two olive trees?",
+        "question": "Who are the two olive trees (according to the bible)?",
         "alternateQuestion": "So he said, \"These are the __________________, who stand beside the Lord of the whole earth.\"",
+        "type": "text",
+        "pairs": [],
         "displayAnswer": "two anointed ones",
         "aliases": []
       },
@@ -267,7 +279,7 @@
         "book": "Zechariah",
         "chapter": 5,
         "verse": 2,
-        "question": "What did Zechariah see in Zechariah 5:1-2, and how many cubits was its length and width?",
+        "question": "What did Zechariah see in Zechariah 5:1-2, and how many cubits were its length and width?",
         "alternateQuestion": "And he said to me, “What do you see?” So I answered, “I see a __________. Its length is _______ cubits and its width ______ cubits.”",
         "displayAnswer": "flying scroll, twenty, ten",
         "aliases": [
@@ -336,8 +348,8 @@
         "book": "Zechariah",
         "chapter": 6,
         "verse": 5,
-        "question": "And the angel answered and said to me, \"These are ____________, who go out from their station before the Lord of all the earth.",
-        "alternateQuestion": "",
+        "question": "What do the four horses represent in Zechariah 6?",
+        "alternateQuestion": "And the angel answered and said to me, \"These are ____________, who go out from their station before the Lord of all the earth.",
         "displayAnswer": "four spirits of heaven",
         "aliases": []
       },
@@ -418,6 +430,17 @@
         "displayAnswer": "Flint",
         "aliases": []
       },
+      "46": {
+        "id": 46,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 3,
+        "question": "\"Thus says the LORD: \"I will return to Zion, And dwell in the midst of Jerusalem. Jerusalem shall be called the ______________, The ____________________, The ___________.'",
+        "alternateQuestion": "",
+        "displayAnswer": "City of Truth, Mountain of the LORD of hosts, Holy Mountain",
+        "aliases": []
+      },
       "47": {
         "id": 47,
         "scope": "verse",
@@ -439,6 +462,536 @@
         "alternateQuestion": "From which two directions would the LORD save His people?",
         "displayAnswer": "east, west",
         "aliases": []
+      },
+      "49": {
+        "id": 49,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 16,
+        "question": "These are the things you shall do: Speak each man the ________ to his neighbor; Give ___________ in your gates for ___________, _________, and ______________;",
+        "alternateQuestion": "",
+        "displayAnswer": "truth, judgment, truth, justice, peace",
+        "aliases": []
+      },
+      "50": {
+        "id": 50,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 19,
+        "question": "\"Thus says the LORD of hosts: \"The fast of the _________ month, The fast of the _____________, The fast of the ____________, And the fast of the _________, Shall be _________ and _________ and _________ feasts For the house of Judah. Therefore love _______, and __________.'",
+        "alternateQuestion": "",
+        "displayAnswer": "Fourth, fifth, seventh, tenth, joy, gladness, cheerful, truth, peace",
+        "aliases": []
+      },
+      "51": {
+        "id": 51,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 3,
+        "question": "For __________ built herself a __________, Heaped up _______ like the ___________, And __________ like the __________ of the streets.",
+        "alternateQuestion": "",
+        "displayAnswer": "Tyre, tower, silver, dust, gold, mire",
+        "aliases": []
+      },
+      "52": {
+        "id": 52,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 9,
+        "question": "\"Rejoice greatly, O ______________! Shout, O  _____________! Behold, your __________ is coming to you; He is _________ and having ____________, _________ and riding on a __________, A _________, the ____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "daughter of Zion, daughter of Jerusalem, King, just, salvation, lowly, donkey, colt, foal of a donkey",
+        "aliases": []
+      },
+      "53": {
+        "id": 53,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 10,
+        "question": "I will cut off the __________ from Ephraim And the _________ from Jerusalem; The _________ shall be cut off. He shall speak peace to the nations; His dominion shall be \"from _____________, And from the _______________________________.'",
+        "alternateQuestion": "",
+        "displayAnswer": "chariot, horse, battle bow, sea to sea, River to the ends of the earth",
+        "aliases": []
+      },
+      "54": {
+        "id": 54,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 11,
+        "question": "\"As for you also, Because of the __________ of your covenant, I will set your prisoners free from the _____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "blood, waterless pit",
+        "aliases": []
+      },
+      "55": {
+        "id": 55,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 17,
+        "question": "For how great is its goodness And how great its beauty! _______ shall make the ___________ thrive, And ___________ the _______________.",
+        "alternateQuestion": "",
+        "displayAnswer": "Grain, young men, new wine, young women",
+        "aliases": []
+      },
+      "56": {
+        "id": 56,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 10,
+        "verse": 1,
+        "question": "Ask the LORD for rain In the time of the _________ rain. The LORD will make _______________; He will give them ____________, ________ in the field for everyone.",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "latter, flashing clouds, showers of rain, grass",
+        "aliases": []
+      },
+      "57": {
+        "id": 57,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 10,
+        "verse": 2,
+        "question": "For the _________ speak _____________; The ___________ envision ___________, And tell _____________; They __________ in vain. Therefore the people wend their way like sheep; They are in trouble because there is no ____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "idols, delusion, diviners, lies, false dreams, comfort, shepherd",
+        "aliases": []
+      },
+      "59": {
+        "id": 59,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 10,
+        "verse": 4,
+        "question": "Name the four things that would come from Judah.",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "cornerstone, tent peg, battle bow, every ruler together",
+        "aliases": [
+          "Cornerstone tent peg battle bow and every ruler"
+        ]
+      },
+      "60": {
+        "id": 60,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 10,
+        "verse": 10,
+        "question": "I will also bring them back from the land of __________, And gather them from ___________. I will bring them into the land of ________ and _________, Until no more room is found for them.",
+        "alternateQuestion": "",
+        "displayAnswer": "Egypt, Assyria, Gilead, Lebanon",
+        "aliases": []
+      },
+      "62": {
+        "id": 62,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 7,
+        "question": "What names were given to the two staffs?",
+        "alternateQuestion": "So I fed the flock for slaughter, in particular the poor of the flock. I took for myself two staffs: the one I called Beauty, and the other I called Bonds; and I fed the flock.",
+        "displayAnswer": "Beauty, Bonds",
+        "aliases": []
+      },
+      "63": {
+        "id": 63,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 8,
+        "question": "I dismissed the ________ shepherds in ___________. My soul loathed them, and their soul also abhorred me.",
+        "alternateQuestion": "",
+        "displayAnswer": "three, one month",
+        "aliases": []
+      },
+      "64": {
+        "id": 64,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 12,
+        "question": "Then I said to them, \"If it is agreeable to you, give me my wages; and if not, refrain.\" So they weighed out for my wages ____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "thirty pieces of silver",
+        "aliases": []
+      },
+      "65": {
+        "id": 65,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 13,
+        "question": "And the LORD said to me, \"Throw it to the _______\"--that ________ they set on me. So I took the thirty pieces of silver and threw them into the _____________ for the ____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "potter, princely price, house of the LORD, potter",
+        "aliases": []
+      },
+      "66": {
+        "id": 66,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 12,
+        "verse": 2,
+        "question": "\"Behold, I will make Jerusalem a ______________ to all the surrounding peoples, when they lay siege against Judah and Jerusalem.",
+        "alternateQuestion": "",
+        "displayAnswer": "cup of drunkenness",
+        "aliases": []
+      },
+      "67": {
+        "id": 67,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 12,
+        "verse": 3,
+        "question": "And it shall happen in that day that I will make Jerusalem a very __________ for all peoples; all who would heave it away will surely be cut in pieces, though all nations of the earth are gathered against it.",
+        "alternateQuestion": "",
+        "displayAnswer": "heavy stone",
+        "aliases": []
+      },
+      "68": {
+        "id": 68,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 12,
+        "verse": 7,
+        "question": "\"The LORD will save the tents of _____________ first, so that the glory of the house of ________ and the glory of the inhabitants of ________ shall not become greater than that of ___________.",
+        "alternateQuestion": "",
+        "displayAnswer": "Judah, David, Jerusalem, Judah",
+        "aliases": []
+      },
+      "69": {
+        "id": 69,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 12,
+        "verse": 10,
+        "question": "\"And I will pour on the house of David and on the inhabitants of Jerusalem the _______________-; then they will look on Me whom they __________. Yes, they will mourn for Him as one mourns for his ___________, and grieve for Him as one grieves for a ___________.",
+        "alternateQuestion": "",
+        "displayAnswer": "Spirit of grace and supplication, pierced, only son, firstborn",
+        "aliases": []
+      },
+      "70": {
+        "id": 70,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 12,
+        "verse": 11,
+        "question": "In that day there shall be a great mourning in Jerusalem, like the mourning at _______________ in the plain of ____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "Hadad Rimmon, Megiddo",
+        "aliases": []
+      },
+      "71": {
+        "id": 71,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 13,
+        "verse": 1,
+        "question": "\"In that day a ______________ shall be opened for the house of David and for the inhabitants of Jerusalem, for ______ and for _______.",
+        "alternateQuestion": "",
+        "displayAnswer": "fountain, sin, uncleanness",
+        "aliases": []
+      },
+      "72": {
+        "id": 72,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 13,
+        "verse": 2,
+        "question": "\"It shall be in that day,\" says the LORD of hosts, \"that I will cut off the names of the _____________ from the land, and they shall no longer be remembered. I will also cause the _________ and the ___________ to depart from the land.",
+        "alternateQuestion": "",
+        "displayAnswer": "idols, prophets, unclean spirit",
+        "aliases": []
+      },
+      "73": {
+        "id": 73,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 13,
+        "verse": 5,
+        "question": "But he will say, \"I am no ______________, I am a __________; for a man taught me to keep _________ from my youth.'",
+        "alternateQuestion": "",
+        "displayAnswer": "prophet, farmer, cattle",
+        "aliases": []
+      },
+      "74": {
+        "id": 74,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 13,
+        "verse": 7,
+        "question": "\"Awake, O ____________, against My ___________, Against the Man who is My _____________-,\" Says the LORD of hosts. \"Strike the _____________, And the sheep will be _____________; Then I will turn My hand against the ____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "sword, Shepherd, Companion, Shepherd, scattered, little ones",
+        "aliases": []
+      },
+      "75": {
+        "id": 75,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 13,
+        "verse": 8,
+        "question": "And it shall come to pass in all the land,\" Says the LORD, \"That ____________ in it shall be cut off and die, But __________ shall be left in it:",
+        "alternateQuestion": "",
+        "displayAnswer": "two-thirds, one-third",
+        "aliases": [
+          "2/3, 1/3"
+        ]
+      },
+      "76": {
+        "id": 76,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 4,
+        "question": "And in that day His feet will stand on the _____________, Which faces Jerusalem on the ____________. And the _____________ shall be split in two, From ____________, Making a very __________; Half of the mountain shall move toward the ____________ And half of it toward the ________.",
+        "alternateQuestion": "",
+        "displayAnswer": "Mount of Olives, east, Mount of Olives, east to west, large valley, north, south",
+        "aliases": []
+      },
+      "78": {
+        "id": 78,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 9,
+        "question": "And the LORD shall be King over all the earth. In that day it shall be-- \"___________,\" And His name _________.",
+        "alternateQuestion": "",
+        "displayAnswer": "The LORD is one, one",
+        "aliases": []
+      },
+      "80": {
+        "id": 80,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 20,
+        "question": "In that day \"___________________\" shall be engraved on the ______________. The __________ in the LORD's house shall be like the ________ before the altar.",
+        "alternateQuestion": "",
+        "displayAnswer": "HOLINESS TO THE LORD, bells of the horses, pots, bowls",
+        "aliases": []
+      },
+      "81": {
+        "id": 81,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 1,
+        "verse": 2,
+        "endVerse": 3,
+        "question": "Who are the two brothers mentioned, one which the LORD loved and the other he did not?",
+        "alternateQuestion": "",
+        "displayAnswer": "Jacob, Esau",
+        "aliases": []
+      },
+      "82": {
+        "id": 82,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 1,
+        "verse": 4,
+        "question": "Even though ____________ has said, \"We have been impoverished, But we will return and build the desolate places,\" Thus says the LORD of hosts: \"They may build, but I will throw down; They shall be called the ______________, And the people against whom the LORD will have indignation forever.",
+        "alternateQuestion": "",
+        "displayAnswer": "Edom, Territory of Wickedness",
+        "aliases": []
+      },
+      "83": {
+        "id": 83,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 1,
+        "verse": 6,
+        "question": "\"A _________ honors his ________, And a _______ his ___________. If then I am the ____________, Where is My honor? And if I am a ___________, Where is My _____________? Says the LORD of hosts To you ___________ who despise My name. Yet you say, \"In what way have we despised Your name?'",
+        "alternateQuestion": "",
+        "displayAnswer": "son, father, servant, master, Father, Master, reverence, priests",
+        "aliases": []
+      },
+      "84": {
+        "id": 84,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 1,
+        "verse": 8,
+        "question": "And when you offer the ___________ as a sacrifice, Is it not evil? And when you offer the ____________ and __________, Is it not evil? Offer it then to your ___________! Would he be pleased with you? Would he accept you favorably?\" Says the LORD of hosts.",
+        "alternateQuestion": "",
+        "displayAnswer": "blind, lame, sick, governor",
+        "aliases": []
+      },
+      "85": {
+        "id": 85,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 1,
+        "verse": 14,
+        "question": "\"But cursed be the ____________ Who has in his flock a male, And takes a vow, But sacrifices to the Lord what is blemished-- For I am a ___________,\" Says the LORD of hosts, \"And My name is to be feared among the nations.",
+        "alternateQuestion": "",
+        "displayAnswer": "deceiver, great King",
+        "aliases": []
+      },
+      "86": {
+        "id": 86,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 5,
+        "question": "\"My covenant was with him, one of ________ and _________, And I gave them to him that he might fear Me; So he feared Me And was reverent before My name.",
+        "alternateQuestion": "",
+        "displayAnswer": "life, peace",
+        "aliases": []
+      },
+      "87": {
+        "id": 87,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 6,
+        "question": "The ______________ was in his mouth, And ___________ was not found on his lips. He walked with Me in ________ and ___________, And turned many away from iniquity.",
+        "alternateQuestion": "",
+        "displayAnswer": "law of truth, injustice, peace, equity",
+        "aliases": []
+      },
+      "88": {
+        "id": 88,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 7,
+        "question": "\"For the lips of a priest should keep ________, And people should seek the ________ from his mouth; For he is the _____________ of the LORD of hosts.",
+        "alternateQuestion": "",
+        "displayAnswer": "knowledge, law, messenger",
+        "aliases": []
+      },
+      "89": {
+        "id": 89,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 14,
+        "question": "Yet you say, \"For what reason?\" Because the LORD has been witness Between you and the ______________, With whom you have dealt treacherously; Yet she is your companion And your wife by covenant.",
+        "alternateQuestion": "",
+        "displayAnswer": "wife of your youth",
+        "aliases": []
+      },
+      "91": {
+        "id": 91,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 1,
+        "question": "\"Behold, I send My _____________, And he will prepare the way before Me. And the ________, whom you seek, Will suddenly come to His ____________, Even the __________________, In whom you delight. Behold, He is coming,\" Says the LORD of hosts.",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "messenger, temple, Lord, Messenger of the covenant",
+        "aliases": []
+      },
+      "92": {
+        "id": 92,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 2,
+        "question": "\"But who can endure the day of His coming? And who can stand when He appears? For He is like a ______________ And like ______________.",
+        "alternateQuestion": "",
+        "displayAnswer": "refiner's fire, launderers' soap",
+        "aliases": []
+      },
+      "93": {
+        "id": 93,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 6,
+        "question": "\"For I am the LORD, I ________________; Therefore you are not _________, O sons of Jacob.",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "do not change, consumed",
+        "aliases": []
+      },
+      "94": {
+        "id": 94,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 8,
+        "question": "\"Will a man rob God? Yet you have robbed Me! But you say, \"In what way have we robbed You?' In ___________ and ____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "tithes, offerings",
+        "aliases": []
+      },
+      "95": {
+        "id": 95,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 16,
+        "question": "Then those who feared the LORD spoke to one another, And the LORD listened and heard them; So a __________________ was written before Him For those who ___________ And who ____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "book of remembrance, fear the LORD, meditate on His name",
+        "aliases": []
+      },
+      "96": {
+        "id": 96,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 4,
+        "verse": 1,
+        "question": "\"For behold, the day is coming, ______________, And all the ________, yes, all who do __________ will be ________. And the day which is coming shall burn them up,\" Says the LORD of hosts, \"That will leave them neither ________ nor __________.",
+        "alternateQuestion": "",
+        "displayAnswer": "Burning like an oven, proud, wickedly, stubble, root, branch",
+        "aliases": []
+      },
+      "97": {
+        "id": 97,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 4,
+        "verse": 2,
+        "question": "But to you who fear My name The __________________ shall arise With ______________; And you shall go out And grow fat like ______________.",
+        "alternateQuestion": "",
+        "displayAnswer": "Sun of Righteousness, healing in His wings, stall-fed calves",
+        "aliases": []
+      },
+      "98": {
+        "id": 98,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 4,
+        "verse": 3,
+        "question": "You shall trample the wicked, For they shall be ________ under the soles of your feet On the day that I do this,\" Says the LORD of hosts.",
+        "alternateQuestion": "",
+        "displayAnswer": "ashes",
+        "aliases": []
+      },
+      "99": {
+        "id": 99,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 4,
+        "verse": 4,
+        "question": "\"Remember the _______________, My servant, Which I commanded him in _____________ for all Israel, With the statutes and judgments.",
+        "alternateQuestion": "",
+        "displayAnswer": "Law of Moses, Horeb",
+        "aliases": []
+      },
+      "100": {
+        "id": 100,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 4,
+        "verse": 5,
+        "question": "Behold, I will send you ______________ Before the coming of the __________ and ___________ day of the LORD.",
+        "alternateQuestion": "",
+        "displayAnswer": "Elijah the prophet, great, dreadful",
+        "aliases": []
       }
     },
     "fillEdits": {},
@@ -446,14 +999,37 @@
       5,
       11,
       23,
-      32
+      32,
+      58,
+      61,
+      77,
+      79,
+      90
     ],
     "removedFill": [
       3000154,
       3000016,
-      3000026
+      3000026,
+      3000001,
+      3000003,
+      3000123,
+      3000025,
+      3000264,
+      3000135,
+      3000192,
+      3000250,
+      3000028,
+      3000012
     ],
-    "removedCustom": [],
+    "removedCustom": [
+      1786965349708,
+      1787537494049
+    ],
+    "memorizationVersesByDetail": {
+      "book": [],
+      "chapter": [],
+      "verse": []
+    },
     "custom": [
       {
         "id": 1785384914327,
@@ -498,7 +1074,8 @@
         "chapter": 1,
         "verse": 14,
         "endVerse": 15,
-        "question": "So the Lord stirred up the spirit of Zerubbabel the son of Shealtiel, governor of Judah, and the spirit of Joshua the son of Jehozadak, the high priest, and the spirit of all the remnant of the people; and they came and worked on the house of the Lord of hosts, their God, on the __________ day of the ________ month, in the ________ year of King Darius.",
+        "question": "On what day, month, and year of Darius did the people begin working on the temple?",
+        "alternateQuestion": "So the Lord stirred up the spirit of Zerubbabel the son of Shealtiel, governor of Judah, and the spirit of Joshua the son of Jehozadak, the high priest, and the spirit of all the remnant of the people; and they came and worked on the house of the Lord of hosts, their God, on the __________ day of the ________ month, in the ________ year of King Darius.",
         "displayAnswer": "twenty-fourth, sixth, second",
         "aliases": []
       },
@@ -513,11 +1090,15 @@
       },
       {
         "id": 1785385676206,
+        "scope": "verse",
         "book": "Haggai",
         "chapter": 2,
         "verse": 7,
-        "question": "and I will shake all nations, and they shall come to the ______________, and I will fill this temple with glory,’ says the Lord of hosts.",
-        "displayAnswer": "Desire of All Nations",
+        "question": "and I will shake all nations, and they shall come to the ______________, and I will fill this temple with ______________’ says the Lord of hosts.",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "Desire of All Nations, glory",
         "aliases": []
       },
       {
@@ -531,11 +1112,15 @@
       },
       {
         "id": 1785385772848,
+        "scope": "verse",
         "book": "Haggai",
         "chapter": 2,
         "verse": 19,
-        "question": "Is the seed still in the barn? As yet the _________, the _________, the __________, and the ____________ have not yielded fruit. But from this day I will bless you.’ ”",
-        "displayAnswer": "vine, fig tree, pomegranate, olive tree",
+        "question": "Is the _______ still in the barn? As yet the _________, the _________, the __________, and the ____________ have not yielded fruit. But from this day I will bless you.’ ”",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "seed, vine, fig tree, pomegranate, olive trees",
         "aliases": []
       },
       {
@@ -562,7 +1147,8 @@
         "book": "Zechariah",
         "chapter": 1,
         "verse": 1,
-        "question": "Who was Zechariah’s father and grandfather?",
+        "question": "Were was Zechariah’s father and grandfather?",
+        "alternateQuestion": "",
         "displayAnswer": "Berechiah, Iddo the prophet",
         "aliases": []
       },
@@ -591,9 +1177,11 @@
         "book": "Haggai",
         "chapter": 1,
         "verse": 11,
-        "question": "For I called for a _________ on the land and the mountains, on the ______ and the _________ and the ________, on whatever the ground brings forth, on __________ and _________, and on all the _________ of your hands.”",
+        "question": "For I called for a _________ on the ___________ and the ___________, on the ______ and the _________ and the ________, on whatever the ground brings forth, on __________ and _________, and on all the __________________.”",
         "alternateQuestion": "",
-        "displayAnswer": "drought, grain, new wine, oil, men, livestock, labor",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "land, mountains, drought, grain, new wine, oil, men, livestock, labor of your hands",
         "aliases": []
       },
       {
@@ -613,6 +1201,9 @@
         "chapter": 2,
         "verse": 1,
         "question": "In the _________ month, on the __________ of the month, the word of the Lord came by Haggai the prophet, saying",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
         "displayAnswer": "seventh, twenty-first",
         "aliases": []
       },
@@ -756,7 +1347,10 @@
         "book": "Zechariah",
         "chapter": 1,
         "verse": 16,
-        "question": "‘Therefore thus says the Lord:\n\n“I am returning to Jerusalem with mercy;\nMy house shall be built in it,” says the Lord of hosts,\n“And a _______________ shall be stretched out over Jerusalem.” ’",
+        "question": "‘Therefore thus says the Lord: “I am returning to Jerusalem with mercy;\nMy house shall be built in it,” says the Lord of hosts, “And a _______________ shall be stretched out over Jerusalem.” ’",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
         "displayAnswer": "surveyor’s line",
         "aliases": []
       },
@@ -776,7 +1370,10 @@
         "book": "Zechariah",
         "chapter": 1,
         "verse": 19,
-        "question": "And I said to the angel who talked with me, “What are these?”\n\nSo he answered me, “These are the horns that have scattered _________, _________, and ____________.”",
+        "question": "And I said to the angel who talked with me, “What are these?” So he answered me, “These are the horns that have scattered _________, _________, and ____________.”",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
         "displayAnswer": "Judah, Israel, Jerusalem",
         "aliases": []
       },
@@ -867,7 +1464,10 @@
         "book": "Zechariah",
         "chapter": 3,
         "verse": 7,
-        "question": "Then the Angel of the Lord admonished Joshua, saying, “Thus says the Lord of hosts:\n\n‘If you will walk in My ways, And if you will keep My command, Then you shall also judge My ____________, And likewise have charge of My __________; I will give you places to walk Among these who stand here.",
+        "question": "Then the Angel of the Lord admonished Joshua, saying, “Thus says the Lord of hosts: ‘If you will walk in My ways, And if you will keep My command, Then you shall also judge My ____________, And likewise have charge of My __________; I will give you places to walk Among these who stand here.",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
         "displayAnswer": "house, courts",
         "aliases": []
       },
@@ -897,8 +1497,9 @@
         "book": "Zechariah",
         "chapter": 4,
         "verse": 10,
-        "question": "For who has despised the day of _____________? For these seven rejoice to see The ______________ in the hand of Zerubbabel. They are the eyes of the LORD, Which scan to and fro throughout the whole earth.\"",
-        "displayAnswer": "small things, plumb line",
+        "question": "For who has despised the day of _____________? For these _______ rejoice to see The ______________ in the hand of Zerubbabel. They are the ____________, Which scan to and fro throughout the whole earth.\"",
+        "alternateQuestion": "",
+        "displayAnswer": "small things, seven, plumb line, eyes of the LORD",
         "aliases": []
       },
       {
@@ -1015,9 +1616,11 @@
         "book": "Zechariah",
         "chapter": 6,
         "verse": 10,
-        "question": "\"Receive the gift from the captives--from _______, ________, and ________, who have come from ____________--and go the same day and enter the house of ____________ the son of ___________.",
+        "question": "\"Receive the gift from the captives--from _______, ________, and ________, who have come from ____________--and go the ________ and enter the house of ____________ the son of ___________.",
         "alternateQuestion": "",
-        "displayAnswer": "Heldai, Tobijah, Jedaiah, Babylon, Josiah, Zephaniah",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "Heldai, Tobijah, Jedaiah, Babylon, same day, Josiah, Zephaniah",
         "aliases": []
       },
       {
@@ -1059,9 +1662,9 @@
         "book": "Zechariah",
         "chapter": 7,
         "verse": 2,
-        "question": "when the people sent _____________, with ___________ and his men, to the house of God, to pray before the LORD,",
+        "question": "when the people sent _____________, with ___________ and his men, to the house of God, to _________ before the LORD,",
         "alternateQuestion": "",
-        "displayAnswer": "Sherezer, Regem-Melech",
+        "displayAnswer": "Sherezer, Regem-Melech, pray",
         "aliases": []
       },
       {
@@ -1070,9 +1673,9 @@
         "book": "Zechariah",
         "chapter": 7,
         "verse": 3,
-        "question": "and to ask the priests who were in the house of the LORD of hosts, and the prophets, saying, \"Should I weep in the ______ month and fast as I have done for so many years?\"",
+        "question": "and to ask the priests who were in the house of the LORD of hosts, and the prophets, saying, \"Should I ________ in the ______ month and ______ as I have done for so many years?\"",
         "alternateQuestion": "",
-        "displayAnswer": "fifth",
+        "displayAnswer": "weep, fifth, fast",
         "aliases": []
       },
       {
@@ -1094,7 +1697,7 @@
         "verse": 14,
         "question": "\"But I scattered them with a _________ among all the nations which they had not known. Thus the land became desolate after them, so that no one passed through or returned; for they made the _______ land desolate.\"",
         "alternateQuestion": "",
-        "displayAnswer": "whirlwind, pleasant,",
+        "displayAnswer": "whirlwind, pleasant",
         "aliases": []
       },
       {
@@ -1151,6 +1754,1983 @@
         "alternateQuestion": "",
         "displayAnswer": "seed, vine, fruit, ground, increase, heavens, dew",
         "aliases": []
+      },
+      {
+        "id": 1786626458536,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 15,
+        "question": "So again in these days I am determined to do good To __________ and to the house of _______________. Do not fear.",
+        "alternateQuestion": "",
+        "displayAnswer": "Jerusalem, Judah",
+        "aliases": []
+      },
+      {
+        "id": 1786626500581,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 17,
+        "question": "Let none of you think evil in your heart against your neighbor; And do not love a _________________. For all these are things that I hate,' Says the LORD.\"",
+        "alternateQuestion": "",
+        "displayAnswer": "false oath",
+        "aliases": []
+      },
+      {
+        "id": 1786626640306,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 23,
+        "question": "\"Thus says the LORD of hosts: \"In those days _________ men from every language of the nations shall grasp the _________ of a ________ man, saying, \"Let us go with you, for we have heard that God is with you.\"\"'",
+        "alternateQuestion": "",
+        "displayAnswer": "ten, sleeve, Jewish",
+        "aliases": []
+      },
+      {
+        "id": 1786626675237,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 1,
+        "endVerse": 2,
+        "question": "The burden of the word of the LORD came against which four places?",
+        "alternateQuestion": "",
+        "displayAnswer": "Hadrach, Damascus, Hamath, Tyre and Sidon",
+        "aliases": []
+      },
+      {
+        "id": 1786626768070,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 2,
+        "question": "Out of the lands in which the burden of the word of the LORD came, which one was very wise?",
+        "alternateQuestion": "",
+        "displayAnswer": "Tyre and Sidon",
+        "aliases": []
+      },
+      {
+        "id": 1786626906328,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 4,
+        "question": "Tyre will be cast out and destroyed where and devoured by what?",
+        "alternateQuestion": "Behold, the LORD will cast her out; He will destroy her power in the ___________, And she will be devoured by ___________.",
+        "displayAnswer": "sea, fire",
+        "aliases": []
+      },
+      {
+        "id": 1786626980124,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 5,
+        "question": "____________ shall see it and fear; ________ also shall be very sorrowful; And __________, for He dried up her expectation. The king shall perish from ________, And __________ shall not be inhabited.",
+        "alternateQuestion": "",
+        "displayAnswer": "Ashkelon, Gaza, Ekron, Gaza, Ashkelon",
+        "aliases": []
+      },
+      {
+        "id": 1786627010724,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 6,
+        "question": "\"A mixed race shall settle in ____________, And I will cut off the pride of the _____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "Ashdod, Philistines",
+        "aliases": []
+      },
+      {
+        "id": 1786627061310,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 7,
+        "question": "I will take away the blood from his mouth, And the abominations from between his teeth. But he who remains, even he shall be for our God, And shall be like a _________ in ___________, And _________ like a __________.",
+        "alternateQuestion": "",
+        "displayAnswer": "leader, Judah, Ekron, Jebusite",
+        "aliases": []
+      },
+      {
+        "id": 1786627083299,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 8,
+        "question": "I will camp around My house Because of the army, Because of him who passes by and him who returns. No more shall an ___________ pass through them, For now I have seen with My eyes.",
+        "alternateQuestion": "",
+        "displayAnswer": "oppressor",
+        "aliases": []
+      },
+      {
+        "id": 1786627410414,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 12,
+        "question": "How much would be restored to the prisoners of hope?",
+        "alternateQuestion": "",
+        "displayAnswer": "double",
+        "aliases": []
+      },
+      {
+        "id": 1786627469807,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 13,
+        "question": "For I have bent _______________, My bow, Fitted the bow with __________, And raised up your sons, O _________, Against your sons, O __________, And made you like the __________ of a mighty man.\"",
+        "alternateQuestion": "",
+        "displayAnswer": "Judah, Ephraim, Zion, Greece, sword",
+        "aliases": []
+      },
+      {
+        "id": 1786627527197,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 14,
+        "question": "Then the LORD will be seen over them, And His ___________ will go forth like ____________. The Lord GOD will blow the ___________, And go with ___________ from the _________.",
+        "alternateQuestion": "",
+        "displayAnswer": "arrow, lightning, trumpet, whirlwinds, south",
+        "aliases": []
+      },
+      {
+        "id": 1786627597556,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 15,
+        "question": "The LORD of hosts will defend them; They shall devour and subdue with _____________. They shall drink and roar as if with ___________; They shall be filled with blood like _____________, Like the ___________ of the altar.",
+        "alternateQuestion": "",
+        "displayAnswer": "slingstones, wine, basins, corners",
+        "aliases": []
+      },
+      {
+        "id": 1786627664880,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 16,
+        "question": "The LORD their God will save them in that day, As the ________ of His people. For they shall be like the ______________, Lifted like a _________ over His land--",
+        "alternateQuestion": "",
+        "displayAnswer": "flock, jewels of a crown, banner",
+        "aliases": []
+      },
+      {
+        "id": 1786800888641,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 1,
+        "verse": 4,
+        "question": "\"Do not be like your fathers, to whom the former prophets preached, saying, \"Thus says the LORD of hosts: \"Turn now from your __________ and your ____________.\"' But they did not hear nor heed Me,\" says the LORD.",
+        "alternateQuestion": "",
+        "displayAnswer": "evil ways, evil deeds",
+        "aliases": []
+      },
+      {
+        "id": 1786800972391,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 1,
+        "verse": 11,
+        "question": "So they answered the Angel of the LORD, who stood among the myrtle trees, and said, \"We have walked to and fro throughout the earth, and behold, all the earth is ___________.\"",
+        "alternateQuestion": "",
+        "displayAnswer": "resting quietly",
+        "aliases": []
+      },
+      {
+        "id": 1786801615539,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 1,
+        "verse": 15,
+        "question": "I am exceedingly angry with the nations at ease; For I was a little angry, And they helped--but with ________________.\"",
+        "alternateQuestion": "",
+        "displayAnswer": "evil intent",
+        "aliases": []
+      },
+      {
+        "id": 1786965076176,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 10,
+        "verse": 3,
+        "question": "\"My anger is kindled against the ____________, And I will punish the ____________. For the LORD of hosts will visit His ____________, The house of _________, And will make them as His ___________ in the battle.",
+        "alternateQuestion": "",
+        "displayAnswer": "shepherds, goatherds, flock, Judah, royal horse",
+        "aliases": []
+      },
+      {
+        "id": 1786965386243,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 10,
+        "verse": 5,
+        "question": "They shall be like ______________, Who tread down their enemies In the mire of the streets in the battle. They shall fight because the LORD is with them, And the ___________ shall be put to shame.",
+        "alternateQuestion": "",
+        "displayAnswer": "mighty men, riders on horses",
+        "aliases": []
+      },
+      {
+        "id": 1786965412427,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 10,
+        "verse": 6,
+        "question": "\"I will strengthen the house of ____________, And I will save the house of _____________. I will bring them back, Because I have mercy on them. They shall be as though I had not cast them aside; For I am the LORD their God, And I will hear them.",
+        "alternateQuestion": "",
+        "displayAnswer": "Judah, Joseph",
+        "aliases": []
+      },
+      {
+        "id": 1786965439312,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 10,
+        "verse": 7,
+        "question": "Those of _____________ shall be like a ___________, And their heart shall rejoice as if with _____________. Yes, their children shall see it and be glad; Their heart shall rejoice in the LORD.",
+        "alternateQuestion": "",
+        "displayAnswer": "Ephraim, mighty man, wine",
+        "aliases": []
+      },
+      {
+        "id": 1786965458547,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 10,
+        "verse": 8,
+        "question": "I will ___________ for them and gather them, For I will ________ them; And they shall increase as they once increased.",
+        "alternateQuestion": "",
+        "displayAnswer": "whistle, redeem",
+        "aliases": []
+      },
+      {
+        "id": 1786965555185,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 10,
+        "verse": 11,
+        "question": "He shall pass through the sea with ____________, And strike the waves of the sea: All the depths of the __________ shall dry up. Then the __________ shall be brought down, And the ____________ shall depart.",
+        "alternateQuestion": "",
+        "displayAnswer": "affliction, River, pride of Assyria, scepter of Egypt",
+        "aliases": []
+      },
+      {
+        "id": 1786965591804,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 1,
+        "question": "Open your doors, O ___________, That _______ may devour your _________.",
+        "alternateQuestion": "",
+        "displayAnswer": "Lebanon, fire, cedars",
+        "aliases": []
+      },
+      {
+        "id": 1786965635856,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 2,
+        "question": "Wail, O ____________, for the __________ has fallen, Because the _________ are ruined. Wail, O ___________, For the ___________ has come down.",
+        "alternateQuestion": "",
+        "displayAnswer": "cypress, cedar, mighty trees, oaks of Bashan, thick forest",
+        "aliases": []
+      },
+      {
+        "id": 1786965741312,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 3,
+        "question": "There is the sound of ________________! For their glory is in ruins. There is the sound of ______________! For the ___________ is in ruins.",
+        "alternateQuestion": "",
+        "displayAnswer": "wailing shepherds, roaring lions, pride of the Jordan",
+        "aliases": []
+      },
+      {
+        "id": 1786965765512,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 5,
+        "question": "whose owners slaughter them and feel no guilt; those who sell them say, \"Blessed be the LORD, for I am _______'; and their shepherds do not pity them.",
+        "alternateQuestion": "",
+        "displayAnswer": "rich",
+        "aliases": []
+      },
+      {
+        "id": 1786965797164,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 6,
+        "question": "For I will no longer pity the inhabitants of the land,\" says the LORD. \"But indeed I will give everyone into his _________ hand and into the hand of his ________. They shall attack the land, and I will not deliver them from their hand.\"",
+        "alternateQuestion": "",
+        "displayAnswer": "neighbor's, king",
+        "aliases": []
+      },
+      {
+        "id": 1786965879571,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 7,
+        "question": "What are the alternate names for the two staffs?",
+        "alternateQuestion": "",
+        "displayAnswer": "Grace, Unity",
+        "aliases": []
+      },
+      {
+        "id": 1786966641811,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 10,
+        "question": "And I took my staff, ___________, and cut it in two, that I might break the ______________ which I had made with all the peoples.",
+        "alternateQuestion": "",
+        "displayAnswer": "Beauty, covenant",
+        "aliases": []
+      },
+      {
+        "id": 1786966812755,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 14,
+        "question": "Then I cut in two my other staff, __________, that I might break the ___________ between Judah and Israel.",
+        "alternateQuestion": "",
+        "displayAnswer": "Bonds, brotherhood",
+        "aliases": []
+      },
+      {
+        "id": 1786966833272,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 15,
+        "question": "And the LORD said to me, \"Next, take for yourself the ___________ of a foolish shepherd.",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "implements",
+        "aliases": []
+      },
+      {
+        "id": 1786966884926,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 16,
+        "question": "For indeed I will raise up a shepherd in the land who will not care for those who are _____________, nor seek the ________, nor heal those that are ________, nor feed those that still _______. But he will eat the flesh of the ______ and tear their __________ in pieces.",
+        "alternateQuestion": "",
+        "displayAnswer": "cut off, young, broken, stand, fat, hooves",
+        "aliases": []
+      },
+      {
+        "id": 1786966937529,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 17,
+        "question": "\"Woe to the worthless shepherd, Who leaves the flock! A _______ shall be against his __________ And against his ____________; His ___________ shall completely ___________, And his __________ shall be totally ________.\"",
+        "alternateQuestion": "",
+        "displayAnswer": "sword, arm, right eye, arm, wither, right eye, blinded",
+        "aliases": []
+      },
+      {
+        "id": 1786966980881,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 12,
+        "verse": 1,
+        "question": "The burden of the word of the LORD against Israel. Thus says the LORD, who stretches out the ______________, lays the foundation of the _________, and forms the ____________ within him:",
+        "alternateQuestion": "",
+        "displayAnswer": "heavens, earth, spirit of man",
+        "aliases": []
+      },
+      {
+        "id": 1786967089790,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 12,
+        "verse": 4,
+        "question": "In that day,\" says the LORD, \"I will strike every _________ with ___________, and its _________ with ____________; I will open My eyes on the house of Judah, and will strike every _________ of the peoples with _____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "horse, confusion, rider, madness, horse, blindness",
+        "aliases": []
+      },
+      {
+        "id": 1786967116308,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 12,
+        "verse": 5,
+        "question": "And the _____________ shall say in their heart, \"The inhabitants of Jerusalem are my __________ in the LORD of hosts, their God.'",
+        "alternateQuestion": "",
+        "displayAnswer": "governors of Judah, strength",
+        "aliases": []
+      },
+      {
+        "id": 1786967155594,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 12,
+        "verse": 6,
+        "question": "In that day I will make the governors of Judah like a _______________, and like a ________________; they shall devour all the _____________ on the right hand and on the left, but Jerusalem shall be inhabited again in her own place--____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "firepan in the woodpile, fiery torch in the sheaves, surrounding peoples, Jerusalem",
+        "aliases": []
+      },
+      {
+        "id": 1786967299420,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 12,
+        "verse": 8,
+        "question": "In that day the LORD will defend the inhabitants of Jerusalem; the one who is ________ among them in that day shall be like ___________, and the house of ____________ shall be like _______, like the _________ before them.",
+        "alternateQuestion": "",
+        "displayAnswer": "feeble, David, David, God, Angel of the LORD",
+        "aliases": []
+      },
+      {
+        "id": 1786967450595,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 12,
+        "verse": 12,
+        "endVerse": 14,
+        "question": "What are the four families that will mourn by itself and their wives by themselves?",
+        "alternateQuestion": "",
+        "displayAnswer": "David, Nathan, Levi, Shimei",
+        "aliases": []
+      },
+      {
+        "id": 1786967708445,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 13,
+        "verse": 3,
+        "question": "It shall come to pass that if anyone still prophesies, then his _______ and __________ who begot him will say to him, \"You shall not live, because you have spoken lies in the name of the LORD.' And his father and mother who begot him shall __________ him through when he prophesies.",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "father, mother, thrust",
+        "aliases": []
+      },
+      {
+        "id": 1786967729146,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 13,
+        "verse": 4,
+        "question": "\"And it shall be in that day that every prophet will be ashamed of his vision when he prophesies; they will not wear a ______________ to deceive.",
+        "alternateQuestion": "",
+        "displayAnswer": "robe of coarse hair",
+        "aliases": []
+      },
+      {
+        "id": 1786967782316,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 13,
+        "verse": 6,
+        "question": "And one will say to him, \"What are these ___________ between your arms?' Then he will answer, \"Those with which I was _________ in the ____________.'",
+        "alternateQuestion": "",
+        "displayAnswer": "wounds, wounded, house of my friends",
+        "aliases": []
+      },
+      {
+        "id": 1786967994690,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 13,
+        "verse": 9,
+        "question": "I will bring the _____________ through the _____, Will refine them as _________ is refined, And test them as __________ is tested. They will call on My name, And I will answer them. I will say, \"___________'; And each one will say, \"____________________.\"'",
+        "alternateQuestion": "",
+        "displayAnswer": "one-third, fire, silver, gold, This is My people, The LORD is my God",
+        "aliases": []
+      },
+      {
+        "id": 1786968350078,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 1,
+        "question": "Behold, the ____________ is coming, And your ________ will be divided in your midst.",
+        "alternateQuestion": "",
+        "displayAnswer": "day of the LORD, spoil",
+        "aliases": []
+      },
+      {
+        "id": 1786968434300,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 2,
+        "question": "For I will gather all the nations to battle against Jerusalem; The _______ shall be _________, The ____________, And the _____________. _________ of the city shall go into ____________, But the _____________ shall not be cut off from the city.",
+        "alternateQuestion": "",
+        "displayAnswer": "city, taken, houses rifled, women ravished, Half, captivity, remnant of the people",
+        "aliases": []
+      },
+      {
+        "id": 1786968533690,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 5,
+        "question": "Then you shall flee through My mountain valley, For the mountain valley shall reach to ________________. Yes, you shall flee As you fled from the earthquake In the days of ______________ king of Judah. Thus the LORD my God will come, And all the ___________ with You.",
+        "alternateQuestion": "",
+        "displayAnswer": "Azal, Uzziah, saints",
+        "aliases": []
+      },
+      {
+        "id": 1786968572509,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 7,
+        "question": "It shall be one day Which is known to the LORD-- Neither day nor night. But at ______________ it shall happen That it will be light.",
+        "alternateQuestion": "",
+        "displayAnswer": "evening time",
+        "aliases": []
+      },
+      {
+        "id": 1786968608078,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 8,
+        "question": "And in that day it shall be That ___________ shall flow from Jerusalem, Half of them toward the __________ And half of them toward the ___________; In both _________ and _________ it shall occur.",
+        "alternateQuestion": "",
+        "displayAnswer": "living waters, eastern sea, western sea, summer, winter",
+        "aliases": []
+      },
+      {
+        "id": 1786968703350,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 10,
+        "question": "All the land shall be turned into a plain from _______ to ____________________. Jerusalem shall be raised up and inhabited in her place from _________ to the place of the ____________ and the ____________, and from the _____________ to the _____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "Geba, Rimmon south of Jerusalem, Benjamin's Gate, First Gate, Corner Gate, Tower of Hananel, king's winepresses",
+        "aliases": []
+      },
+      {
+        "id": 1786968752703,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 12,
+        "question": "And this shall be the ___________ with which the LORD will strike all the people who fought against Jerusalem: Their ____________ shall dissolve while they stand on their __________, Their ___________ shall dissolve in their ___________, And their ___________ shall dissolve in their _________.",
+        "alternateQuestion": "",
+        "displayAnswer": "plague, flesh, feet, eyes, sockets, tongues, mouths",
+        "aliases": []
+      },
+      {
+        "id": 1786968781371,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 13,
+        "question": "It shall come to pass in that day That a __________ from the LORD will be among them. Everyone will seize the hand of his _____________, And raise his hand against his ___________'s hand;",
+        "alternateQuestion": "",
+        "displayAnswer": "great panic, neighbor, neighbor",
+        "aliases": []
+      },
+      {
+        "id": 1786968816259,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 14,
+        "question": "Judah also will fight at Jerusalem. And the ___________ of all the surrounding nations Shall be gathered together: ________, ____________, and __________ in great abundance.",
+        "alternateQuestion": "",
+        "displayAnswer": "wealth, gold, silver, apparel",
+        "aliases": []
+      },
+      {
+        "id": 1786969217800,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 15,
+        "question": "Such also shall be the plague On the ________ and the ___________, On the _____________ and the _____________, And on all the __________ that will be in those camps. So shall this plague be.",
+        "alternateQuestion": "",
+        "displayAnswer": "horse, mule, camel, donkey, cattle",
+        "aliases": []
+      },
+      {
+        "id": 1786969233950,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 16,
+        "question": "And it shall come to pass that everyone who is left of all the nations which came against Jerusalem shall go up from year to year to worship the King, the LORD of hosts, and to keep the _________________.",
+        "alternateQuestion": "",
+        "displayAnswer": "Feast of Tabernacles",
+        "aliases": []
+      },
+      {
+        "id": 1786969246182,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 17,
+        "question": "And it shall be that whichever of the families of the earth do not come up to Jerusalem to worship the King, the LORD of hosts, on them there will be no __________.",
+        "alternateQuestion": "",
+        "displayAnswer": "rain",
+        "aliases": []
+      },
+      {
+        "id": 1786969267052,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 18,
+        "question": "If the family of _____________ will not come up and enter in, they shall have no rain; they shall receive the plague with which the LORD strikes the nations who do not come up to keep the Feast of Tabernacles.",
+        "alternateQuestion": "",
+        "displayAnswer": "Egypt",
+        "aliases": []
+      },
+      {
+        "id": 1786969347843,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 21,
+        "question": "Yes, every __________ in Jerusalem and Judah shall be ___________ to the LORD of hosts. Everyone who sacrifices shall come and take them and cook in them. In that day there shall no longer be a __________ in the house of the LORD of hosts.",
+        "alternateQuestion": "",
+        "displayAnswer": "pot, holiness, Canaanite",
+        "aliases": []
+      },
+      {
+        "id": 1787175849649,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 1,
+        "verse": 3,
+        "question": "But Esau I have hated, And laid waste his _________ and his __________ For the _______ of the wilderness.\"",
+        "alternateQuestion": "",
+        "displayAnswer": "mountains, heritage, jackals",
+        "aliases": []
+      },
+      {
+        "id": 1787175902987,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 1,
+        "verse": 5,
+        "question": "Your eyes shall see, And you shall say, \"The LORD is __________ beyond the _____________.'",
+        "alternateQuestion": "",
+        "displayAnswer": "magnified, border of Israel",
+        "aliases": []
+      },
+      {
+        "id": 1787176005670,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 1,
+        "verse": 7,
+        "question": "\"You offer _____________ on My altar, But say, \"In what way have we defiled You?' By saying, \"The _______ of the LORD is ____________.'",
+        "alternateQuestion": "",
+        "displayAnswer": "defiled food, table, contemptible",
+        "aliases": []
+      },
+      {
+        "id": 1787176056737,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 1,
+        "verse": 9,
+        "question": "\"But now entreat God's _________, That He may be gracious to us. While this is being done by your hands, Will He accept you favorably?\" Says the LORD of hosts.",
+        "alternateQuestion": "",
+        "displayAnswer": "favor",
+        "aliases": []
+      },
+      {
+        "id": 1787176111164,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 1,
+        "verse": 11,
+        "question": "For from the rising of the sun, even to its going down, My name shall be great among the _____________; In every place _________ shall be offered to My name, And a _____________; For My name shall be great among the nations,\" Says the LORD of hosts.",
+        "alternateQuestion": "",
+        "displayAnswer": "Gentiles, incense, pure offering",
+        "aliases": []
+      },
+      {
+        "id": 1787176148756,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 1,
+        "verse": 13,
+        "question": "You also say, \"Oh, what a _______________!' And you sneer at it,\" Says the LORD of hosts. \"And you bring the ___________, the _________, and the _________; Thus you bring an offering! Should I accept this from your hand?\" Says the LORD.",
+        "alternateQuestion": "",
+        "displayAnswer": "weariness, stolen, lame, sick",
+        "aliases": []
+      },
+      {
+        "id": 1787177773784,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 7,
+        "verse": 11,
+        "question": "But they refused to __________, ____________, and ___________ so that they could not hear.",
+        "alternateQuestion": "",
+        "displayAnswer": "heed, shrugged their shoulders, stopped their ears",
+        "aliases": []
+      },
+      {
+        "id": 1787177855401,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 13,
+        "question": "And it shall come to pass That just as you were a ___________ among the nations, O house of Judah and house of Israel, So I will save you, and you shall be a _______________. Do not fear, Let your hands be strong.'",
+        "alternateQuestion": "",
+        "displayAnswer": "curse, blessing",
+        "aliases": []
+      },
+      {
+        "id": 1787199109168,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 1,
+        "question": "\"And now, O _____________, this commandment is for you.",
+        "alternateQuestion": "",
+        "displayAnswer": "priests",
+        "aliases": []
+      },
+      {
+        "id": 1787199168624,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 2,
+        "question": "If you will not hear, And if you will not take it to heart, To give glory to My name,\" Says the LORD of hosts, \"I will send a __________ upon you, And I will ________ your __________. Yes, I have __________ them already, Because you do not take it to heart.",
+        "alternateQuestion": "",
+        "displayAnswer": "curse, curse, blessings, cursed",
+        "aliases": []
+      },
+      {
+        "id": 1787199226002,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 3,
+        "question": "\"Behold, I will rebuke your ___________ And spread __________ on your ____________, The _____________ of your _____________; And one will take you away with it.",
+        "alternateQuestion": "",
+        "displayAnswer": "descendants, refuse, faces, refuse, solemn feasts",
+        "aliases": []
+      },
+      {
+        "id": 1787199245326,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 4,
+        "question": "Then you shall know that I have sent this commandment to you, That My covenant with _________ may continue,\" Says the LORD of hosts.",
+        "alternateQuestion": "",
+        "displayAnswer": "Levi",
+        "aliases": []
+      },
+      {
+        "id": 1787199361192,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 8,
+        "question": "But you have departed from the way; You have caused many to stumble at the law. You have corrupted the ______________,\" Says the LORD of hosts.",
+        "alternateQuestion": "",
+        "displayAnswer": "covenant of Levi",
+        "aliases": []
+      },
+      {
+        "id": 1787199387845,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 9,
+        "question": "\"Therefore I also have made you ___________ and ___________ Before all the people, Because you have not kept My ways But have shown partiality in the law.\"",
+        "alternateQuestion": "",
+        "displayAnswer": "contemptible, base",
+        "aliases": []
+      },
+      {
+        "id": 1787199416896,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 10,
+        "question": "Have we not all one ____________? Has not one ____________ created us? Why do we deal treacherously with one another By profaning the covenant of the fathers?",
+        "alternateQuestion": "",
+        "displayAnswer": "Father, God",
+        "aliases": []
+      },
+      {
+        "id": 1787199477528,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 11,
+        "question": "__________ has dealt treacherously, And an abomination has been committed in _________ and in ____________, For __________ has profaned The LORD's _______________ which He loves: He has married the _____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "Judah, Israel, Jerusalem, Judah, holy institution, daughter of a foreign god",
+        "aliases": []
+      },
+      {
+        "id": 1787199495611,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 12,
+        "question": "May the LORD cut off from the ______________ The man who does this, being awake and aware, Yet who brings an offering to the LORD of hosts!",
+        "alternateQuestion": "",
+        "displayAnswer": "tents of Jacob",
+        "aliases": []
+      },
+      {
+        "id": 1787199520723,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 13,
+        "question": "And this is the second thing you do: You cover the altar of the LORD with ___________, With ________ and __________; So He does not regard the offering anymore, Nor receive it with goodwill from your hands.",
+        "alternateQuestion": "",
+        "displayAnswer": "tears, weeping, crying",
+        "aliases": []
+      },
+      {
+        "id": 1787199563310,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 15,
+        "question": "But did He not make them one, Having a _______________? And why one? He seeks ________________. Therefore take heed to your spirit, And let none deal treacherously with the wife of his youth.",
+        "alternateQuestion": "",
+        "displayAnswer": "remnant of the Spirit, godly offspring",
+        "aliases": []
+      },
+      {
+        "id": 1787199588797,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 16,
+        "question": "\"For the LORD God of Israel says That He hates ___________, For it covers one's garment with _____________,\" Says the LORD of hosts. \"Therefore take heed to your spirit, That you do not deal treacherously.\"",
+        "alternateQuestion": "",
+        "displayAnswer": "divorce, violence",
+        "aliases": []
+      },
+      {
+        "id": 1787266761832,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 3,
+        "question": "He will sit as a ___________ and a _________ of __________; He will purify the _____________, And purge them as gold and silver, That they may offer to the LORD An offering in _______________.",
+        "alternateQuestion": "",
+        "displayAnswer": "refiner, purifier, silver, sons of Levi, righteousness",
+        "aliases": []
+      },
+      {
+        "id": 1787279297618,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 4,
+        "question": "\"Then the offering of ____________ and ___________ Will be pleasant to the LORD, As in the _____________, As in _____________.",
+        "alternateQuestion": "",
+        "displayAnswer": "Judah, Jerusalem, days of old, former years",
+        "aliases": []
+      },
+      {
+        "id": 1787279411294,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 5,
+        "question": "And I will come near you for judgment; I will be a swift witness Against ____________, Against ___________, Against ___________, Against those who exploit ____________ and _________ and __________, And against those who turn away an ____________-- Because they do not fear Me,\" Says the LORD of hosts.",
+        "alternateQuestion": "",
+        "displayAnswer": "sorcerers, adulterers, perjurers, wage earners, widows, orphans, alien",
+        "aliases": []
+      },
+      {
+        "id": 1787279712777,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 10,
+        "question": "Bring all the ______________ into the ______________, That there may be food in My house, And try Me now in this,\" Says the LORD of hosts, \"If I will not open for you the ______________ And pour out for you ______________ That there will not be room enough to receive it.",
+        "alternateQuestion": "",
+        "displayAnswer": "tithes, storehouse, windows of heaven, such blessing",
+        "aliases": []
+      },
+      {
+        "id": 1787279765914,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 11,
+        "question": "\"And I will rebuke the ____________ for your sakes, So that he will not destroy the ___________ of your ground, Nor shall the ____________ fail to bear fruit for you in the field,\" Says the LORD of hosts;",
+        "alternateQuestion": "",
+        "displayAnswer": "devourer, fruit, vine",
+        "aliases": []
+      },
+      {
+        "id": 1787279785548,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 12,
+        "question": "And all nations will call you ___________, For you will be a ___________,\" Says the LORD of hosts.",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "blessed, delightful land",
+        "aliases": []
+      },
+      {
+        "id": 1787279944823,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 14,
+        "question": "You have said, \"It is ____________ to serve God; What profit is it that we have kept His ______________, And that we have walked as _________ Before the LORD of hosts?",
+        "alternateQuestion": "",
+        "displayAnswer": "useless, ordinance, mourners",
+        "aliases": []
+      },
+      {
+        "id": 1787279973642,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 15,
+        "question": "So now we call the __________ ___________, For those who do wickedness are raised up; They even _______ God and go free.\"'",
+        "alternateQuestion": "",
+        "displayAnswer": "proud, blessed, tempt",
+        "aliases": []
+      },
+      {
+        "id": 1787280026845,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 17,
+        "question": "\"They shall be Mine,\" says the LORD of hosts, \"On the day that I make them My ______________. And I will spare them As a man spares his ___________ who serves him.\"",
+        "alternateQuestion": "",
+        "displayAnswer": "jewels, own son",
+        "aliases": []
+      },
+      {
+        "id": 1787280061980,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 18,
+        "question": "Then you shall again discern Between the __________ and the ___________, Between one who serves ____________ And one who does not serve ______.",
+        "alternateQuestion": "",
+        "displayAnswer": "righteous, wicked, God, Him",
+        "aliases": []
+      },
+      {
+        "id": 1787280456408,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 4,
+        "verse": 6,
+        "question": "And he will turn The hearts of the _________ to the ___________, And the hearts of the ___________ to their _________, Lest I come and strike the earth with a ____________.\"",
+        "alternateQuestion": "",
+        "displayAnswer": "fathers, children, children, fathers, curse",
+        "aliases": []
+      },
+      {
+        "id": 1787537665409,
+        "scope": "verse",
+        "book": "Haggai",
+        "chapter": 2,
+        "verse": 6,
+        "question": "[Reference question]\n\n\"For thus says the LORD of hosts: \"Once more (it is a little while) I will shake heaven and earth, the sea and dry land;\n\nWhat other book[s] reference this verse?",
+        "alternateQuestion": "",
+        "displayAnswer": "Hebrews 12:26",
+        "aliases": []
+      },
+      {
+        "id": 1787538137187,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 16,
+        "question": "[Reference question]\n\nThese are the things you shall do: Speak each man the truth to his neighbor; Give judgment in your gates for truth, justice, and peace;\n\nWhat book[s] reference this verse?",
+        "alternateQuestion": "",
+        "displayAnswer": "Ephesians 4:25",
+        "aliases": []
+      },
+      {
+        "id": 1787538182508,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 9,
+        "question": "[Reference Question]\n\n“Rejoice greatly, O daughter of Zion! Shout, O daughter of Jerusalem! Behold, your King is coming to you; He is just and having salvation, Lowly and riding on a donkey, A colt, the foal of a donkey.\n\nWhat book[s] reference this verse?",
+        "alternateQuestion": "",
+        "displayAnswer": "Matthew 21:5, John 12:15",
+        "aliases": []
+      },
+      {
+        "id": 1787538246149,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 11,
+        "endVerse": 12,
+        "question": "[Reference Question]\n\nThen I said to them, “If it is agreeable to you, give me my wages; and if not, refrain.” So they weighed out for my wages thirty pieces of silver. And the Lord said to me, “Throw it to the potter”—that princely price they set on me. So I took the thirty pieces of silver and threw them into the house of the Lord for the potter.\n\nWhich book[s] reference this verse?",
+        "alternateQuestion": "",
+        "displayAnswer": "Matthew 27:9–10",
+        "aliases": []
+      },
+      {
+        "id": 1787538275534,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 12,
+        "verse": 10,
+        "question": "[Reference Question]\n\n“And I will pour on the house of David and on the inhabitants of Jerusalem the Spirit of grace and supplication; then they will look on Me whom they pierced. Yes, they will mourn for Him as one mourns for his only son, and grieve for Him as one grieves for a firstborn.\n\nWhat book[s] reference this verse?",
+        "alternateQuestion": "",
+        "displayAnswer": "John 19:37",
+        "aliases": []
+      },
+      {
+        "id": 1787538308774,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 13,
+        "verse": 7,
+        "question": "[Reference Question]\n\n“Awake, O sword, against My Shepherd, Against the Man who is My Companion,” Says the Lord of hosts. “Strike the Shepherd, And the sheep will be scattered; Then I will turn My hand against the little ones.\n\nWhat book[s] reference this verse?",
+        "alternateQuestion": "",
+        "displayAnswer": "Matthew 26:31, Mark 14:27",
+        "aliases": []
+      },
+      {
+        "id": 1787538358518,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 1,
+        "verse": 2,
+        "endVerse": 3,
+        "question": "[Reference Question]\n\n“I have loved you,” says the Lord. “Yet you say, ‘In what way have You loved us?’ Was not Esau Jacob’s brother?” Says the Lord. “Yet Jacob I have loved; But Esau I have hated, And laid waste his mountains and his heritage For the jackals of the wilderness.”\n\nWhat book[s] reference this verse?",
+        "alternateQuestion": "",
+        "displayAnswer": "Romans 9:13",
+        "aliases": []
+      },
+      {
+        "id": 1787538403073,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 3,
+        "verse": 1,
+        "question": "[Reference Question]\n\n“Behold, I send My messenger, And he will prepare the way before Me. And the Lord, whom you seek, Will suddenly come to His temple, Even the Messenger of the covenant, In whom you delight. Behold, He is coming,” Says the Lord of hosts.\n\nWhat book[s] reference this verse?",
+        "alternateQuestion": "",
+        "displayAnswer": "Matthew 11:10, Mark 1:2, Luke 7:27",
+        "aliases": []
+      },
+      {
+        "id": 1787629580427,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 6,
+        "question": "It shall come to pass in that day That there will be no _____________; The ____________ will diminish.",
+        "alternateQuestion": "",
+        "displayAnswer": "light, lights",
+        "aliases": []
+      },
+      {
+        "id": 1787661388303,
+        "scope": "book",
+        "book": "Zechariah",
+        "question": "Match the visions of Zechariah in order",
+        "alternateQuestion": "",
+        "type": "matching",
+        "pairs": [
+          {
+            "prompt": "1",
+            "answer": "The Horsemen Among the Myrtle Trees"
+          },
+          {
+            "prompt": "2",
+            "answer": "The Four Horns and Four Craftsmen"
+          },
+          {
+            "prompt": "3",
+            "answer": "The Man with the Measuring Line"
+          },
+          {
+            "prompt": "4",
+            "answer": "Joshua the High Priest Cleansed"
+          },
+          {
+            "prompt": "5",
+            "answer": "The Golden Lampstand and Two Olive Trees"
+          },
+          {
+            "prompt": "6",
+            "answer": "The Flying Scroll"
+          },
+          {
+            "prompt": "7",
+            "answer": "The Woman in the Basket/Ephah"
+          },
+          {
+            "prompt": "8",
+            "answer": "The Four Chariots"
+          }
+        ],
+        "displayAnswer": "1: The Horsemen Among the Myrtle Trees; 2: The Four Horns and Four Craftsmen; 3: The Man with the Measuring Line; 4: Joshua the High Priest Cleansed; 5: The Golden Lampstand and Two Olive Trees; 6: The Flying Scroll; 7: The Woman in the Basket/Ephah; 8: The Four Chariots",
+        "aliases": []
+      },
+      {
+        "id": 1787661857748,
+        "scope": "book",
+        "book": "Zechariah",
+        "question": "What chapters of Zechariah have his eight visions?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "Zechariah 1-6",
+        "aliases": [
+          "1-6"
+        ]
+      },
+      {
+        "id": 1787662756092,
+        "scope": "book",
+        "book": "Zechariah",
+        "question": "Match each vision from Zechariah to the chapter it belongs to.",
+        "alternateQuestion": "",
+        "type": "matching",
+        "pairs": [
+          {
+            "prompt": "1",
+            "answer": "The Horsemen Among the Myrtle Trees",
+            "answers": [
+              "The Horsemen Among the Myrtle Trees",
+              "The Four Horns and Four Craftsmen"
+            ]
+          },
+          {
+            "prompt": "2",
+            "answer": "The Man with the Measuring Line",
+            "answers": [
+              "The Man with the Measuring Line"
+            ]
+          },
+          {
+            "prompt": "3",
+            "answer": "Joshua the High Priest Cleansed",
+            "answers": [
+              "Joshua the High Priest Cleansed"
+            ]
+          },
+          {
+            "prompt": "4",
+            "answer": "The Golden Lampstand and Two Olive Trees",
+            "answers": [
+              "The Golden Lampstand and Two Olive Trees"
+            ]
+          },
+          {
+            "prompt": "5",
+            "answer": "The Flying Scroll",
+            "answers": [
+              "The Flying Scroll",
+              "The Woman in the Basket/Ephah"
+            ]
+          },
+          {
+            "prompt": "6",
+            "answer": "The Four Chariots",
+            "answers": [
+              "The Four Chariots"
+            ]
+          }
+        ],
+        "displayAnswer": "1: The Horsemen Among the Myrtle Trees, The Four Horns and Four Craftsmen; 2: The Man with the Measuring Line; 3: Joshua the High Priest Cleansed; 4: The Golden Lampstand and Two Olive Trees; 5: The Flying Scroll, The Woman in the Basket/Ephah; 6: The Four Chariots",
+        "aliases": []
+      },
+      {
+        "id": 1787662879510,
+        "scope": "all-books",
+        "book": "Haggai",
+        "books": [
+          "Haggai",
+          "Zechariah",
+          "Malachi"
+        ],
+        "question": "Match the verse to the corresponding book.",
+        "alternateQuestion": "",
+        "type": "matching",
+        "pairs": [
+          {
+            "prompt": "Haggai",
+            "answer": "‘In that day,’ says the Lord of hosts, ‘I will take you, Zerubbabel My servant, the son of Shealtiel,’ says the Lord, ‘and will make you like a signet ring; for I have chosen you,’ says the Lord of hosts.”",
+            "answers": [
+              "‘In that day,’ says the Lord of hosts, ‘I will take you, Zerubbabel My servant, the son of Shealtiel,’ says the Lord, ‘and will make you like a signet ring; for I have chosen you,’ says the Lord of hosts.”"
+            ]
+          },
+          {
+            "prompt": "Zechariah",
+            "answer": "Yes, every pot in Jerusalem and Judah shall be holiness to the Lord of hosts. Everyone who sacrifices shall come and take them and cook in them. In that day there shall no longer be a Canaanite in the house of the Lord of hosts.",
+            "answers": [
+              "Yes, every pot in Jerusalem and Judah shall be holiness to the Lord of hosts. Everyone who sacrifices shall come and take them and cook in them. In that day there shall no longer be a Canaanite in the house of the Lord of hosts."
+            ]
+          },
+          {
+            "prompt": "Malachi",
+            "answer": "And he will turn The hearts of the fathers to the children, And the hearts of the children to their fathers, Lest I come and strike the earth with a curse.”",
+            "answers": [
+              "And he will turn The hearts of the fathers to the children, And the hearts of the children to their fathers, Lest I come and strike the earth with a curse.”"
+            ]
+          }
+        ],
+        "displayAnswer": "Haggai: ‘In that day,’ says the Lord of hosts, ‘I will take you, Zerubbabel My servant, the son of Shealtiel,’ says the Lord, ‘and will make you like a signet ring; for I have chosen you,’ says the Lord of hosts.”; Zechariah: Yes, every pot in Jerusalem and Judah shall be holiness to the Lord of hosts. Everyone who sacrifices shall come and take them and cook in them. In that day there shall no longer be a Canaanite in the house of the Lord of hosts.; Malachi: And he will turn The hearts of the fathers to the children, And the hearts of the children to their fathers, Lest I come and strike the earth with a curse.”",
+        "aliases": []
+      },
+      {
+        "id": 1787716112679,
+        "scope": "book",
+        "book": "Haggai",
+        "question": "Match the chapter descriptions",
+        "alternateQuestion": "",
+        "type": "matching",
+        "pairs": [
+          {
+            "prompt": "1",
+            "answer": "Rebuke for Neglecting the Temple; “Consider Your Ways”; Drought Because of Disobedience; Zerubbabel & Joshua Lead the Rebuilding",
+            "answers": [
+              "Rebuke for Neglecting the Temple; “Consider Your Ways”; Drought Because of Disobedience; Zerubbabel & Joshua Lead the Rebuilding"
+            ]
+          },
+          {
+            "prompt": "2",
+            "answer": "Glory of the Latter Temple; “I Will Shake Heaven and Earth”; Clean vs. Unclean; Promise of Blessing; Zerubbabel as God’s Signet Ring",
+            "answers": [
+              "Glory of the Latter Temple; “I Will Shake Heaven and Earth”; Clean vs. Unclean; Promise of Blessing; Zerubbabel as God’s Signet Ring"
+            ]
+          }
+        ],
+        "displayAnswer": "1: Rebuke for Neglecting the Temple; “Consider Your Ways”; Drought Because of Disobedience; Zerubbabel & Joshua Lead the Rebuilding; 2: Glory of the Latter Temple; “I Will Shake Heaven and Earth”; Clean vs. Unclean; Promise of Blessing; Zerubbabel as God’s Signet Ring",
+        "aliases": []
+      },
+      {
+        "id": 1787716243605,
+        "scope": "book",
+        "book": "Zechariah",
+        "question": "Match the chapter descriptions",
+        "alternateQuestion": "",
+        "type": "matching",
+        "pairs": [
+          {
+            "prompt": "1",
+            "answer": "Call to Repentance; Horseman Among the Myrtle Trees; Four Horns & Four Craftsmen",
+            "answers": [
+              "Call to Repentance; Horseman Among the Myrtle Trees; Four Horns & Four Craftsmen"
+            ]
+          },
+          {
+            "prompt": "2",
+            "answer": "Man with the Measuring Line; Jerusalem Without Walls; Lord a Wall of Fire; “Apple of His Eye”; Call to Flee Babylon",
+            "answers": [
+              "Man with the Measuring Line; Jerusalem Without Walls; Lord a Wall of Fire; “Apple of His Eye”; Call to Flee Babylon"
+            ]
+          },
+          {
+            "prompt": "3",
+            "answer": "Joshua the High Priest Before Satan; Filthy Garments Removed; Clean Turban; The BRANCH",
+            "answers": [
+              "Joshua the High Priest Before Satan; Filthy Garments Removed; Clean Turban; The BRANCH"
+            ]
+          },
+          {
+            "prompt": "4",
+            "answer": "Gold Lampstand & Two Olive Trees; “Not by Might nor by Power, but by My Spirit”; Zerubbabel; Two Anointed Ones",
+            "answers": [
+              "Gold Lampstand & Two Olive Trees; “Not by Might nor by Power, but by My Spirit”; Zerubbabel; Two Anointed Ones"
+            ]
+          },
+          {
+            "prompt": "5",
+            "answer": "Flying Scroll; Curse Against Thieves & Perjurers; Woman Called Wickedness in the Basket; Taken to Shinar",
+            "answers": [
+              "Flying Scroll; Curse Against Thieves & Perjurers; Woman Called Wickedness in the Basket; Taken to Shinar"
+            ]
+          },
+          {
+            "prompt": "6",
+            "answer": "Four Chariots / Four Spirits of Heaven; Joshua Crowned; The BRANCH Will Build the Temple",
+            "answers": [
+              "Four Chariots / Four Spirits of Heaven; Joshua Crowned; The BRANCH Will Build the Temple"
+            ]
+          },
+          {
+            "prompt": "7",
+            "answer": "Question About Fasting; True Justice, Mercy & Compassion; Israel’s Former Disobedience",
+            "answers": [
+              "Question About Fasting; True Justice, Mercy & Compassion; Israel’s Former Disobedience"
+            ]
+          },
+          {
+            "prompt": "8",
+            "answer": "Jerusalem Restored; City of Truth; Old Men & Children in the Streets; Fasts Become Joyful Feasts; Nations Seek the LORD",
+            "answers": [
+              "Jerusalem Restored; City of Truth; Old Men & Children in the Streets; Fasts Become Joyful Feasts; Nations Seek the LORD"
+            ]
+          },
+          {
+            "prompt": "9",
+            "answer": "Judgment on Surrounding Nations; King Comes Riding on a Donkey; His Dominion Sea to Sea; Zion Against Greece",
+            "answers": [
+              "Judgment on Surrounding Nations; King Comes Riding on a Donkey; His Dominion Sea to Sea; Zion Against Greece"
+            ]
+          },
+          {
+            "prompt": "10",
+            "answer": "Ask the LORD for Rain; Idols & Diviners Condemned; Judah as Cornerstone, Tent Peg & Battle Bow; Israel Gathered",
+            "answers": [
+              "Ask the LORD for Rain; Idols & Diviners Condemned; Judah as Cornerstone, Tent Peg & Battle Bow; Israel Gathered"
+            ]
+          },
+          {
+            "prompt": "11",
+            "answer": "Two Shepherds; Staffs Beauty & Bonds; Thirty Pieces of Silver; Money Thrown to the Potter; Foolish Shepherd",
+            "answers": [
+              "Two Shepherds; Staffs Beauty & Bonds; Thirty Pieces of Silver; Money Thrown to the Potter; Foolish Shepherd"
+            ]
+          },
+          {
+            "prompt": "12",
+            "answer": "Jerusalem a Cup of Drunkenness & Burdensome Stone; Judah Defended; “They Will Look on Me Whom They Pierced”; Great Mourning",
+            "answers": [
+              "Jerusalem a Cup of Drunkenness & Burdensome Stone; Judah Defended; “They Will Look on Me Whom They Pierced”; Great Mourning"
+            ]
+          },
+          {
+            "prompt": "13",
+            "answer": "Fountain Opened for Sin; Idols & False Prophets Removed; “Strike the Shepherd”; Sheep Scattered; Remnant Refined",
+            "answers": [
+              "Fountain Opened for Sin; Idols & False Prophets Removed; “Strike the Shepherd”; Sheep Scattered; Remnant Refined"
+            ]
+          },
+          {
+            "prompt": "14",
+            "answer": "Day of the LORD; Jerusalem Attacked; LORD Stands on Mount of Olives; Living Waters; LORD King Over All the Earth; Feast of Tabernacles; “HOLINESS TO THE LORD”",
+            "answers": [
+              "Day of the LORD; Jerusalem Attacked; LORD Stands on Mount of Olives; Living Waters; LORD King Over All the Earth; Feast of Tabernacles; “HOLINESS TO THE LORD”"
+            ]
+          }
+        ],
+        "displayAnswer": "1: Call to Repentance; Horseman Among the Myrtle Trees; Four Horns & Four Craftsmen; 2: Man with the Measuring Line; Jerusalem Without Walls; Lord a Wall of Fire; “Apple of His Eye”; Call to Flee Babylon; 3: Joshua the High Priest Before Satan; Filthy Garments Removed; Clean Turban; The BRANCH; 4: Gold Lampstand & Two Olive Trees; “Not by Might nor by Power, but by My Spirit”; Zerubbabel; Two Anointed Ones; 5: Flying Scroll; Curse Against Thieves & Perjurers; Woman Called Wickedness in the Basket; Taken to Shinar; 6: Four Chariots / Four Spirits of Heaven; Joshua Crowned; The BRANCH Will Build the Temple; 7: Question About Fasting; True Justice, Mercy & Compassion; Israel’s Former Disobedience; 8: Jerusalem Restored; City of Truth; Old Men & Children in the Streets; Fasts Become Joyful Feasts; Nations Seek the LORD; 9: Judgment on Surrounding Nations; King Comes Riding on a Donkey; His Dominion Sea to Sea; Zion Against Greece; 10: Ask the LORD for Rain; Idols & Diviners Condemned; Judah as Cornerstone, Tent Peg & Battle Bow; Israel Gathered; 11: Two Shepherds; Staffs Beauty & Bonds; Thirty Pieces of Silver; Money Thrown to the Potter; Foolish Shepherd; 12: Jerusalem a Cup of Drunkenness & Burdensome Stone; Judah Defended; “They Will Look on Me Whom They Pierced”; Great Mourning; 13: Fountain Opened for Sin; Idols & False Prophets Removed; “Strike the Shepherd”; Sheep Scattered; Remnant Refined; 14: Day of the LORD; Jerusalem Attacked; LORD Stands on Mount of Olives; Living Waters; LORD King Over All the Earth; Feast of Tabernacles; “HOLINESS TO THE LORD”",
+        "aliases": []
+      },
+      {
+        "id": 1787716292495,
+        "scope": "book",
+        "book": "Malachi",
+        "question": "Match the chapter descriptions",
+        "alternateQuestion": "",
+        "type": "matching",
+        "pairs": [
+          {
+            "prompt": "1",
+            "answer": "God’s Love for Israel; Jacob & Esau; Edom Judged; Priests Dishonor God; Defiled & Unacceptable Sacrifices",
+            "answers": [
+              "God’s Love for Israel; Jacob & Esau; Edom Judged; Priests Dishonor God; Defiled & Unacceptable Sacrifices"
+            ]
+          },
+          {
+            "prompt": "2",
+            "answer": "Priests Rebuked; Covenant with Levi; Corrupt Teaching; Judah’s Treachery; Marriage Covenant & Divorce",
+            "answers": [
+              "Priests Rebuked; Covenant with Levi; Corrupt Teaching; Judah’s Treachery; Marriage Covenant & Divorce"
+            ]
+          },
+          {
+            "prompt": "3",
+            "answer": "Messenger Prepares the Way; Lord Comes to His Temple; Refiner’s Fire; Robbing God in Tithes; Book of Remembrance",
+            "answers": [
+              "Messenger Prepares the Way; Lord Comes to His Temple; Refiner’s Fire; Robbing God in Tithes; Book of Remembrance"
+            ]
+          },
+          {
+            "prompt": "4",
+            "answer": "Coming Day Burning Like an Oven; Sun of Righteousness; Wicked Become Ashes; Remember the Law of Moses; Elijah Before the Great Day of the LORD",
+            "answers": [
+              "Coming Day Burning Like an Oven; Sun of Righteousness; Wicked Become Ashes; Remember the Law of Moses; Elijah Before the Great Day of the LORD"
+            ]
+          }
+        ],
+        "displayAnswer": "1: God’s Love for Israel; Jacob & Esau; Edom Judged; Priests Dishonor God; Defiled & Unacceptable Sacrifices; 2: Priests Rebuked; Covenant with Levi; Corrupt Teaching; Judah’s Treachery; Marriage Covenant & Divorce; 3: Messenger Prepares the Way; Lord Comes to His Temple; Refiner’s Fire; Robbing God in Tithes; Book of Remembrance; 4: Coming Day Burning Like an Oven; Sun of Righteousness; Wicked Become Ashes; Remember the Law of Moses; Elijah Before the Great Day of the LORD",
+        "aliases": []
+      },
+      {
+        "id": 1787717550981,
+        "scope": "book",
+        "book": "Zechariah",
+        "question": "What does Zechariah mean?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "The LORD remembers",
+        "aliases": []
+      },
+      {
+        "id": 1787796312517,
+        "scope": "all-books",
+        "book": "Haggai",
+        "books": [
+          "Haggai",
+          "Zechariah",
+          "Malachi"
+        ],
+        "question": "Which number temple did the people build during Haggai and Zechariah's time?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "2nd",
+        "aliases": [
+          "2"
+        ]
+      },
+      {
+        "id": 1787796340284,
+        "scope": "all-books",
+        "book": "Haggai",
+        "books": [
+          "Haggai",
+          "Zechariah",
+          "Malachi"
+        ],
+        "question": "Which king signed the decree to let the Jewish exiles to return?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "Cyrus",
+        "aliases": []
+      },
+      {
+        "id": 1787796663767,
+        "scope": "all-books",
+        "book": "Haggai",
+        "books": [
+          "Haggai",
+          "Zechariah",
+          "Malachi"
+        ],
+        "question": "Match the years to the following events",
+        "alternateQuestion": "",
+        "type": "matching",
+        "pairs": [
+          {
+            "prompt": "606 BC",
+            "answer": "Beginning of Babylonian invasion",
+            "answers": [
+              "Beginning of Babylonian invasion"
+            ]
+          },
+          {
+            "prompt": "586 BC",
+            "answer": "Babylon destroys Jerusalem",
+            "answers": [
+              "Babylon destroys Jerusalem"
+            ]
+          },
+          {
+            "prompt": "536 BC",
+            "answer": "End of 70-year captivity; first exiles return",
+            "answers": [
+              "End of 70-year captivity; first exiles return"
+            ]
+          },
+          {
+            "prompt": "516 BC",
+            "answer": "Second temple completed",
+            "answers": [
+              "Second temple completed"
+            ]
+          }
+        ],
+        "displayAnswer": "606 BC: Beginning of Babylonian invasion; 586 BC: Babylon destroys Jerusalem; 536 BC: End of 70-year captivity; first exiles return; 516 BC: Second temple completed",
+        "aliases": []
+      },
+      {
+        "id": 1787796688499,
+        "scope": "all-books",
+        "book": "Haggai",
+        "books": [
+          "Haggai",
+          "Zechariah",
+          "Malachi"
+        ],
+        "question": "When did the Babylonian invasion begin?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "606 BC",
+        "aliases": []
+      },
+      {
+        "id": 1787796702917,
+        "scope": "all-books",
+        "book": "Haggai",
+        "books": [
+          "Haggai",
+          "Zechariah",
+          "Malachi"
+        ],
+        "question": "When did Babylon destroy Jerusalem?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "586 BC",
+        "aliases": []
+      },
+      {
+        "id": 1787796730519,
+        "scope": "all-books",
+        "book": "Haggai",
+        "books": [
+          "Haggai",
+          "Zechariah",
+          "Malachi"
+        ],
+        "question": "When did the first wave of exiles return to return to Israel after captivity?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "536 BC",
+        "aliases": []
+      },
+      {
+        "id": 1787796748653,
+        "scope": "all-books",
+        "book": "Haggai",
+        "books": [
+          "Haggai",
+          "Zechariah",
+          "Malachi"
+        ],
+        "question": "When was the second temple completed?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "516 BC",
+        "aliases": []
+      },
+      {
+        "id": 1787796812304,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 4,
+        "verse": 14,
+        "question": "Who are the two anointed ones, or two olive trees?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "Zerubbabel, Joshua",
+        "aliases": []
+      },
+      {
+        "id": 1787796847173,
+        "scope": "book",
+        "book": "Malachi",
+        "question": "What does Malachi mean?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "My messenger",
+        "aliases": []
+      },
+      {
+        "id": 1787797082917,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 11,
+        "verse": 12,
+        "question": "The thirty pieces of silver is the price of a servant mentioned in what old testament book?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "Exodus 21:32",
+        "aliases": []
+      },
+      {
+        "id": 1787797127637,
+        "scope": "all-books",
+        "book": "Haggai",
+        "books": [
+          "Haggai",
+          "Zechariah",
+          "Malachi"
+        ],
+        "question": "How long was the intertestamental period?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "400 years",
+        "aliases": []
+      },
+      {
+        "id": 1787797187105,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 4,
+        "verse": 5,
+        "question": "Behold, I will send you Elijah the prophet Before the coming of the great and dreadful day of the LORD.\n\nWho is Elijah referring to?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "John the Baptist",
+        "aliases": []
+      },
+      {
+        "id": 1787797287560,
+        "scope": "all-books",
+        "book": "Haggai",
+        "books": [
+          "Haggai",
+          "Zechariah",
+          "Malachi"
+        ],
+        "question": "For how long did the temple construction stop until Haggai and Zechariah urged the people to rebuild it?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "16 years",
+        "aliases": []
+      },
+      {
+        "id": 1787797306895,
+        "scope": "all-books",
+        "book": "Haggai",
+        "books": [
+          "Haggai",
+          "Zechariah",
+          "Malachi"
+        ],
+        "question": "How long did it take to build the second temple?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "20 years",
+        "aliases": []
+      },
+      {
+        "id": 1787797584857,
+        "scope": "book",
+        "book": "Haggai",
+        "question": "What does Haggai mean?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "My festival",
+        "aliases": []
+      },
+      {
+        "id": 1787797926017,
+        "scope": "all-books",
+        "book": "Haggai",
+        "books": [
+          "Haggai",
+          "Zechariah",
+          "Malachi"
+        ],
+        "question": "Put the major 6 periods in order",
+        "alternateQuestion": "",
+        "type": "matching",
+        "pairs": [
+          {
+            "prompt": "1",
+            "answer": "Persia",
+            "answers": [
+              "Persia"
+            ]
+          },
+          {
+            "prompt": "2",
+            "answer": "Greece",
+            "answers": [
+              "Greece"
+            ]
+          },
+          {
+            "prompt": "3",
+            "answer": "Ptolemaic Egypt",
+            "answers": [
+              "Ptolemaic Egypt"
+            ]
+          },
+          {
+            "prompt": "4",
+            "answer": "Seleucid Syria",
+            "answers": [
+              "Seleucid Syria"
+            ]
+          },
+          {
+            "prompt": "5",
+            "answer": "Maccabees / Hasmoneans",
+            "answers": [
+              "Maccabees / Hasmoneans"
+            ]
+          },
+          {
+            "prompt": "6",
+            "answer": "Rome",
+            "answers": [
+              "Rome"
+            ]
+          }
+        ],
+        "displayAnswer": "1: Persia; 2: Greece; 3: Ptolemaic Egypt; 4: Seleucid Syria; 5: Maccabees / Hasmoneans; 6: Rome",
+        "aliases": []
+      },
+      {
+        "id": 1787882948319,
+        "scope": "all-books",
+        "book": "Haggai",
+        "books": [
+          "Haggai",
+          "Zechariah",
+          "Malachi"
+        ],
+        "question": "Name the 12 books of the minor prophets in order",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "Hosea, Joel, Amos, Obadiah, Jonah, Micah, Nahum, Habakkuk, Zephaniah, Haggai, Zechariah, Malachi",
+        "aliases": []
+      },
+      {
+        "id": 1787953807795,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 14,
+        "verse": 12,
+        "question": "Where is this verse?\n\nAnd this shall be the plague with which the LORD will strike all the people who fought against Jerusalem: Their flesh shall dissolve while they stand on their feet, Their eyes shall dissolve in their sockets, And their tongues shall dissolve in their mouths.",
+        "alternateQuestion": "",
+        "type": "reference",
+        "pairs": [],
+        "displayAnswer": "Zechariah 14:12",
+        "aliases": []
+      },
+      {
+        "id": 1787968305077,
+        "scope": "all-books",
+        "book": "Haggai",
+        "books": [
+          "Haggai",
+          "Zechariah",
+          "Malachi"
+        ],
+        "question": "How long was the Babylonian captivity?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "70 years",
+        "aliases": []
+      },
+      {
+        "id": 1787971533959,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 12,
+        "verse": 10,
+        "question": "What verse is this?\n\n“And I will pour on the house of David and on the inhabitants of Jerusalem the Spirit of grace and supplication; then they will look on Me whom they pierced. Yes, they will mourn for Him as one mourns for his only son, and grieve for Him as one grieves for a firstborn.",
+        "alternateQuestion": "",
+        "type": "reference",
+        "pairs": [],
+        "displayAnswer": "Zechariah 12:10",
+        "aliases": []
+      },
+      {
+        "id": 1788144217291,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 10,
+        "verse": 4,
+        "question": "What verse is this?\n\nFrom him comes the cornerstone, From him the tent peg, From him the battle bow, From him every ruler together.",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "Zechariah 10:4",
+        "aliases": []
+      },
+      {
+        "id": 1788145017377,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 8,
+        "verse": 3,
+        "question": "Where is this verse?\n\n“Thus says the Lord: ‘I will return to Zion, And dwell in the midst of Jerusalem. Jerusalem shall be called the City of Truth, The Mountain of the Lord of hosts, The Holy Mountain.’",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "Zechariah 8:3",
+        "aliases": []
+      },
+      {
+        "id": 1788146378733,
+        "scope": "chapter",
+        "book": "Malachi",
+        "chapter": 1,
+        "question": "Match the following:",
+        "alternateQuestion": "",
+        "type": "matching",
+        "pairs": [
+          {
+            "prompt": "Malachi 1:8",
+            "answer": "blind, lame, sick",
+            "answers": [
+              "blind, lame, sick"
+            ]
+          },
+          {
+            "prompt": "Malachi 1:13",
+            "answer": "stolen, lame, sick",
+            "answers": [
+              "stolen, lame, sick"
+            ]
+          }
+        ],
+        "displayAnswer": "Malachi 1:8: blind, lame, sick; Malachi 1:13: stolen, lame, sick",
+        "aliases": []
+      },
+      {
+        "id": 1788146755810,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 9,
+        "verse": 13,
+        "question": "According to Zechariah 9:13, which nation does the LORD say He will raise up Zion’s sons against?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "Greece",
+        "aliases": []
+      },
+      {
+        "id": 1788146916838,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 4,
+        "verse": 1,
+        "question": "According to Malachi 4:1, what two things would the coming day leave the wicked without?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "root, branch",
+        "aliases": []
+      },
+      {
+        "id": 1788147677902,
+        "scope": "verse",
+        "book": "Haggai",
+        "chapter": 2,
+        "verse": 7,
+        "question": "What verse is this?\n\nand I will shake all nations, and they shall come to the Desire of All Nations, and I will fill this temple with glory,’ says the Lord of hosts.",
+        "alternateQuestion": "",
+        "type": "reference",
+        "pairs": [],
+        "displayAnswer": "Haggai 2:7",
+        "aliases": []
+      },
+      {
+        "id": 1788147783229,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 7,
+        "question": "According to Malachi 2:7, what should the lips of a priest preserve?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "knowledge",
+        "aliases": []
+      },
+      {
+        "id": 1788147803866,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 5,
+        "question": "According to Malachi 2:5, what two things did the LORD say His covenant with Levi was one of?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "life, peace",
+        "aliases": []
+      },
+      {
+        "id": 1788147928378,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 1,
+        "verse": 14,
+        "question": "According to Malachi 1:14, what title does the LORD give Himself when He says His name is to be feared among the nations?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "great king",
+        "aliases": []
+      },
+      {
+        "id": 1788148065854,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 2,
+        "verse": 6,
+        "question": "According to Malachi 2:6, Levi walked with the LORD in what two things?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "life, peace",
+        "aliases": []
+      },
+      {
+        "id": 1788148568849,
+        "scope": "verse",
+        "book": "Zechariah",
+        "chapter": 6,
+        "verse": 10,
+        "endVerse": 11,
+        "question": "According to Zechariah 6:10–11, what three men were instructed to provide silver and gold from which the crown was made?",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "Heldai, Tobijah, Jedaiah",
+        "aliases": []
+      },
+      {
+        "id": 1788148755935,
+        "scope": "verse",
+        "book": "Malachi",
+        "chapter": 1,
+        "verse": 11,
+        "question": "According to Malachi 1:11, from the rising of the sun even to its going down, what did the LORD say would be great among the Gentiles",
+        "alternateQuestion": "",
+        "type": "text",
+        "pairs": [],
+        "displayAnswer": "my name",
+        "aliases": []
       }
     ]
   },
@@ -1166,6 +3746,9 @@
     ],
     "1785714715257": [
       "2"
+    ],
+    "1785385567517": [
+      "24, 6, 2"
     ]
   }
 }

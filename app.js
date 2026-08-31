@@ -5,7 +5,8 @@ const QUESTION_MODE_KEY = "minor-prophets-recall-question-mode-v1";
 const QUESTION_WORDING_KEY = "minor-prophets-recall-question-wording-v1";
 const REFERENCE_DETAIL_KEY = "minor-prophets-recall-reference-detail-v1";
 const SELECTED_BOOKS_KEY = "minor-prophets-recall-selected-books-v1";
-const QUESTION_LIBRARY_ASSET = "question-library.json?v=20260812-1";
+const QUESTION_LIBRARY_ASSET = "question-library.json?v=20260831-1";
+const QUESTION_LIBRARY_VERSION = 2;
 const BOOK_ORDER = ["Haggai", "Zechariah", "Malachi"];
 const REFERENCE_DETAILS = ["book", "chapter", "verse"];
 
@@ -25,8 +26,76 @@ function emptyQuestionLibrary() {
   };
 }
 
+function blankCount(value) {
+  return (String(value || "").match(/_{3,}/g) || []).length;
+}
+
+function questionBlankCount(question) {
+  return Math.max(
+    blankCount(question?.question),
+    blankCount(question?.alternateQuestion),
+  );
+}
+
+function normalizedBlankAnswers(answers) {
+  if (!Array.isArray(answers)) return [];
+  return answers.map(String).map((answer) => answer.trim()).filter(Boolean);
+}
+
+function deriveLegacyBlankAnswers(question, count) {
+  if (!count) return [];
+  const explicit = normalizedBlankAnswers(question?.blankAnswers);
+  if (explicit.length === count) return explicit;
+
+  const displayAnswer = String(question?.displayAnswer || "").trim();
+  const commaSeparated = displayAnswer
+    .split(/\s*,\s*/)
+    .map((answer) => answer.trim())
+    .filter(Boolean);
+  if (commaSeparated.length === count) return commaSeparated;
+
+  if (count === 2 && commaSeparated.length === 1) {
+    const joinedPair = displayAnswer
+      .split(/\s+and\s+/i)
+      .map((answer) => answer.trim())
+      .filter(Boolean);
+    if (joinedPair.length === count) return joinedPair;
+  }
+  return [];
+}
+
+function migrateStoredQuestion(question, libraryVersion) {
+  if (!question || typeof question !== "object" || libraryVersion !== 1) {
+    return question;
+  }
+  if (["matching", "reference", "fill-blank"].includes(question.type)) {
+    return question;
+  }
+
+  const count = questionBlankCount(question);
+  const blankAnswers = deriveLegacyBlankAnswers(question, count);
+  return count && blankAnswers.length === count
+    ? {
+        ...question,
+        type: "fill-blank",
+        blankAnswers,
+        displayAnswer: blankAnswers.join(", "),
+      }
+    : question;
+}
+
 function normalizedQuestionLibrary(saved) {
-  if (!saved || saved.version !== 1) return null;
+  if (!saved || ![1, QUESTION_LIBRARY_VERSION].includes(saved.version)) {
+    return null;
+  }
+  const migrateQuestion = (question) =>
+    migrateStoredQuestion(question, saved.version);
+  const migrateEdits = (edits) =>
+    Object.fromEntries(
+      Object.entries(edits && typeof edits === "object" ? edits : {}).map(
+        ([id, question]) => [id, migrateQuestion(question)],
+      ),
+    );
   const legacyMemorizationVerses = Array.isArray(saved.memorizationVerses)
     ? [...new Set(saved.memorizationVerses.map(String).filter(Boolean))]
     : [];
@@ -36,12 +105,8 @@ function normalizedQuestionLibrary(saved) {
       ? saved.memorizationVersesByDetail
       : {};
   return {
-    edits:
-      saved.edits && typeof saved.edits === "object" ? saved.edits : {},
-    fillEdits:
-      saved.fillEdits && typeof saved.fillEdits === "object"
-        ? saved.fillEdits
-        : {},
+    edits: migrateEdits(saved.edits),
+    fillEdits: migrateEdits(saved.fillEdits),
     removedStudy: Array.isArray(saved.removedStudy)
       ? saved.removedStudy.map(Number)
       : [],
@@ -59,7 +124,9 @@ function normalizedQuestionLibrary(saved) {
         return [detail, [...new Set(verses.map(String).filter(Boolean))]];
       }),
     ),
-    custom: Array.isArray(saved.custom) ? saved.custom : [],
+    custom: Array.isArray(saved.custom)
+      ? saved.custom.map(migrateQuestion)
+      : [],
   };
 }
 
@@ -172,17 +239,33 @@ function isReferenceQuestion(question) {
   return question?.type === "reference";
 }
 
+function isFillBlankQuestion(question) {
+  return (
+    question?.type === "fill-blank" &&
+    question.blankAnswers?.length === questionBlankCount(question)
+  );
+}
+
 function hydrateQuestion(question, id) {
   const matchingPairs = normalizedMatchingPairs(question.pairs);
+  const blankAnswers = deriveLegacyBlankAnswers(
+    question,
+    questionBlankCount(question),
+  );
   const type =
     question.type === "matching" && matchingPairs.length >= 2
       ? "matching"
       : question.type === "reference"
         ? "reference"
+        : question.type === "fill-blank" &&
+            blankAnswers.length === questionBlankCount(question)
+          ? "fill-blank"
         : "text";
   const displayAnswer =
     type === "matching"
       ? matchingAnswerSummary(matchingPairs)
+      : type === "fill-blank"
+        ? blankAnswers.join(", ")
       : String(question.displayAnswer || "").trim();
   const scope =
     question.scope ||
@@ -214,6 +297,7 @@ function hydrateQuestion(question, id) {
     alternateQuestion: String(question.alternateQuestion || "").trim(),
     type,
     pairs: type === "matching" ? matchingPairs : [],
+    blankAnswers: type === "fill-blank" ? blankAnswers : [],
     displayAnswer,
     aliases: aliases.map(String).map((answer) => answer.trim()).filter(Boolean),
   };
@@ -258,8 +342,12 @@ function buildStudyQuestionBank() {
     ...expandedQuestionBank
       .map((question, index) => {
         const id = index + 1;
+        const stored = {
+          ...question,
+          ...(questionLibrary.edits[id] || {}),
+        };
         return hydrateQuestion(
-          { ...question, ...(questionLibrary.edits[id] || {}) },
+          migrateStoredQuestion(stored, 1),
           id,
         );
       })
@@ -344,6 +432,7 @@ const elements = {
   bookAnswerInputs: document.querySelectorAll('input[name="book-answer"]'),
   matchingArea: document.querySelector("#matching-area"),
   matchingBoard: document.querySelector("#matching-board"),
+  fillBlankAnswerArea: document.querySelector("#fill-blank-answer-area"),
   feedback: document.querySelector("#feedback"),
   markCorrectButton: document.querySelector("#mark-correct-button"),
   acceptAnswerButton: document.querySelector("#accept-answer-button"),
@@ -422,6 +511,12 @@ const elements = {
   matchingPairField: document.querySelector("#matching-pair-field"),
   matchingPairEditor: document.querySelector("#matching-pair-editor"),
   addPairButton: document.querySelector("#add-pair-button"),
+  fillBlankAnswerField: document.querySelector(
+    "#fill-blank-answer-field",
+  ),
+  fillBlankAnswerEditor: document.querySelector(
+    "#fill-blank-answer-editor",
+  ),
   toast: document.querySelector("#toast"),
 };
 
@@ -579,6 +674,11 @@ function usesBookAnswerChoices() {
 }
 
 function selectedAnswerValue() {
+  if (usesInlineBlankInputs()) {
+    return inlineBlankInputs()
+      .map((input) => input.value.trim())
+      .join(", ");
+  }
   if (!usesBookAnswerChoices()) return elements.answerInput.value.trim();
   return (
     [...elements.bookAnswerInputs].find((input) => input.checked)?.value || ""
@@ -589,6 +689,17 @@ function displayedQuestion(question) {
   return state.questionWording === "alternate" && question.alternateQuestion
     ? question.alternateQuestion
     : question.question;
+}
+
+function usesInlineBlankInputs(question = currentQuestion()) {
+  return (
+    isFillBlankQuestion(question) &&
+    blankCount(displayedQuestion(question)) === question.blankAnswers.length
+  );
+}
+
+function inlineBlankInputs() {
+  return [...elements.questionText.querySelectorAll(".inline-blank-input")];
 }
 
 function concealsQuestionReference(question = currentQuestion()) {
@@ -790,18 +901,67 @@ function populateMatchingPairEditor(pairs = []) {
   initialPairs.forEach(addMatchingPairEditorRow);
 }
 
+function readFillBlankAnswerEditor() {
+  return [
+    ...elements.fillBlankAnswerEditor.querySelectorAll(
+      ".fill-blank-editor-answer",
+    ),
+  ].map((input) => input.value.trim());
+}
+
+function syncFillBlankAnswerEditor(initialAnswers = null) {
+  const previousAnswers =
+    initialAnswers || readFillBlankAnswerEditor();
+  const count = Math.max(
+    blankCount(elements.questionPrompt.value),
+    blankCount(elements.alternateQuestionPrompt.value),
+  );
+  elements.fillBlankAnswerEditor.replaceChildren(
+    ...Array.from({ length: count }, (_, index) => {
+      const label = document.createElement("label");
+      const caption = document.createElement("span");
+      const input = document.createElement("input");
+      caption.textContent = `Blank ${index + 1}`;
+      input.className = "fill-blank-editor-answer";
+      input.type = "text";
+      input.value = previousAnswers[index] || "";
+      input.required = elements.questionType.value === "fill-blank";
+      input.setAttribute("aria-label", `Official answer for blank ${index + 1}`);
+      label.append(caption, input);
+      return label;
+    }),
+  );
+}
+
 function setEditorQuestionType(type, lockType = false) {
   const questionType =
-    !lockType && ["matching", "reference"].includes(type) ? type : "text";
+    !lockType &&
+    ["fill-blank", "matching", "reference"].includes(type)
+      ? type
+      : "text";
   const matching = questionType === "matching";
+  const fillBlank = questionType === "fill-blank";
   elements.questionType.value = questionType;
   elements.questionType.disabled = lockType;
   elements.questionTypeField.hidden = lockType;
-  elements.questionTextAnswerFields.hidden = matching;
+  elements.questionTextAnswerFields.hidden = matching || fillBlank;
   elements.matchingPairField.hidden = !matching;
-  elements.questionAnswer.required = !matching;
+  elements.fillBlankAnswerField.hidden = !fillBlank;
+  elements.questionAnswer.required = !matching && !fillBlank;
   elements.matchingPairEditor.querySelectorAll("input").forEach((input) => {
     input.required = matching;
+  });
+  if (!lockType) {
+    elements.questionPromptLabel.textContent = fillBlank
+      ? "Question with blanks"
+      : "Preferred question";
+    elements.questionPrompt.placeholder = fillBlank
+      ? "The Lord is my ________."
+      : "";
+  }
+  if (fillBlank) syncFillBlankAnswerEditor();
+  elements.fillBlankAnswerEditor.querySelectorAll("input").forEach((input) => {
+    input.required = fillBlank;
   });
 }
 
@@ -849,8 +1009,13 @@ function openQuestionEditor(question = null) {
     ? "matching"
     : isReferenceQuestion(question)
       ? "reference"
+      : isFillBlankQuestion(question)
+        ? "fill-blank"
       : "text";
   populateMatchingPairEditor(isMatchingQuestion(question) ? question.pairs : []);
+  syncFillBlankAnswerEditor(
+    isFillBlankQuestion(question) ? question.blankAnswers : [],
+  );
   setEditorQuestionType(
     elements.questionType.value,
     isGeneratedVerseQuestion,
@@ -870,6 +1035,7 @@ function closeQuestionEditor() {
   elements.questionDialogBackdrop.hidden = true;
   document.body.classList.remove("editor-open");
   elements.matchingPairEditor.replaceChildren();
+  elements.fillBlankAnswerEditor.replaceChildren();
   state.editingQuestionId = null;
 }
 
@@ -878,6 +1044,8 @@ function questionFieldsFromEditor() {
   const endVerse = Number(elements.questionEndVerse.value);
   const type = elements.questionType.value;
   const pairs = type === "matching" ? readMatchingPairEditor() : [];
+  const blankAnswers =
+    type === "fill-blank" ? readFillBlankAnswerEditor() : [];
   return {
     scope,
     book: scope === "all-books" ? BOOK_ORDER[0] : elements.questionBook.value,
@@ -893,9 +1061,12 @@ function questionFieldsFromEditor() {
     alternateQuestion: elements.alternateQuestionPrompt.value.trim(),
     type,
     pairs,
+    blankAnswers,
     displayAnswer:
       type === "matching"
         ? matchingAnswerSummary(pairs)
+        : type === "fill-blank"
+          ? blankAnswers.join(", ")
         : elements.questionAnswer.value.trim(),
     aliases:
       type === "matching"
@@ -920,6 +1091,7 @@ function storedQuestion(question) {
     alternateQuestion: question.alternateQuestion,
     type: question.type,
     pairs: question.pairs,
+    blankAnswers: question.blankAnswers,
     displayAnswer: question.displayAnswer,
     aliases: question.aliases,
   };
@@ -929,7 +1101,7 @@ function saveQuestionLibrary() {
   try {
     localStorage.setItem(
       QUESTION_LIBRARY_KEY,
-      JSON.stringify({ version: 1, ...questionLibrary }),
+      JSON.stringify({ version: QUESTION_LIBRARY_VERSION, ...questionLibrary }),
     );
     return true;
   } catch {
@@ -959,7 +1131,10 @@ function exportQuestions() {
     format: "golden-bell-question-export",
     version: 1,
     exportedAt: new Date().toISOString(),
-    questionLibrary: { version: 1, ...questionLibrary },
+    questionLibrary: {
+      version: QUESTION_LIBRARY_VERSION,
+      ...questionLibrary,
+    },
     acceptedAnswers,
   };
   const date = exported.exportedAt.slice(0, 10);
@@ -1059,6 +1234,27 @@ function handleQuestionSave(event) {
     );
     if (new Set(normalizedAnswers).size !== normalizedAnswers.length) {
       showToast("Each match must have a distinct answer.");
+      return;
+    }
+  }
+  if (fields.type === "fill-blank") {
+    const counts = [
+      blankCount(fields.question),
+      blankCount(fields.alternateQuestion),
+    ].filter(Boolean);
+    if (!counts.length) {
+      showToast("Add at least one underscore blank to the question.");
+      elements.questionPrompt.focus();
+      return;
+    }
+    if (
+      counts.some((count) => count !== fields.blankAnswers.length) ||
+      fields.blankAnswers.some((answer) => !answer)
+    ) {
+      showToast("Add one official answer for every blank.");
+      elements.fillBlankAnswerEditor
+        .querySelector("input:invalid")
+        ?.focus();
       return;
     }
   }
@@ -1484,6 +1680,49 @@ function escapeHtml(value) {
   const node = document.createElement("div");
   node.textContent = value;
   return node.innerHTML;
+}
+
+function renderQuestionPrompt(question) {
+  const prompt = displayedQuestion(question);
+  if (!usesInlineBlankInputs(question)) {
+    elements.questionText.textContent = prompt;
+    return;
+  }
+
+  const parts = prompt.split(/(_{3,})/g);
+  let blankIndex = 0;
+  elements.questionText.replaceChildren(
+    ...parts.map((part) => {
+      if (!/^_{3,}$/.test(part)) return document.createTextNode(part);
+
+      const input = document.createElement("input");
+      const inputNumber = blankIndex + 1;
+      input.className = "inline-blank-input";
+      input.type = "text";
+      input.name = `blank-${inputNumber}`;
+      input.dataset.blankIndex = String(blankIndex);
+      input.setAttribute("form", "answer-form");
+      input.setAttribute(
+        "aria-label",
+        `Blank ${inputNumber} of ${question.blankAnswers.length}`,
+      );
+      input.setAttribute("autocomplete", "off");
+      input.setAttribute("autocapitalize", "sentences");
+      input.setAttribute("spellcheck", "false");
+      input.required = true;
+      const answerLength = question.blankAnswers[blankIndex]?.length || 0;
+      input.size = Math.max(
+        7,
+        Math.min(
+          40,
+          Math.max(answerLength + 1, Math.ceil(part.length / 1.5)),
+        ),
+      );
+      if (answerLength > 24) input.classList.add("is-long");
+      blankIndex += 1;
+      return input;
+    }),
+  );
 }
 
 function createMatchingState(question) {
@@ -2034,8 +2273,14 @@ function populateQuestionSelect() {
 
 function clearFeedback() {
   const matching = isMatchingQuestion(currentQuestion());
-  const showBookChoices = !matching && usesBookAnswerChoices();
-  elements.quizView.dataset.answerType = matching ? "matching" : "text";
+  const inlineBlank = usesInlineBlankInputs();
+  const showBookChoices =
+    !matching && !inlineBlank && usesBookAnswerChoices();
+  elements.quizView.dataset.answerType = matching
+    ? "matching"
+    : inlineBlank
+      ? "fill-blank"
+      : "text";
   state.pendingRejectedAnswer = "";
   state.advancing = false;
   elements.feedback.hidden = true;
@@ -2046,17 +2291,25 @@ function clearFeedback() {
   elements.nextButton.hidden = true;
   elements.answerInput.hidden = showBookChoices;
   elements.answerInput.disabled = showBookChoices;
-  elements.answerInput.required = !showBookChoices && !matching;
+  elements.answerInput.required =
+    !showBookChoices && !matching && !inlineBlank;
   elements.answerInput.value = "";
   elements.answerInput.removeAttribute("aria-invalid");
+  inlineBlankInputs().forEach((input) => {
+    input.value = "";
+    input.disabled = false;
+    input.required = true;
+    input.removeAttribute("aria-invalid");
+  });
   elements.bookAnswerChoices.hidden = !showBookChoices;
   elements.bookAnswerChoices.removeAttribute("aria-invalid");
   elements.bookAnswerInputs.forEach((input) => {
     input.checked = false;
     input.disabled = !showBookChoices;
   });
-  elements.textAnswerArea.hidden = matching;
+  elements.textAnswerArea.hidden = matching || inlineBlank;
   elements.matchingArea.hidden = !matching;
+  elements.fillBlankAnswerArea.hidden = !inlineBlank;
   elements.answerNote.hidden = showBookChoices;
   elements.answerLabel.textContent =
     state.questionMode === "fill" ? referenceDetailLabel() : "Your answer";
@@ -2161,6 +2414,10 @@ function showCorrectFeedback(question, heading = "Correct.") {
   state.advancing = true;
   elements.answerInput.disabled = true;
   elements.answerInput.removeAttribute("aria-invalid");
+  inlineBlankInputs().forEach((input) => {
+    input.disabled = true;
+    input.removeAttribute("aria-invalid");
+  });
   elements.bookAnswerChoices.removeAttribute("aria-invalid");
   elements.bookAnswerInputs.forEach((input) => {
     input.disabled = true;
@@ -2218,7 +2475,7 @@ function renderQuestion() {
         : question.source;
   elements.openReaderButton.hidden = concealReference;
   if (concealReference && state.readerOpen) closeReader();
-  elements.questionText.textContent = displayedQuestion(question);
+  renderQuestionPrompt(question);
   elements.questionSelect.value = String(question.id);
   matchingState = isMatchingQuestion(question)
     ? createMatchingState(question)
@@ -2238,6 +2495,8 @@ function renderQuestion() {
     requestAnimationFrame(() => {
       if (matchingState) {
         elements.matchingBoard.querySelector(".match-option")?.focus();
+      } else if (usesInlineBlankInputs()) {
+        inlineBlankInputs()[0]?.focus();
       } else if (usesBookAnswerChoices()) {
         elements.bookAnswerInputs[0]?.focus();
       } else {
@@ -2384,13 +2643,28 @@ function handleSubmit(event) {
   }
 
   state.pendingRejectedAnswer = value;
-  elements.answerInput.value = "";
-  elements.answerInput.setAttribute("aria-invalid", "true");
-  elements.bookAnswerInputs.forEach((input) => {
-    input.checked = false;
-  });
-  elements.bookAnswerChoices.setAttribute("aria-invalid", "true");
-  elements.answerLabel.textContent = "Try the same question again";
+  const inlineBlank = usesInlineBlankInputs(question);
+  if (inlineBlank) {
+    inlineBlankInputs().forEach((input, index) => {
+      const correct =
+        normalizeAnswer(input.value) ===
+        normalizeAnswer(question.blankAnswers[index]);
+      if (correct) {
+        input.removeAttribute("aria-invalid");
+      } else {
+        input.setAttribute("aria-invalid", "true");
+        input.value = "";
+      }
+    });
+  } else {
+    elements.answerInput.value = "";
+    elements.answerInput.setAttribute("aria-invalid", "true");
+    elements.bookAnswerInputs.forEach((input) => {
+      input.checked = false;
+    });
+    elements.bookAnswerChoices.setAttribute("aria-invalid", "true");
+    elements.answerLabel.textContent = "Try the same question again";
+  }
   elements.feedback.className = "feedback wrong";
   elements.feedback.hidden = false;
   elements.feedback.innerHTML = `
@@ -2407,8 +2681,14 @@ function handleSubmit(event) {
   updateQuestionStatus(question);
   updateStats();
   saveSession();
-  if (usesBookAnswerChoices()) elements.bookAnswerInputs[0]?.focus();
-  else elements.answerInput.focus();
+  if (inlineBlank) {
+    inlineBlankInputs().find((input) => input.hasAttribute("aria-invalid"))
+      ?.focus();
+  } else if (usesBookAnswerChoices()) {
+    elements.bookAnswerInputs[0]?.focus();
+  } else {
+    elements.answerInput.focus();
+  }
 }
 
 function markCurrentCorrect(acceptPermanently) {
@@ -2705,6 +2985,9 @@ elements.answerForm.addEventListener("submit", handleSubmit);
 elements.answerInput.addEventListener("input", () => {
   elements.answerInput.removeAttribute("aria-invalid");
 });
+elements.questionText.addEventListener("input", (event) => {
+  event.target.closest(".inline-blank-input")?.removeAttribute("aria-invalid");
+});
 elements.bookAnswerInputs.forEach((input) => {
   input.addEventListener("change", () => {
     elements.bookAnswerChoices.removeAttribute("aria-invalid");
@@ -2773,6 +3056,16 @@ elements.deleteQuestionButton.addEventListener("click", deleteCurrentQuestion);
 elements.questionForm.addEventListener("submit", handleQuestionSave);
 elements.questionType.addEventListener("change", () => {
   setEditorQuestionType(elements.questionType.value);
+});
+elements.questionPrompt.addEventListener("input", () => {
+  if (elements.questionType.value === "fill-blank") {
+    syncFillBlankAnswerEditor();
+  }
+});
+elements.alternateQuestionPrompt.addEventListener("input", () => {
+  if (elements.questionType.value === "fill-blank") {
+    syncFillBlankAnswerEditor();
+  }
 });
 elements.addPairButton.addEventListener("click", () => {
   addMatchingPairEditorRow();
