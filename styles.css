@@ -616,7 +616,7 @@ main {
   margin: 0 0.08em;
   padding: 0 0.14em 0.02em;
   vertical-align: -0.08em;
-  color: var(--ink);
+  color: #175cd3;
   background: rgba(255, 255, 255, 0.72);
   border: 0;
   border-bottom: 2px solid var(--teal);
