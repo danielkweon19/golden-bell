@@ -3222,6 +3222,19 @@ elements.readerChapterSelect.addEventListener("change", (event) => {
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && state.readerOpen) closeReader();
 
+  const shortcutIndex = {
+    "1": 0,
+    "2": 1,
+    "3": 2,
+    Numpad1: 0,
+    Numpad2: 1,
+    Numpad3: 2,
+  }[event.code] ?? {
+    "1": 0,
+    "2": 1,
+    "3": 2,
+  }[event.key];
+
   if (
     state.advancing ||
     !usesBookAnswerChoices() ||
@@ -3229,16 +3242,15 @@ document.addEventListener("keydown", (event) => {
     event.ctrlKey ||
     event.metaKey ||
     event.altKey ||
-    !["1", "2", "3"].includes(event.key)
+    shortcutIndex === undefined
   ) {
     return;
   }
 
-  const choice = elements.bookAnswerInputs[Number(event.key) - 1];
+  const choice = elements.bookAnswerInputs[shortcutIndex];
   if (!choice || choice.disabled) return;
   event.preventDefault();
-  choice.checked = true;
-  choice.dispatchEvent(new Event("change", { bubbles: true }));
+  choice.click();
   choice.focus();
 });
 window.addEventListener("resize", () => {
