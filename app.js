@@ -3221,6 +3221,25 @@ elements.readerChapterSelect.addEventListener("change", (event) => {
 });
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && state.readerOpen) closeReader();
+
+  if (
+    state.advancing ||
+    !usesBookAnswerChoices() ||
+    elements.bookAnswerChoices.hidden ||
+    event.ctrlKey ||
+    event.metaKey ||
+    event.altKey ||
+    !["1", "2", "3"].includes(event.key)
+  ) {
+    return;
+  }
+
+  const choice = elements.bookAnswerInputs[Number(event.key) - 1];
+  if (!choice || choice.disabled) return;
+  event.preventDefault();
+  choice.checked = true;
+  choice.dispatchEvent(new Event("change", { bubbles: true }));
+  choice.focus();
 });
 window.addEventListener("resize", () => {
   if (state.readerOpen) updateReaderLayout();
